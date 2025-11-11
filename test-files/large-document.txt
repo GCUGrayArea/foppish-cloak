@@ -1,0 +1,6 @@
+EXTENDED MEDICAL INCIDENT REPORT - DETAILED DOCUMENTATION
+
+This is a large test document created for testing file upload functionality.
+The document simulates a comprehensive legal case file.
+
+(Content abbreviated for file creation - see actual file for full content)
