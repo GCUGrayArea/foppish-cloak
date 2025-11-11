@@ -8,9 +8,9 @@ This file tracks which agent identities are currently in use. Agents must claim 
 
 | Identity | Status | Last Commit | Current PR |
 |----------|--------|-------------|------------|
-| White    | Available | 2025-11-11 | PR-001 (Complete) |
-| Orange   | Available | 2025-11-11 | PR-002 & PR-003 (Planned) |
-| Blonde   | Available | - | - |
+| White    | In Use | 2025-11-11 | PR-002 (Database Schema) |
+| Orange   | In Use | 2025-11-11 | PR-003 (AWS Infrastructure) |
+| Blonde   | In Use | 2025-11-11 | PR-004 & PR-005 (Planning Block 2) |
 | Pink     | Available | - | - |
 | Blue     | Available | - | - |
 | Brown    | Available | - | - |
