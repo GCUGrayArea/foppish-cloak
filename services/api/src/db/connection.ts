@@ -1,4 +1,8 @@
 import { Pool, PoolClient, PoolConfig, QueryResult } from 'pg';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // Database connection configuration
 const poolConfig: PoolConfig = {
