@@ -56,7 +56,7 @@ This establishes the foundation for all other work. Should include instructions 
 ---
 
 ### PR-002: PostgreSQL Database Schema and Migrations
-**Status:** New
+**Status:** Blocked-Ready
 **Dependencies:** PR-001 (needs directory structure and package.json files)
 **Priority:** High
 
@@ -65,42 +65,189 @@ Design and implement database schema for users, firms, templates, documents, and
 
 **Coordination Notes:**
 - Requires `services/api/src/` and `services/ai-processor/src/` directories from PR-001
-- Will modify `package.json` and `requirements.txt` to add database dependencies
+- Will modify `services/api/package.json` and `services/ai-processor/requirements.txt` to add database dependencies
 - Can run in parallel with PR-003 after PR-001 completes
+- **File coordination with PR-003:** PR-002 will modify .env.example to add database variables after PR-003 creates it
 
-**Files (ESTIMATED - will be refined during Planning):**
+**Files (VERIFIED during Planning):**
 - services/database/migrations/001_initial_schema.sql (create)
-- services/database/schema.sql (create) - complete schema definition
-- services/api/src/db/connection.ts (create) - Node DB connection
-- services/api/src/db/models/ (create directory) - TypeScript models
-- services/api/src/db/models/User.ts (create)
-- services/api/src/db/models/Firm.ts (create)
-- services/api/src/db/models/Template.ts (create)
-- services/api/src/db/models/Document.ts (create)
-- services/api/src/db/models/DemandLetter.ts (create)
+- services/database/migrations/.migrate (create) - migration tracking file
+- services/database/schema.sql (create) - complete schema for reference
+- services/api/src/db/connection.ts (create) - Node DB connection with pooling
+- services/api/src/db/migrate.ts (create) - Migration runner
+- services/api/src/db/models/index.ts (create) - Export all models
+- services/api/src/db/models/Firm.ts (create) - Firm model
+- services/api/src/db/models/User.ts (create) - User model
+- services/api/src/db/models/Template.ts (create) - Template model
+- services/api/src/db/models/TemplateVersion.ts (create) - Template versioning
+- services/api/src/db/models/Document.ts (create) - Document metadata model
+- services/api/src/db/models/DemandLetter.ts (create) - Demand letter model
+- services/api/src/db/models/LetterRevision.ts (create) - Letter revision history
+- services/api/src/db/types.ts (create) - Shared database types
 - services/ai-processor/src/db/connection.py (create) - Python DB connection
-- services/ai-processor/src/models/ (create directory) - Python models
-- docker-compose.yml (create) - local PostgreSQL for development
+- services/ai-processor/src/models/__init__.py (create)
+- services/ai-processor/src/models/base.py (create) - Base model class
+- services/ai-processor/src/models/document.py (create) - Document model
+- services/ai-processor/src/models/letter.py (create) - Letter model
+- docker-compose.yml (create) - local PostgreSQL + pgAdmin for development
+- .env.example (modify) - Add database connection variables
+- services/api/package.json (modify) - Add pg, node-pg-migrate dependencies
+- services/ai-processor/requirements.txt (modify) - Add psycopg2-binary, sqlalchemy
 
 **Acceptance Criteria:**
 - [ ] Schema supports multi-tenant architecture (firm-level data isolation)
-- [ ] User authentication data (hashed passwords, sessions)
+- [ ] User authentication data (hashed passwords, refresh tokens)
 - [ ] Template management with version history
 - [ ] Document storage references (S3 paths/metadata)
 - [ ] Demand letter drafts with revision tracking
 - [ ] Foreign key constraints and indexes defined
-- [ ] Migration system configured (e.g., node-pg-migrate or Flyway)
+- [ ] Migration system configured (node-pg-migrate)
 - [ ] Connection pooling configured for both Node and Python
 - [ ] TypeScript and Python models with full type definitions
 - [ ] Database can run locally via Docker Compose
+- [ ] Seed data script for development (optional but helpful)
 
 **Notes:**
 Critical foundation for all data persistence. Schema should support future real-time collaboration (document locking, change tracking).
 
 ---
 
+## Planning Notes: PR-002 (Database Schema)
+
+**Technology Decisions:**
+- **Migration Tool:** node-pg-migrate (chosen for TypeScript support, Node.js native)
+- **Node.js Database Client:** pg (node-postgres) with pg-pool for connection pooling
+- **Python Database Client:** psycopg2-binary with SQLAlchemy for ORM
+- **TypeScript Models:** Plain classes with type definitions (not using ORM yet - can add later if needed)
+- **Python Models:** SQLAlchemy declarative models
+
+**Database Schema Design:**
+
+**Core Tables:**
+1. `firms` (Multi-tenant root)
+   - id (UUID, PK)
+   - name (VARCHAR)
+   - settings (JSONB) - firm-level configuration
+   - created_at, updated_at (TIMESTAMP)
+
+2. `users` (Belongs to firm)
+   - id (UUID, PK)
+   - firm_id (UUID, FK → firms.id)
+   - email (VARCHAR, UNIQUE per firm)
+   - password_hash (VARCHAR)
+   - role (ENUM: admin, attorney, paralegal)
+   - first_name, last_name (VARCHAR)
+   - is_active (BOOLEAN)
+   - created_at, updated_at (TIMESTAMP)
+   - Indexes: (firm_id, email), (firm_id, role)
+
+3. `refresh_tokens` (Session management)
+   - id (UUID, PK)
+   - user_id (UUID, FK → users.id)
+   - token_hash (VARCHAR)
+   - expires_at (TIMESTAMP)
+   - created_at (TIMESTAMP)
+   - Indexes: (user_id), (token_hash)
+
+4. `templates` (Firm-specific templates)
+   - id (UUID, PK)
+   - firm_id (UUID, FK → firms.id)
+   - name (VARCHAR)
+   - description (TEXT)
+   - current_version_id (UUID, FK → template_versions.id)
+   - is_default (BOOLEAN)
+   - created_by (UUID, FK → users.id)
+   - created_at, updated_at (TIMESTAMP)
+   - Indexes: (firm_id, is_default), (firm_id, name)
+
+5. `template_versions` (Version history)
+   - id (UUID, PK)
+   - template_id (UUID, FK → templates.id)
+   - version_number (INTEGER)
+   - content (TEXT) - template with {{variables}}
+   - variables (JSONB) - list of required variables
+   - created_by (UUID, FK → users.id)
+   - created_at (TIMESTAMP)
+   - Indexes: (template_id, version_number)
+   - Unique: (template_id, version_number)
+
+6. `documents` (Source documents)
+   - id (UUID, PK)
+   - firm_id (UUID, FK → firms.id)
+   - uploaded_by (UUID, FK → users.id)
+   - filename (VARCHAR)
+   - file_type (VARCHAR) - PDF, DOCX, etc.
+   - file_size (BIGINT) - bytes
+   - s3_bucket (VARCHAR)
+   - s3_key (VARCHAR)
+   - virus_scan_status (ENUM: pending, clean, infected)
+   - virus_scan_date (TIMESTAMP)
+   - metadata (JSONB) - extracted metadata
+   - created_at, updated_at (TIMESTAMP)
+   - Indexes: (firm_id, uploaded_by), (firm_id, created_at)
+
+7. `demand_letters` (Demand letter projects)
+   - id (UUID, PK)
+   - firm_id (UUID, FK → firms.id)
+   - created_by (UUID, FK → users.id)
+   - template_id (UUID, FK → templates.id, nullable)
+   - title (VARCHAR)
+   - status (ENUM: draft, analyzing, generating, refining, complete, archived)
+   - current_content (TEXT) - latest draft
+   - extracted_data (JSONB) - from document analysis
+   - generation_metadata (JSONB) - AI generation details
+   - created_at, updated_at (TIMESTAMP)
+   - Indexes: (firm_id, created_by), (firm_id, status), (firm_id, created_at)
+
+8. `letter_revisions` (Revision history)
+   - id (UUID, PK)
+   - letter_id (UUID, FK → demand_letters.id)
+   - content (TEXT)
+   - revision_number (INTEGER)
+   - change_type (ENUM: initial, ai_generation, manual_edit, ai_refinement)
+   - changed_by (UUID, FK → users.id)
+   - change_notes (TEXT)
+   - created_at (TIMESTAMP)
+   - Indexes: (letter_id, revision_number)
+   - Unique: (letter_id, revision_number)
+
+9. `letter_documents` (Many-to-many: letters to source documents)
+   - id (UUID, PK)
+   - letter_id (UUID, FK → demand_letters.id)
+   - document_id (UUID, FK → documents.id)
+   - created_at (TIMESTAMP)
+   - Indexes: (letter_id), (document_id)
+   - Unique: (letter_id, document_id)
+
+**Migration Strategy:**
+- Single initial migration (001_initial_schema.sql) creates all tables
+- Use node-pg-migrate for migration management
+- Migrations run automatically on `npm run migrate`
+- CI/CD runs migrations before deployment
+
+**Connection Pooling:**
+- Node.js: pg-pool with max 10 connections
+- Python: SQLAlchemy with pool_size=5, max_overflow=10
+- Connection strings from environment variables (DATABASE_URL)
+
+**Time Breakdown:**
+- Schema design and migration file: 30 min
+- TypeScript models and connection: 30 min
+- Python models and connection: 20 min
+- Docker Compose setup: 15 min
+- Testing and documentation: 15 min
+- **Total: 110 minutes**
+
+**Risks/Challenges:**
+1. UUID generation: Use PostgreSQL `gen_random_uuid()` or application-level
+2. ENUM types: PostgreSQL native ENUMs vs. VARCHAR with constraints
+3. JSONB indexing: May need GIN indexes for JSONB columns if queried frequently
+4. Multi-tenant isolation: Must ensure ALL queries include firm_id filter
+
+---
+
 ### PR-003: AWS Infrastructure Setup (Terraform/CDK)
-**Status:** New
+**Status:** Blocked-Ready
 **Dependencies:** PR-001 (recommended but not strictly required)
 **Priority:** High
 
@@ -109,36 +256,238 @@ Define AWS infrastructure as code for Lambda functions, API Gateway, S3 buckets,
 
 **Coordination Notes:**
 - Can technically run independently, but benefits from knowing project structure from PR-001
-- Minor file overlap: `.env.example` (PR-003 should create/own this file)
 - Can run in parallel with PR-002 after PR-001 completes
+- **File coordination with PR-002:** PR-003 creates .env.example, PR-002 will modify it to add database-specific variables (commit PR-003 first or coordinate)
 
-**Files (ESTIMATED - will be refined during Planning):**
+**Files (VERIFIED during Planning):**
+- infrastructure/terraform.tfvars.example (create) - Example Terraform variables
 - infrastructure/main.tf (create) - Terraform main configuration
-- infrastructure/variables.tf (create) - environment variables
-- infrastructure/lambda.tf (create) - Lambda function definitions
-- infrastructure/api-gateway.tf (create) - API Gateway config
-- infrastructure/s3.tf (create) - S3 buckets for documents
+- infrastructure/variables.tf (create) - Input variable declarations
+- infrastructure/outputs.tf (create) - Output values for services
+- infrastructure/provider.tf (create) - AWS provider configuration
+- infrastructure/backend.tf (create) - Terraform state backend (S3)
+- infrastructure/vpc.tf (create) - VPC, subnets, NAT, security groups
 - infrastructure/rds.tf (create) - PostgreSQL RDS instance
-- infrastructure/vpc.tf (create) - VPC and networking
+- infrastructure/s3.tf (create) - S3 buckets for documents
 - infrastructure/iam.tf (create) - IAM roles and policies
+- infrastructure/lambda-api.tf (create) - API service Lambda function
+- infrastructure/lambda-ai.tf (create) - AI processor Lambda function
+- infrastructure/api-gateway.tf (create) - API Gateway REST API
+- infrastructure/api-gateway-websocket.tf (create) - WebSocket API (for collaboration)
+- infrastructure/secrets.tf (create) - AWS Secrets Manager
+- infrastructure/cloudwatch.tf (create) - Log groups and basic alarms
 - infrastructure/bedrock.tf (create) - Bedrock permissions
-- infrastructure/outputs.tf (create) - output values for services
-- .env.example (create) - environment variable template
+- infrastructure/environments/dev.tfvars (create) - Dev environment config
+- infrastructure/environments/prod.tfvars (create) - Prod environment config
+- scripts/deploy-infrastructure.sh (create) - Terraform deployment script
+- scripts/destroy-infrastructure.sh (create) - Terraform destroy script
+- .env.example (create) - Environment variable template for local dev
 
 **Acceptance Criteria:**
 - [ ] Infrastructure code defines all AWS resources
-- [ ] Separate dev and prod environments
-- [ ] S3 buckets for document storage with proper permissions
-- [ ] RDS PostgreSQL instance with security groups
-- [ ] Lambda execution roles with least-privilege IAM
-- [ ] Bedrock access policies configured
+- [ ] Separate dev and prod environments (via tfvars files)
+- [ ] S3 buckets for document storage with proper permissions and encryption
+- [ ] RDS PostgreSQL instance with security groups and private subnets
+- [ ] Lambda execution roles with least-privilege IAM policies
+- [ ] Bedrock access policies configured for AI Lambda
 - [ ] API Gateway with proper CORS configuration
-- [ ] VPC with private subnets for RDS
-- [ ] Infrastructure can be deployed via CI/CD
+- [ ] VPC with public and private subnets, NAT gateway
+- [ ] Secrets Manager for sensitive configuration
+- [ ] CloudWatch log groups for all Lambda functions
+- [ ] Infrastructure can be deployed via Terraform commands
 - [ ] .env.example documents all required environment variables
+- [ ] Deployment scripts automate Terraform apply/destroy
 
 **Notes:**
 Can be worked on in parallel with code. Developers can use local PostgreSQL (docker-compose) until AWS is ready.
+
+---
+
+## Planning Notes: PR-003 (AWS Infrastructure)
+
+**Technology Decisions:**
+- **IaC Tool:** Terraform (chosen over AWS CDK for broader compatibility and HCL simplicity)
+- **Terraform Version:** >= 1.5.0 (latest stable)
+- **State Backend:** S3 + DynamoDB for locking (to be created manually first or via bootstrap script)
+- **Environment Strategy:** Workspace-based (dev, prod) using separate tfvars files
+
+**AWS Resources to Provision:**
+
+**1. VPC and Networking:**
+- VPC with CIDR 10.0.0.0/16
+- Public subnets (2 AZs): 10.0.1.0/24, 10.0.2.0/24 (for NAT gateway)
+- Private subnets (2 AZs): 10.0.10.0/24, 10.0.11.0/24 (for RDS, Lambda)
+- Internet Gateway for public subnets
+- NAT Gateway in public subnets (for Lambda internet access)
+- Route tables for public and private subnets
+- Security groups:
+  - RDS security group (allow PostgreSQL from Lambda SG)
+  - Lambda security group (allow outbound to RDS and internet)
+  - ALB security group (if needed for API Gateway alternative)
+
+**2. RDS PostgreSQL:**
+- Engine: PostgreSQL 15.x
+- Instance class: db.t3.micro (dev), db.t3.small (prod)
+- Storage: 20GB GP3 (dev), 50GB GP3 (prod)
+- Multi-AZ: false (dev), true (prod)
+- Backup retention: 7 days (dev), 30 days (prod)
+- Encryption at rest: enabled
+- Security groups: private subnets only
+- Master credentials stored in AWS Secrets Manager
+- DB subnet group spanning private subnets
+
+**3. S3 Buckets:**
+- Documents bucket: `{project}-documents-{env}`
+  - Versioning enabled
+  - Encryption: S3-managed (SSE-S3)
+  - Lifecycle policy: transition to Glacier after 90 days
+  - CORS configuration for frontend uploads
+  - Block public access: enabled
+- Lambda deployment bucket: `{project}-lambda-deployments-{env}`
+  - For storing Lambda deployment packages
+- Terraform state bucket: `{project}-terraform-state` (manual creation)
+
+**4. Lambda Functions:**
+
+**API Service Lambda:**
+- Runtime: Node.js 18.x
+- Memory: 1024 MB (adjustable)
+- Timeout: 30 seconds
+- VPC: Yes (private subnets for RDS access)
+- Environment variables: DATABASE_URL, JWT_SECRET, etc.
+- IAM role: Execute role with RDS, S3, Secrets Manager, Bedrock invoke permissions
+- CloudWatch log group with 30-day retention
+
+**AI Processor Lambda:**
+- Runtime: Python 3.11
+- Memory: 2048 MB (adjustable, AI processing needs more)
+- Timeout: 300 seconds (5 minutes for long AI operations)
+- VPC: Yes (private subnets for RDS access)
+- Environment variables: DATABASE_URL, BEDROCK_MODEL_ID, etc.
+- IAM role: Execute role with Bedrock, S3, RDS, Secrets Manager permissions
+- CloudWatch log group with 30-day retention
+
+**5. API Gateway:**
+
+**REST API (Main API):**
+- Type: Regional
+- Endpoint: HTTPS only
+- CORS: Enabled for frontend domain
+- Authorization: None (handled by Lambda JWT middleware)
+- Lambda proxy integration to API Lambda
+- Routes: `/{proxy+}` (catch-all to Lambda)
+- Stages: dev, prod
+- Logging: Access logs to CloudWatch
+- Throttling: 10,000 requests per second (adjustable)
+
+**WebSocket API (Collaboration - P1):**
+- Type: Regional
+- Routes: $connect, $disconnect, $default
+- Lambda integration for connection management
+- Connection tracking: DynamoDB table (connections)
+- Authorization: JWT in query string on connect
+
+**6. IAM Roles and Policies:**
+
+**Lambda Execution Role (API Service):**
+- Trust policy: lambda.amazonaws.com
+- Policies:
+  - AWSLambdaVPCAccessExecutionRole (managed)
+  - Custom policy: RDS access, S3 read/write, Secrets Manager read, Bedrock invoke
+  - CloudWatch Logs write
+
+**Lambda Execution Role (AI Processor):**
+- Trust policy: lambda.amazonaws.com
+- Policies:
+  - AWSLambdaVPCAccessExecutionRole (managed)
+  - Custom policy: Bedrock full access, S3 read/write, RDS access, Secrets Manager read
+  - CloudWatch Logs write
+
+**API Gateway Execution Role:**
+- Trust policy: apigateway.amazonaws.com
+- Policies: Lambda invoke, CloudWatch logs
+
+**7. Secrets Manager:**
+- Secret: `{project}/database/master` (RDS master credentials)
+- Secret: `{project}/jwt/secret` (JWT signing key)
+- Secret: `{project}/api/keys` (API keys if needed)
+- Rotation: Disabled initially (can enable later)
+
+**8. CloudWatch:**
+- Log groups: `/aws/lambda/api-service-{env}`, `/aws/lambda/ai-processor-{env}`
+- Log retention: 30 days (dev), 90 days (prod)
+- Alarms:
+  - Lambda errors > 5 in 5 minutes
+  - API Gateway 5xx errors > 10 in 5 minutes
+  - RDS CPU > 80% for 10 minutes
+  - RDS storage < 20% free
+
+**9. Bedrock Access:**
+- IAM policy for Lambda to invoke Bedrock
+- Model: anthropic.claude-3-5-sonnet-20240620-v1:0
+- Region: us-east-1 (or us-west-2, depending on Bedrock availability)
+
+**Environment Variables (.env.example):**
+```
+# Database
+DATABASE_URL=postgresql://user:pass@localhost:5432/demand_letters
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=demand_letters
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+
+# AWS
+AWS_REGION=us-east-1
+AWS_ACCOUNT_ID=123456789012
+S3_BUCKET_DOCUMENTS=demand-letters-documents-dev
+S3_BUCKET_LAMBDA=demand-letters-lambda-dev
+
+# Bedrock
+BEDROCK_MODEL_ID=anthropic.claude-3-5-sonnet-20240620-v1:0
+BEDROCK_REGION=us-east-1
+
+# API
+JWT_SECRET=your-secret-key-here
+JWT_EXPIRES_IN=1h
+REFRESH_TOKEN_EXPIRES_IN=30d
+API_BASE_URL=http://localhost:3000
+
+# Frontend
+VITE_API_BASE_URL=http://localhost:3000
+VITE_WS_BASE_URL=ws://localhost:3001
+
+# Environment
+NODE_ENV=development
+LOG_LEVEL=debug
+```
+
+**Deployment Scripts:**
+- `scripts/deploy-infrastructure.sh`: Terraform init, plan, apply with environment selection
+- `scripts/destroy-infrastructure.sh`: Terraform destroy with confirmation
+
+**Time Breakdown:**
+- VPC and networking: 20 min
+- RDS configuration: 15 min
+- S3 buckets: 10 min
+- Lambda resource definitions: 20 min
+- API Gateway configuration: 20 min
+- IAM roles and policies: 20 min
+- Secrets Manager and CloudWatch: 15 min
+- .env.example and documentation: 10 min
+- Testing deployment (terraform plan): 10 min
+- **Total: 140 minutes**
+
+**Risks/Challenges:**
+1. **State Backend Bootstrap:** Need to manually create S3 bucket and DynamoDB table for Terraform state first
+2. **Bedrock Access:** May require AWS account approval or region selection (not all regions support Bedrock)
+3. **VPC NAT Costs:** NAT Gateway is expensive (~$30/month) - consider alternatives for dev
+4. **RDS Costs:** Even t3.micro is ~$15/month - ensure stopped when not in use (dev)
+5. **Lambda VPC Cold Starts:** VPC-attached Lambdas have slower cold starts - may need optimization
+
+**Dependencies on PR-001 Output:**
+- None strictly required, but knowing final service names helps
+- Can proceed independently and adjust Lambda names later
 
 ---
 

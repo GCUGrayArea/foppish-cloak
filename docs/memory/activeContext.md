@@ -8,23 +8,30 @@ This file tracks the current work focus, recent changes, next steps, and active 
 
 ## Current Project Phase
 
-**Phase:** Initial Planning
-**Status:** Planning documents generated, ready for implementation to begin
+**Phase:** Block 1 Planning Complete
+**Status:** PR-002 and PR-003 planned and ready for implementation after PR-001
 
 **Completed:**
 - PRD already exists in spec.md
 - Task list generated with 28 PRs across 11 dependency blocks
 - Memory bank created (this file and others)
 - .gitignore updated for Node.js, Python, React, AWS tech stack
+- **PR-002 (Database Schema) planned in detail** (2025-11-11)
+- **PR-003 (AWS Infrastructure) planned in detail** (2025-11-11)
 
 **Ready to Start:**
-- Any PR in Block 1 (PR-001, PR-002, PR-003) can be claimed immediately
+- PR-001 (Project Setup) - MUST START FIRST
+- After PR-001 completes: PR-002 and PR-003 can run in parallel
 
 ---
 
 ## Active PRs
 
 **Currently Active:** None
+
+**Planning Complete:**
+- **PR-002:** PostgreSQL Database Schema and Migrations (Status: Blocked-Ready)
+- **PR-003:** AWS Infrastructure Setup (Status: Blocked-Ready)
 
 **Next Available Work:**
 - **PR-001:** Project Setup and Repository Structure (Block 1) - **MUST START FIRST**
@@ -38,6 +45,24 @@ This file tracks the current work focus, recent changes, next steps, and active 
 ---
 
 ## Recent Significant Changes
+
+### 2025-11-11: PR-002 and PR-003 Planning Complete
+- **Agent Orange** completed detailed planning for both PRs together
+- **PR-002 (Database Schema) planning:**
+  - Verified file list (23 files)
+  - Designed complete schema: 9 tables with proper multi-tenant architecture
+  - Technology decisions: node-pg-migrate, pg with pooling, SQLAlchemy for Python
+  - Time estimate: 110 minutes
+  - File conflict noted with PR-003 on .env.example (coordination required)
+- **PR-003 (AWS Infrastructure) planning:**
+  - Verified file list (22 files)
+  - Designed complete Terraform configuration for all AWS resources
+  - Technology decisions: Terraform, VPC with public/private subnets, RDS PostgreSQL, Lambda, API Gateway
+  - Time estimate: 140 minutes
+  - Documented extensive .env.example structure
+- **Status changed:** Both PRs from "New" → "Blocked-Ready"
+- **Coordination note:** Both PRs can run in parallel after PR-001, but need to coordinate on .env.example file
+- **Key decisions documented:** Schema design, AWS architecture, security configuration
 
 ### 2025-11-10: Block 1 Dependency Analysis
 - **Discovery:** PR-002 has hard dependency on PR-001's directory structure
@@ -118,9 +143,9 @@ This file tracks the current work focus, recent changes, next steps, and active 
 - Recommendation: Radix UI + shadcn/ui (headless, customizable, no Tailwind required)
 
 **ORM/Query Builder:**
-- Options: Raw SQL with pg, Prisma, Knex.js, or Drizzle
-- Decision needed by: PR-002 (Database Schema)
-- Consider: Type safety, migration support, performance
+- ✅ **DECIDED:** Plain SQL with pg for Node.js, SQLAlchemy for Python
+- Decided by: PR-002 planning (2025-11-11)
+- Rationale: Flexibility, performance, TypeScript types via manual models
 
 **Email Service:**
 - Options: AWS SES, SendGrid, Resend, or similar
@@ -144,9 +169,14 @@ This file tracks the current work focus, recent changes, next steps, and active 
 - Consider: Text extraction quality, table support, performance
 
 **Infrastructure as Code:**
-- Options: Terraform (confirmed) or AWS CDK
-- Decision needed by: PR-003 (AWS Infrastructure)
-- Recommendation: Terraform (HCL, widely used, cloud-agnostic)
+- ✅ **DECIDED:** Terraform (not AWS CDK)
+- Decided by: PR-003 planning (2025-11-11)
+- Rationale: HCL simplicity, broader compatibility, mature tooling
+
+**Migration Tool:**
+- ✅ **DECIDED:** node-pg-migrate
+- Decided by: PR-002 planning (2025-11-11)
+- Rationale: TypeScript support, Node.js native, simple migration management
 
 ---
 
