@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS invitations (
 CREATE INDEX idx_invitations_firm_id ON invitations(firm_id);
 CREATE INDEX idx_invitations_token ON invitations(token);
 CREATE INDEX idx_invitations_firm_email ON invitations(firm_id, email);
-CREATE INDEX idx_invitations_firm_pending ON invitations(firm_id, used, expires_at) WHERE used = false AND expires_at > NOW();
+CREATE INDEX idx_invitations_firm_pending ON invitations(firm_id, used, expires_at) WHERE used = false;
 
 -- Add comment
 COMMENT ON TABLE invitations IS 'User invitations for firms - supports email-based user onboarding';

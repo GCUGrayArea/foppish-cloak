@@ -150,6 +150,14 @@ export function getPoolStats() {
   };
 }
 
+/**
+ * Get the connection pool instance
+ * @returns Pool instance
+ */
+export function getPool(): Pool {
+  return pool;
+}
+
 // Export pool for direct access if needed (advanced use cases)
 export { pool };
 
