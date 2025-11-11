@@ -9,7 +9,7 @@ This file tracks which agent identities are currently in use. Agents must claim 
 | Identity | Status | Last Commit | Current PR |
 |----------|--------|-------------|------------|
 | White    | In Use | 2025-11-11 | Coordinating PR-007 & planning |
-| Orange   | In Use | 2025-11-11 | PR-008/009/010/011 (Block 4 Planning) |
+| Orange   | Available | 2025-11-11 | Block 4 Planning (Complete) |
 | Blonde   | In Use | 2025-11-11 | PR-007 (Template Management) |
 | Pink     | Available | - | - |
 | Blue     | Available | - | - |
