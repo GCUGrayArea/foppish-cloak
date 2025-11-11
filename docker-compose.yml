@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: demand-letters-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: demand_letters
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - demand-letters-network
+
+  # pgAdmin - Database Management UI
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: demand-letters-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@demandletters.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - demand-letters-network
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  demand-letters-network:
+    driver: bridge
+
+# Usage:
+# Start services:     docker-compose up -d
+# Stop services:      docker-compose down
+# View logs:          docker-compose logs -f
+# Remove volumes:     docker-compose down -v
+#
+# Access pgAdmin at:  http://localhost:5050
+# Login:              admin@demandletters.local / admin
+#
+# PostgreSQL connection from host:
+# Host:     localhost
+# Port:     5435
+# Database: demand_letters
+# User:     postgres
+# Password: postgres
+#
+# PostgreSQL connection from pgAdmin (inside Docker):
+# Host:     postgres (use service name, not localhost)
+# Port:     5432 (internal port, not 5435)
+# Database: demand_letters
+# User:     postgres
+# Password: postgres

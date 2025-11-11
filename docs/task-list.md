@@ -58,11 +58,11 @@ This establishes the foundation for all other work. Should include instructions 
 ---
 
 ### PR-002: PostgreSQL Database Schema and Migrations
-**Status:** In Progress
+**Status:** Complete
 **Dependencies:** PR-001 (needs directory structure and package.json files)
 **Priority:** High
 **Assigned to:** Agent White
-**Started:** 2025-11-11
+**Completed on:** 2025-11-11
 
 **Description:**
 Design and implement database schema for users, firms, templates, documents, and demand letters. Set up migration system and connection pooling for both Node and Python services.
@@ -99,16 +99,16 @@ Design and implement database schema for users, firms, templates, documents, and
 - services/ai-processor/requirements.txt (modify) - Add psycopg2-binary, sqlalchemy
 
 **Acceptance Criteria:**
-- [ ] Schema supports multi-tenant architecture (firm-level data isolation)
-- [ ] User authentication data (hashed passwords, refresh tokens)
-- [ ] Template management with version history
-- [ ] Document storage references (S3 paths/metadata)
-- [ ] Demand letter drafts with revision tracking
-- [ ] Foreign key constraints and indexes defined
-- [ ] Migration system configured (node-pg-migrate)
-- [ ] Connection pooling configured for both Node and Python
-- [ ] TypeScript and Python models with full type definitions
-- [ ] Database can run locally via Docker Compose
+- [x] Schema supports multi-tenant architecture (firm-level data isolation)
+- [x] User authentication data (hashed passwords, refresh tokens)
+- [x] Template management with version history
+- [x] Document storage references (S3 paths/metadata)
+- [x] Demand letter drafts with revision tracking
+- [x] Foreign key constraints and indexes defined
+- [x] Migration system configured (custom migration runner)
+- [x] Connection pooling configured for both Node and Python
+- [x] TypeScript and Python models with full type definitions
+- [x] Database can run locally via Docker Compose
 - [ ] Seed data script for development (optional but helpful)
 
 **Notes:**
