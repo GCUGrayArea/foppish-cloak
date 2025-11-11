@@ -926,7 +926,8 @@ export function requireRole(...allowedRoles: Role[]) {
 ---
 
 ### PR-005: Firm and User Management API
-**Status:** Blocked-Ready
+**Status:** In Progress
+**Agent:** Orange
 **Dependencies:** PR-001, PR-002, PR-004
 **Priority:** High
 
