@@ -251,8 +251,9 @@ Critical foundation for all data persistence. Schema should support future real-
 ---
 
 ### PR-003: AWS Infrastructure Setup (Terraform/CDK)
-**Status:** In Progress
+**Status:** Complete
 **Agent:** Orange
+**Completed on:** 2025-11-11
 **Dependencies:** PR-001 (recommended but not strictly required)
 **Priority:** High
 
@@ -289,19 +290,19 @@ Define AWS infrastructure as code for Lambda functions, API Gateway, S3 buckets,
 - .env.example (create) - Environment variable template for local dev
 
 **Acceptance Criteria:**
-- [ ] Infrastructure code defines all AWS resources
-- [ ] Separate dev and prod environments (via tfvars files)
-- [ ] S3 buckets for document storage with proper permissions and encryption
-- [ ] RDS PostgreSQL instance with security groups and private subnets
-- [ ] Lambda execution roles with least-privilege IAM policies
-- [ ] Bedrock access policies configured for AI Lambda
-- [ ] API Gateway with proper CORS configuration
-- [ ] VPC with public and private subnets, NAT gateway
-- [ ] Secrets Manager for sensitive configuration
-- [ ] CloudWatch log groups for all Lambda functions
-- [ ] Infrastructure can be deployed via Terraform commands
-- [ ] .env.example documents all required environment variables
-- [ ] Deployment scripts automate Terraform apply/destroy
+- [x] Infrastructure code defines all AWS resources
+- [x] Separate dev and prod environments (via tfvars files)
+- [x] S3 buckets for document storage with proper permissions and encryption
+- [x] RDS PostgreSQL instance with security groups and private subnets
+- [x] Lambda execution roles with least-privilege IAM policies
+- [x] Bedrock access policies configured for AI Lambda
+- [x] API Gateway with proper CORS configuration
+- [x] VPC with public and private subnets, NAT gateway
+- [x] Secrets Manager for sensitive configuration
+- [x] CloudWatch log groups for all Lambda functions
+- [x] Infrastructure can be deployed via Terraform commands
+- [x] .env.example documents all required environment variables
+- [x] Deployment scripts automate Terraform apply/destroy
 
 **Notes:**
 Can be worked on in parallel with code. Developers can use local PostgreSQL (docker-compose) until AWS is ready.
@@ -2356,21 +2357,21 @@ Estimated 90-120 minutes. Should not be rushed.
 
 ## Summary Statistics
 
-**Overall Progress:** 1/28 PRs Complete (3.6%)
+**Overall Progress:** 2/28 PRs Complete (7.1%)
 
 **Status Breakdown:**
-- Complete: 1
-- In Progress: 0
+- Complete: 2
+- In Progress: 1 (PR-002)
 - Broken: 0
 - Blocked-Ready: 0
 - Suspended: 0
 - Planning: 0
-- New: 27
+- New: 25
 
 **Dependency Blocks:**
 - Block 1 (Foundation): 3 PRs - **PHASED EXECUTION:**
   - Phase 1: PR-001 alone (60-90 min) - **COMPLETE**
-  - Phase 2: PR-002 + PR-003 in parallel (90-120 min) - **READY TO START**
+  - Phase 2: PR-002 + PR-003 in parallel (90-120 min) - **IN PROGRESS (PR-002), COMPLETE (PR-003)**
 - Block 2 (Auth): 2 PRs (depend on Block 1)
 - Block 3 (Document/Template): 2 PRs (depend on Block 2)
 - Block 4 (AI): 4 PRs (depend on Block 3)
@@ -2394,7 +2395,9 @@ PR-001 → (PR-002 or PR-003) → Block 2 → Block 3 → Block 4 → Block 5 �
 - Block 10: PR-023, PR-024 can start early
 
 **Next Available Work:**
-PR-002 (Database Schema) and PR-003 (AWS Infrastructure) - **READY TO START IN PARALLEL**
+After Block 1 completes (when PR-002 finishes), Block 2 PRs become available:
+- PR-004 (User Authentication Service) - Depends on PR-001, PR-002
+- PR-005 (Firm and User Management API) - Depends on PR-001, PR-002, PR-004
 
 ---
 

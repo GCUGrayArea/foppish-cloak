@@ -1,0 +1,45 @@
+# Terraform Variables Example
+# Copy this file to terraform.tfvars and customize values
+# Or use environment-specific files: terraform apply -var-file="environments/dev.tfvars"
+
+# Project Configuration
+project_name = "demand-letters"
+environment  = "dev" # or "prod"
+aws_region   = "us-east-1"
+
+# VPC Configuration
+vpc_cidr             = "10.0.0.0/16"
+availability_zones   = ["us-east-1a", "us-east-1b"]
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs = ["10.0.10.0/24", "10.0.11.0/24"]
+
+# RDS Configuration
+db_instance_class        = "db.t3.micro"
+db_allocated_storage     = 20
+db_engine_version        = "15.4"
+db_name                  = "demand_letters"
+db_username              = "dbadmin"
+db_backup_retention_days = 7
+db_multi_az              = false
+
+# Lambda Configuration
+lambda_api_memory  = 1024
+lambda_api_timeout = 30
+lambda_ai_memory   = 2048
+lambda_ai_timeout  = 300
+
+# Bedrock Configuration
+bedrock_model_id = "anthropic.claude-3-5-sonnet-20240620-v1:0"
+bedrock_region   = "us-east-1"
+
+# CloudWatch Configuration
+log_retention_days = 30
+
+# S3 Configuration
+document_bucket_lifecycle_days = 90
+
+# Additional Tags
+additional_tags = {
+  CostCenter = "Engineering"
+  Owner      = "DevTeam"
+}
