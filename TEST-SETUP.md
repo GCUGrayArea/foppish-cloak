@@ -147,6 +147,41 @@ curl "http://localhost:3000/documents/{documentId}/download" \
 
 Expected: `{"downloadUrl":"...","expiresAt":"..."}`
 
+### Test 9: Create a Template (Admin)
+```bash
+curl -X POST http://localhost:3000/templates \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My Custom Template",
+    "description": "Custom demand letter template",
+    "content": "Dear {{defendant_name}},\n\nThis letter demands {{demand_amount}} for damages...",
+    "isDefault": false
+  }'
+```
+
+Expected: Template created with version 1 and extracted variables
+
+### Test 10: List Templates
+```bash
+curl http://localhost:3000/templates \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+Expected: List of templates (including any default templates from seeds)
+
+### Test 11: Update Template (Creates New Version)
+```bash
+curl -X PUT http://localhost:3000/templates/{templateId} \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "Updated content with {{plaintiff_name}}..."
+  }'
+```
+
+Expected: Template updated, new version created (version 2)
+
 ## What Works
 
 ✅ **Authentication System (PR-004)**
@@ -173,10 +208,19 @@ Expected: `{"downloadUrl":"...","expiresAt":"..."}`
 - Delete documents
 - Multi-tenant security (can't access other firms' documents)
 
+✅ **Template Management (PR-007)**
+- Create templates with {{variable}} syntax
+- List templates with filters (isDefault, search, pagination)
+- Update templates (auto-versioning on content changes)
+- Template versioning and rollback
+- Delete templates
+- Variable extraction and validation
+- Default templates (personal injury, property damage, contract breach)
+- Admin-only template creation/modification
+
 ## What's NOT Implemented Yet
 
-❌ **Templates (PR-007)** - Planned but not implemented
-❌ **AI Processing (Block 4)** - Not started
+❌ **AI Processing (Block 4)** - Planned but not implemented yet
 ❌ **Frontend (Blocks 6-7)** - Not started
 
 ## Troubleshooting
