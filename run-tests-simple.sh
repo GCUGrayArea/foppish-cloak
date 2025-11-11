@@ -228,10 +228,11 @@ fi
 
 # Test 12: Create Template
 echo -n "Test 12: Create Template... "
+TEMPLATE_NAME="Test Template $(date +%s)"
 RESP=$(curl -s -w "\n%{http_code}" -X POST "$API_URL/templates" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -H "Content-Type: application/json" \
-    -d '{"name":"Test Template","description":"Automated test","content":"Dear {{defendant_name}},\n\nI demand {{demand_amount}}.\n\nSincerely,\n{{attorney_name}}","isDefault":false}')
+    -d "{\"name\":\"$TEMPLATE_NAME\",\"description\":\"Automated test\",\"content\":\"Dear {{defendant_name}},\\n\\nI demand {{demand_amount}}.\\n\\nSincerely,\\n{{attorney_name}}\",\"isDefault\":false}")
 CODE=$(echo "$RESP" | tail -n1)
 BODY=$(echo "$RESP" | head -n-1)
 if [ "$CODE" = "201" ]; then
