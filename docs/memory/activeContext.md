@@ -27,15 +27,25 @@ This file tracks the current work focus, recent changes, next steps, and active 
 **Currently Active:** None
 
 **Next Available Work:**
-- **PR-001:** Project Setup and Repository Structure (Block 1)
-- **PR-002:** PostgreSQL Database Schema and Migrations (Block 1)
-- **PR-003:** AWS Infrastructure Setup (Terraform/CDK) (Block 1)
+- **PR-001:** Project Setup and Repository Structure (Block 1) - **MUST START FIRST**
 
-All three can be worked on in parallel by different agents.
+**After PR-001 completes:**
+- **PR-002:** PostgreSQL Database Schema and Migrations (Block 1) - Can run in parallel with PR-003
+- **PR-003:** AWS Infrastructure Setup (Terraform/CDK) (Block 1) - Can run in parallel with PR-002
+
+**IMPORTANT:** PR-002 depends on PR-001's directory structure. Block 1 uses phased execution for optimal parallelization.
 
 ---
 
 ## Recent Significant Changes
+
+### 2025-11-10: Block 1 Dependency Analysis
+- **Discovery:** PR-002 has hard dependency on PR-001's directory structure
+- **Updated task list:** Changed Block 1 from "all parallel" to phased execution
+  - Phase 1: PR-001 alone (establishes foundation)
+  - Phase 2: PR-002 + PR-003 in parallel (after PR-001 merged)
+- **Rationale:** PR-002 needs `services/api/src/` and `services/ai-processor/src/` directories that don't exist yet
+- **Time savings:** Phased approach saves 90-120 minutes vs fully sequential
 
 ### 2025-11-10: Initial Planning Phase
 - Created comprehensive task list (docs/task-list.md)
@@ -198,7 +208,12 @@ See .claude/rules/commit-policy.md for complete policy.
 ## Work Prioritization
 
 **Critical Path:**
-Block 1 → Block 2 → Block 3 → Block 4 → Block 5 → Block 7 → Block 9
+PR-001 → (PR-002 or PR-003) → Block 2 → Block 3 → Block 4 → Block 5 → Block 7 → Block 9
+
+**Block 1 Execution Strategy:**
+- Start with PR-001 (single agent, 60-90 minutes)
+- After PR-001 merges, run PR-002 and PR-003 in parallel (2 agents, 90-120 minutes)
+- Total Block 1 time: 150-210 minutes (vs 240-330 if fully sequential)
 
 **High Priority (P0 - Must-have):**
 - All PRs in Blocks 1-7 (foundation through frontend features)
@@ -214,7 +229,9 @@ Block 1 → Block 2 → Block 3 → Block 4 → Block 5 → Block 7 → Block 9
 - PR-028 (architecture documentation - but must be done last)
 
 **Parallel Work Opportunities:**
-- All of Block 1 can run in parallel (3 agents)
+- Block 1 Phase 2: PR-002 + PR-003 (2 agents after PR-001)
+- Block 2: PR-004 + PR-005 (2 agents)
+- Block 3: PR-006 + PR-007 (2 agents)
 - PR-023, PR-024 (monitoring/security) can start early
 - Test PRs can sometimes run alongside implementation
 
@@ -280,7 +297,7 @@ Block 1 → Block 2 → Block 3 → Block 4 → Block 5 → Block 7 → Block 9
 **What the next agent should do:**
 1. Read ALL memory bank files (this file, systemPatterns.md, techContext.md, progress.md)
 2. Read docs/prd.md and docs/task-list.md
-3. Choose a PR from Block 1 (PR-001, PR-002, or PR-003)
+3. **Start with PR-001 (Project Setup) - REQUIRED FIRST**
 4. Claim agent identity using /work command
 5. Transition PR to Planning phase
 6. Verify file list and acceptance criteria
@@ -288,9 +305,10 @@ Block 1 → Block 2 → Block 3 → Block 4 → Block 5 → Block 7 → Block 9
 
 **Context the next agent will need:**
 - This is a brand new project, no code exists yet
-- All Block 1 PRs can start immediately (no dependencies)
+- **PR-001 MUST complete before PR-002 or PR-003** (directory structure dependency)
 - Focus on establishing solid foundation (testing, linting, structure)
 - Multi-tenant architecture is critical from day one
+- After PR-001 merges, two agents can work on PR-002 and PR-003 in parallel
 
 **Things to watch out for:**
 - Don't forget to update memory bank after completing work

@@ -14,12 +14,16 @@ Last updated: 2025-11-10
 
 ---
 
-## Block 1: Foundation & Infrastructure (No Dependencies)
+## Block 1: Foundation & Infrastructure
+
+**IMPORTANT: Execute in phases for optimal parallelization:**
+- **Phase 1:** PR-001 alone (establishes directory structure and base files)
+- **Phase 2:** PR-002 + PR-003 in parallel (after PR-001 merged)
 
 ### PR-001: Project Setup and Repository Structure
 **Status:** New
 **Dependencies:** None
-**Priority:** High
+**Priority:** High (MUST COMPLETE FIRST - Foundation for Block 1)
 
 **Description:**
 Initialize monorepo structure with proper configuration for TypeScript, Node.js, Python, and build tooling. Set up development environment, linting, formatting, and basic CI/CD pipeline.
@@ -53,11 +57,16 @@ This establishes the foundation for all other work. Should include instructions 
 
 ### PR-002: PostgreSQL Database Schema and Migrations
 **Status:** New
-**Dependencies:** None
+**Dependencies:** PR-001 (needs directory structure and package.json files)
 **Priority:** High
 
 **Description:**
 Design and implement database schema for users, firms, templates, documents, and demand letters. Set up migration system and connection pooling for both Node and Python services.
+
+**Coordination Notes:**
+- Requires `services/api/src/` and `services/ai-processor/src/` directories from PR-001
+- Will modify `package.json` and `requirements.txt` to add database dependencies
+- Can run in parallel with PR-003 after PR-001 completes
 
 **Files (ESTIMATED - will be refined during Planning):**
 - services/database/migrations/001_initial_schema.sql (create)
@@ -92,11 +101,16 @@ Critical foundation for all data persistence. Schema should support future real-
 
 ### PR-003: AWS Infrastructure Setup (Terraform/CDK)
 **Status:** New
-**Dependencies:** None
+**Dependencies:** PR-001 (recommended but not strictly required)
 **Priority:** High
 
 **Description:**
 Define AWS infrastructure as code for Lambda functions, API Gateway, S3 buckets, RDS PostgreSQL, VPC, and IAM roles. Set up dev and prod environments.
+
+**Coordination Notes:**
+- Can technically run independently, but benefits from knowing project structure from PR-001
+- Minor file overlap: `.env.example` (PR-003 should create/own this file)
+- Can run in parallel with PR-002 after PR-001 completes
 
 **Files (ESTIMATED - will be refined during Planning):**
 - infrastructure/main.tf (create) - Terraform main configuration
@@ -1062,7 +1076,9 @@ Estimated 90-120 minutes. Should not be rushed.
 - New: 28
 
 **Dependency Blocks:**
-- Block 1 (Foundation): 3 PRs (can start immediately, run in parallel)
+- Block 1 (Foundation): 3 PRs - **PHASED EXECUTION:**
+  - Phase 1: PR-001 alone (60-90 min)
+  - Phase 2: PR-002 + PR-003 in parallel (90-120 min)
 - Block 2 (Auth): 2 PRs (depend on Block 1)
 - Block 3 (Document/Template): 2 PRs (depend on Block 2)
 - Block 4 (AI): 4 PRs (depend on Block 3)
@@ -1075,18 +1091,19 @@ Estimated 90-120 minutes. Should not be rushed.
 - Block 11 (Documentation/Deployment): 4 PRs (deploy early, docs last)
 
 **Critical Path:**
-Block 1 → Block 2 → Block 3 → Block 4 → Block 5 → Block 7 → Block 9
+PR-001 → (PR-002 or PR-003) → Block 2 → Block 3 → Block 4 → Block 5 → Block 7 → Block 9
 
 **Parallel Work Opportunities:**
-- Block 1 (all 3 PRs can run in parallel)
-- Block 2 (PR-004, PR-005 after Block 1)
-- Block 3 (PR-006, PR-007 can run in parallel)
-- Block 4 (PR-008, PR-009, PR-010 sequential, but PR-011 separate)
-- Block 6 (PR-014, PR-015 after Block 2)
-- Block 10 (PR-023, PR-024 can start early)
+- Block 1: PR-002 + PR-003 after PR-001 completes (2 agents)
+- Block 2: PR-004, PR-005 can run in parallel (2 agents)
+- Block 3: PR-006, PR-007 can run in parallel (2 agents)
+- Block 4: PR-008, PR-009, PR-010 sequential, but PR-011 separate
+- Block 6: PR-014, PR-015 after Block 2
+- Block 10: PR-023, PR-024 can start early
 
 **Next Available Work:**
-Any PR in Block 1 (PR-001, PR-002, PR-003) can be claimed immediately by any agent.
+PR-001 (Project Setup) - **MUST START FIRST**
+After PR-001 completes: PR-002 and PR-003 can start in parallel
 
 ---
 
