@@ -2230,7 +2230,9 @@ router.post('/templates',
 ## Block 4: AI Processing Service (Depends on: Block 3)
 
 ### PR-008: AWS Bedrock Integration (Python)
-**Status:** New
+**Status:** Blocked-Ready
+**Agent:** Available for claim
+**Planned by:** Agent Orange (2025-11-11)
 **Dependencies:** PR-001, PR-002, PR-003
 **Priority:** High
 
@@ -2263,7 +2265,9 @@ Follow patterns from .claude/rules/llm-architecture.md for robust LLM applicatio
 ---
 
 ### PR-009: Document Analysis and Extraction (Python)
-**Status:** New
+**Status:** Blocked-Ready
+**Agent:** Available for claim
+**Planned by:** Agent Orange (2025-11-11)
 **Dependencies:** PR-001, PR-002, PR-006, PR-008
 **Priority:** High
 
@@ -2297,7 +2301,9 @@ This is the core AI capability. Quality of extraction directly impacts letter qu
 ---
 
 ### PR-010: Demand Letter Generation (Python)
-**Status:** New
+**Status:** Blocked-Ready
+**Agent:** Available for claim
+**Planned by:** Agent Orange (2025-11-11)
 **Dependencies:** PR-001, PR-002, PR-007, PR-008, PR-009
 **Priority:** High
 
@@ -2330,7 +2336,9 @@ Follow LLM architecture patterns for deterministic operations vs. creative gener
 ---
 
 ### PR-011: AI Service Lambda Deployment
-**Status:** New
+**Status:** Blocked-Ready
+**Agent:** Available for claim
+**Planned by:** Agent Orange (2025-11-11)
 **Dependencies:** PR-003, PR-008, PR-009, PR-010
 **Priority:** High
 
@@ -2358,6 +2366,592 @@ Package Python AI processor as AWS Lambda function with proper layers, environme
 
 **Notes:**
 Consider using container image for Lambda to simplify dependency management.
+
+---
+
+## Planning Notes: PR-008 (AWS Bedrock Integration)
+
+**Planning by:** Agent Orange
+**Planned on:** 2025-11-11
+
+**Technology Decisions:**
+- **AWS Bedrock SDK:** Use boto3 with bedrock-runtime client (not direct Anthropic SDK)
+- **Model:** Claude 3.5 Sonnet (anthropic.claude-3-5-sonnet-20241022-v2:0)
+- **Structured Outputs:** Use Claude's tool calling (not JSON mode) for reliable schema adherence
+- **Retry Library:** Custom exponential backoff (no external retry library needed)
+- **Configuration:** pydantic-settings for environment-based config
+- **Logging:** Python logging module with structured JSON logs to CloudWatch
+
+**Verified File List (18 files):**
+- services/ai-processor/src/bedrock/client.py (create) - BedrockClient class
+- services/ai-processor/src/bedrock/config.py (create) - Bedrock configuration
+- services/ai-processor/src/bedrock/tools.py (create) - Tool calling definitions
+- services/ai-processor/src/bedrock/exceptions.py (create) - Custom exceptions
+- services/ai-processor/src/bedrock/__init__.py (create)
+- services/ai-processor/src/utils/retry.py (create) - Exponential backoff decorator
+- services/ai-processor/src/utils/logging.py (create) - Structured logging setup
+- services/ai-processor/src/utils/__init__.py (create)
+- services/ai-processor/src/config.py (create) - Global app configuration
+- services/ai-processor/tests/bedrock/test_client.py (create)
+- services/ai-processor/tests/bedrock/test_retry.py (create)
+- services/ai-processor/tests/bedrock/test_tools.py (create)
+- services/ai-processor/tests/bedrock/__init__.py (create)
+- services/ai-processor/tests/conftest.py (create) - Pytest fixtures
+- services/ai-processor/tests/fixtures/bedrock_responses.json (create) - Mock responses
+- services/ai-processor/requirements.txt (modify) - Already has boto3, anthropic
+- services/ai-processor/.env.example (modify) - Add Bedrock config
+- README.md (modify) - Document Bedrock setup
+
+**BedrockClient Design:**
+
+Core class with features:
+- Tool calling for structured outputs
+- Automatic retry with exponential backoff
+- Token usage tracking and logging
+- Cost estimation
+- Conversation history management
+- Streaming support for long-form generation
+
+**Retry Strategy:**
+
+Exponential backoff decorator that retries on:
+- ThrottlingException (429)
+- ServiceUnavailableException (503)
+- InternalServerException (500)
+
+Does NOT retry on client errors (400, 403, 404)
+Backoff: base_delay * (2 ** attempt) + random jitter
+
+**Logging Strategy:**
+
+All Bedrock invocations logged with:
+- Correlation ID, Model ID, Token counts (input/output)
+- Latency, Cost estimate, Tool usage
+- Error details, Firm/user context
+
+Format: Structured JSON for CloudWatch
+
+**Tool Calling Pattern:**
+
+Following .claude/rules/llm-architecture.md principles:
+- Use tool calling for ALL structured data extraction (not JSON mode)
+- Tool definitions as Pydantic models converted to JSON schema
+- Automatic validation of tool outputs
+- LLM decides when to use tools based on context
+
+**Configuration:**
+
+Environment variables:
+- AWS_REGION, BEDROCK_MODEL_ID, BEDROCK_MAX_TOKENS
+- BEDROCK_TEMPERATURE (0.0 for extraction, 0.7 for generation)
+- Cost tracking config, Retry config, Logging config
+
+**Testing Strategy:**
+
+Unit Tests:
+- BedrockClient initialization, Request/response formatting
+- Token counting, Cost calculation, Tool schema generation
+- Error handling, Retry logic, Logging verification
+
+Integration Tests (dev only):
+- Real Bedrock invocation, Tool calling with real Claude
+- Streaming responses, Rate limit retry
+
+**Time Breakdown:**
+- BedrockClient: 45 min, Retry logic: 20 min, Logging: 15 min
+- Tool calling framework: 30 min, Config: 15 min, Exceptions: 15 min
+- Unit tests: 40 min, Integration tests: 20 min, Docs: 15 min
+- **Total: 215 minutes (3 hours 35 minutes)**
+
+**Risks/Challenges:**
+1. Bedrock API format differs from direct Anthropic API
+2. Tool calling schema must be exact (JSON schema from Pydantic)
+3. Rate limits vary by account and region
+4. boto3 client initialization adds to Lambda cold start
+5. Token counting accuracy for cost tracking
+
+**Dependencies:**
+- boto3, anthropic SDK, pydantic, pydantic-settings (all already in requirements.txt)
+
+**Notes:**
+- Foundation for all AI processing (PR-009, PR-010 depend on this)
+- Temperature 0.0 for extraction (deterministic), 0.7 for generation (creative)
+- Following LLM architecture principles strictly
+
+---
+
+## Planning Notes: PR-009 (Document Analysis and Extraction)
+
+**Planning by:** Agent Orange
+**Planned on:** 2025-11-11
+
+**Technology Decisions:**
+- **PDF Parsing:** PyPDF2 (primary) + pdfplumber (fallback for tables/complex layouts)
+- **Text Chunking:** Custom strategy for multi-page documents (8k tokens, 1k overlap)
+- **Schema Validation:** Pydantic models for extracted data
+- **Tool Calling:** Use BedrockClient with extraction tools (per LLM architecture rules)
+- **Confidence Scoring:** LLM provides confidence scores (0.0-1.0) in tool outputs
+
+**Verified File List (22 files):**
+- services/ai-processor/src/document_analyzer.py (create) - Main DocumentAnalyzer class
+- services/ai-processor/src/parsers/pdf_parser.py (create) - PDF text extraction
+- services/ai-processor/src/parsers/text_chunker.py (create) - Chunk long documents
+- services/ai-processor/src/parsers/__init__.py (create)
+- services/ai-processor/src/extractors/party_extractor.py (create) - Extract parties
+- services/ai-processor/src/extractors/fact_extractor.py (create) - Extract case facts
+- services/ai-processor/src/extractors/damage_extractor.py (create) - Extract damages
+- services/ai-processor/src/extractors/date_extractor.py (create) - Extract dates
+- services/ai-processor/src/extractors/base_extractor.py (create) - Base extractor class
+- services/ai-processor/src/extractors/__init__.py (create)
+- services/ai-processor/src/schemas/extraction.py (create) - Pydantic extraction schemas
+- services/ai-processor/src/prompts/extraction_prompts.py (create) - Extraction prompts
+- services/ai-processor/tests/document_analyzer/test_analyzer.py (create)
+- services/ai-processor/tests/document_analyzer/test_pdf_parser.py (create)
+- services/ai-processor/tests/document_analyzer/test_extractors.py (create)
+- services/ai-processor/tests/fixtures/sample_police_report.pdf (create)
+- services/ai-processor/tests/fixtures/sample_medical_record.pdf (create)
+- services/ai-processor/tests/fixtures/sample_contract.pdf (create)
+- services/ai-processor/tests/fixtures/expected_extractions.json (create)
+- services/ai-processor/requirements.txt (modify) - Add pdfplumber
+- services/ai-processor/README.md (modify) - Document analysis features
+- docs/memory/techContext.md (modify) - Note pdfplumber addition
+
+**DocumentAnalyzer Design:**
+
+Core functionality:
+- Multi-page PDF parsing with quality checking
+- Intelligent text chunking for long documents
+- Parallel extraction of parties, facts, damages, dates
+- Confidence scoring for extracted data
+- Support for multiple document types (police reports, medical records, contracts)
+
+**Extraction Schemas:**
+
+Pydantic models:
+- Party (name, role, contact_info, confidence)
+- CaseFact (description, date, location, source_page, confidence)
+- Damage (type, description, amount, currency, confidence)
+- ExtractedDates (incident_date, report_date, other_dates)
+- ExtractedData (complete result with all fields + metadata)
+
+**Tool Definitions:**
+
+Each extractor defines a tool for Claude:
+- extract_parties: Extract all parties with roles
+- extract_facts: Extract case facts with context
+- extract_damages: Extract damages with amounts
+- extract_dates: Extract important dates
+
+All tools return confidence scores with each item
+
+**Extraction Prompts:**
+
+System prompt establishes legal document analysis expertise
+User prompt provides document context and extraction instructions
+Prompts emphasize accuracy, confidence scoring, and thoroughness
+
+**Text Chunking Strategy:**
+
+For documents >10k tokens:
+- Split into 8k token chunks with 1k overlap
+- Process chunks separately
+- Merge results with deduplication
+- Use highest confidence when duplicates found
+
+**PDF Parsing:**
+
+Two-tier approach:
+1. Try PyPDF2 first (fast, simple)
+2. Fall back to pdfplumber if text quality is poor
+3. Quality checking heuristics (word count, character diversity)
+
+**Performance Target:**
+
+10-page document in <30 seconds:
+- PDF parsing: ~2 sec, Chunking: <1 sec
+- Bedrock API call: ~20 sec, Merging: ~2 sec
+- DB update: ~1 sec
+- **Total: ~26 seconds** (within budget)
+
+50-page document: ~90 seconds (multiple chunks)
+
+**Testing Strategy:**
+
+Unit Tests: PDF parsing, Text chunking, Extractors with mocked Bedrock,
+Schema validation, Confidence scores, Result merging
+
+Integration Tests: Full analysis with sample documents, Multi-page handling,
+Each document type, Edge cases (empty, scanned, malformed PDFs)
+
+Fixture documents: Sample police report, medical record, contract with expected extractions
+
+**Time Breakdown:**
+- DocumentAnalyzer: 30 min, PDF parsers: 25 min, Text chunker: 20 min
+- Extractors (4 types): 60 min, Schemas: 25 min, Prompts: 30 min
+- Result merging: 20 min, DB integration: 15 min
+- Unit tests: 50 min, Integration tests: 40 min, Fixtures: 30 min, Docs: 20 min
+- **Total: 365 minutes (6 hours 5 minutes)**
+
+**Risks/Challenges:**
+1. Scanned PDFs may have poor OCR quality
+2. Document format variety in legal field
+3. Very long documents may exceed context window
+4. AI may hallucinate or miss information
+5. 30-second target may be tight for complex documents
+
+**New Dependencies:**
+```
+pdfplumber>=0.10.0  # Advanced PDF parsing with table support
+```
+
+**Dependencies:**
+- PR-008 (BedrockClient) - MUST complete first
+- PR-006 (Document upload) - For S3 integration
+
+**Notes:**
+- Core AI capability - quality is critical
+- Accuracy more important than speed
+- Confidence scores essential for human review workflow
+- Consider OCR support for image-based documents in future
+
+---
+
+## Planning Notes: PR-010 (Demand Letter Generation)
+
+**Planning by:** Agent Orange
+**Planned on:** 2025-11-11
+
+**Technology Decisions:**
+- **Generation Approach:** Template-guided generation (not free-form)
+- **Tool Calling:** For structured variable population (deterministic operations)
+- **Streaming:** Use streaming API for real-time generation feedback to UI
+- **History Management:** Maintain conversation history for refinement context
+- **Temperature:** 0.7 for creative legal writing (not 0.0 like extraction)
+- **Template Variables:** Mustache-style {{variable}} syntax
+
+**Verified File List (20 files):**
+- services/ai-processor/src/letter_generator.py (create) - Main LetterGenerator class
+- services/ai-processor/src/generation/template_processor.py (create) - Template variable handling
+- services/ai-processor/src/generation/section_generator.py (create) - Generate letter sections
+- services/ai-processor/src/generation/refinement_handler.py (create) - Handle attorney feedback
+- services/ai-processor/src/generation/history_manager.py (create) - Conversation history
+- services/ai-processor/src/generation/__init__.py (create)
+- services/ai-processor/src/schemas/letter.py (create) - Letter Pydantic models
+- services/ai-processor/src/schemas/refinement.py (create) - Refinement request models
+- services/ai-processor/src/prompts/generation_prompts.py (create) - Generation prompts
+- services/ai-processor/src/prompts/refinement_prompts.py (create) - Refinement prompts
+- services/ai-processor/src/validators/legal_tone_validator.py (create) - Tone checking
+- services/ai-processor/tests/letter_generator/test_generator.py (create)
+- services/ai-processor/tests/letter_generator/test_template_processor.py (create)
+- services/ai-processor/tests/letter_generator/test_refinement.py (create)
+- services/ai-processor/tests/letter_generator/test_tone_validator.py (create)
+- services/ai-processor/tests/fixtures/sample_templates.json (create)
+- services/ai-processor/tests/fixtures/sample_extracted_data.json (create)
+- services/ai-processor/tests/fixtures/expected_letters.json (create)
+- services/ai-processor/README.md (modify) - Document generation features
+- docs/memory/systemPatterns.md (modify) - Note generation patterns
+
+**LetterGenerator Design:**
+
+Core features:
+- Template-guided generation with variable population
+- Structured variable population using tool calling
+- Iterative refinement with conversation history
+- Legal tone validation
+- Section-by-section generation
+- Streaming support for real-time UI feedback
+
+**Letter Structure:**
+
+Pydantic models:
+- LetterSection (section_type, content, template_source)
+- GeneratedLetter (sections, full_text, populated_variables, metadata)
+- GenerationMetadata (template_id, model, tokens, cost, tone_validation)
+- RefinementRequest (instruction, target_section, preserve_facts flag)
+
+**Template Variable Population:**
+
+Tool calling for deterministic variable population:
+- Tool: populate_template_variables
+- Input: Template variables needed
+- Output: Populated variables from extracted data
+- Example: {{defendant_name}} → "Acme Corp" from extracted parties
+
+**Generation Prompts:**
+
+System prompt: Establish legal writing expertise, tone, structure
+User prompt: Provide template, case info, instructions
+Refinement prompt: Previous letter + attorney feedback + modification instructions
+
+Prompts emphasize:
+- Professional legal tone
+- Factual accuracy
+- Structured format
+- Clear damages statement
+- Settlement deadline
+
+**Legal Tone Validation:**
+
+Validator checks:
+- Professional language (no slang, profanity)
+- Appropriate formality
+- Legal terminology usage
+- No emotional/inflammatory language
+- Clear structure
+
+Uses Claude to score (0-10) and identify issues
+
+**Conversation History Management:**
+
+Store in demand_letters.conversation_history (JSONB):
+- Array of messages (user/assistant alternating)
+- Token counts per message
+- Total token tracking
+- Truncation when approaching context limit
+
+**Section-by-Section Generation:**
+
+Sections in order:
+1. Header (firm letterhead info)
+2. Introduction
+3. Facts (from extracted data)
+4. Liability (legal analysis)
+5. Damages (itemized)
+6. Demand (settlement amount + deadline)
+7. Closing
+
+Each section generated with full context
+
+**Streaming Implementation:**
+
+Async streaming for real-time UI updates:
+- Yield chunks as generated
+- Allow frontend to show progressive output
+- Improve perceived performance
+
+**Performance Target:**
+
+Initial generation (<10 seconds):
+- Template processing: <1 sec, Variable population: ~2 sec
+- Letter generation (streaming): ~6 sec, Tone validation: ~2 sec (parallel)
+- DB save: <1 sec
+- **Total: ~8-9 seconds**
+
+Refinement (<10 seconds):
+Similar timeline with history loading overhead
+
+**Testing Strategy:**
+
+Unit Tests: Template variable extraction, Variable population, Section generation,
+History management, Tone validation, Refinement processing
+
+Integration Tests: Full letter generation with sample templates,
+Multi-round refinement (3 iterations), Streaming generation,
+Edge cases (missing variables, incomplete data, long templates, conflicting refinements)
+
+Fixtures: 3 sample templates (personal injury, property, contract),
+Corresponding extracted data, Expected generated letters,
+Refinement scenarios with before/after
+
+**Time Breakdown:**
+- LetterGenerator: 35 min, TemplateProcessor: 30 min, SectionGenerator: 30 min
+- RefinementHandler: 35 min, HistoryManager: 25 min
+- Schemas: 25 min, Generation prompts: 40 min, Refinement prompts: 25 min
+- LegalToneValidator: 25 min, Streaming: 20 min
+- Unit tests: 60 min, Integration tests: 50 min, Fixtures: 35 min, Docs: 25 min
+- **Total: 460 minutes (7 hours 40 minutes)**
+
+**Risks/Challenges:**
+1. Template variables may not match available extracted data
+2. Maintaining professional tone across refinements
+3. AI might alter facts during refinement
+4. Long conversation histories may exceed context limits
+5. Attorney may request many refinements (cost implications)
+
+**Mitigation:**
+1. Graceful handling of missing variables, attorney notification
+2. Tone validator, explicit prompt instructions
+3. "preserve_facts" flag, validation against original data
+4. History truncation, summarization
+5. Track refinement count, cost alerts after 5+ rounds
+
+**Dependencies:**
+- PR-008 (BedrockClient) - MUST complete first
+- PR-007 (Templates) - For template structure
+- PR-009 (Extraction) - For extracted data schemas
+
+**Notes:**
+- Creative heart of the system (quality critical)
+- Refinement capability is key for user satisfaction
+- Consider A/B testing different prompts with real users
+- Temperature 0.7 for creative legal writing
+
+---
+
+## Planning Notes: PR-011 (AI Service Lambda Deployment)
+
+**Planning by:** Agent Orange
+**Planned on:** 2025-11-11
+
+**Technology Decisions:**
+- **Deployment Method:** Docker container image (not zip file) for easier dependency management
+- **Lambda Runtime:** Python 3.11 on arm64 (Graviton2 for cost savings and performance)
+- **Handler Pattern:** Single Lambda with route-based dispatch (not separate Lambdas)
+- **Layers:** Not needed with container image approach
+- **Warm-up Strategy:** CloudWatch Events scheduled pings every 5 minutes
+- **API Integration:** API Gateway REST API with Lambda proxy integration
+
+**Verified File List (18 files):**
+- services/ai-processor/lambda_handler.py (modify) - Lambda entry point with routing
+- services/ai-processor/Dockerfile (create) - Multi-stage Docker build
+- services/ai-processor/.dockerignore (create) - Exclude unnecessary files
+- services/ai-processor/deploy.sh (create) - Build and deploy script
+- services/ai-processor/scripts/build-image.sh (create) - Docker build script
+- services/ai-processor/scripts/push-image.sh (create) - ECR push script
+- services/ai-processor/scripts/warm-lambda.sh (create) - Lambda warm-up script
+- infrastructure/ecr.tf (create) - ECR repository for Lambda images
+- infrastructure/lambda-ai.tf (modify) - AI Lambda configuration with container
+- infrastructure/lambda-ai-warmup.tf (create) - CloudWatch Events for warm-up
+- infrastructure/api-gateway-ai.tf (create) - API Gateway routes to AI Lambda
+- services/ai-processor/config/lambda.yaml (create) - Lambda configuration values
+- services/ai-processor/tests/test_lambda_handler.py (create)
+- services/ai-processor/.env.lambda.example (create) - Lambda env vars
+- .github/workflows/deploy-ai-processor.yml (create) - CI/CD for AI Lambda
+- scripts/test-ai-lambda.sh (create) - Integration test script
+- docs/deployment/ai-lambda-deployment.md (create) - Deployment docs
+- docs/memory/techContext.md (modify) - Note Lambda deployment approach
+
+**Lambda Handler Design:**
+
+Route-based dispatch with module-level initialization:
+- Routes: POST /analyze, POST /generate, POST /refine, GET /health
+- Module-level client initialization for reuse across invocations
+- API Gateway proxy integration
+- Correlation ID tracking for request tracing
+- Structured error responses
+
+**Dockerfile:**
+
+Multi-stage build:
+1. Builder stage: Install dependencies to /build/dependencies
+2. Runtime stage: Copy dependencies + application code
+3. Base image: public.ecr.aws/lambda/python:3.11-arm64
+4. Handler: lambda_handler.lambda_handler
+
+**Terraform Configuration:**
+
+Resources:
+- ECR repository for Lambda images (scan on push, encryption)
+- Lambda function with container image (arm64, 2048MB, 300s timeout)
+- VPC configuration (private subnets, security groups)
+- IAM role with Bedrock, S3, RDS permissions
+- CloudWatch Events for warm-up (every 5 minutes)
+- API Gateway integration (routes for analyze, generate, refine, health)
+
+**Deployment Scripts:**
+
+deploy.sh:
+1. Build Docker image (linux/arm64)
+2. Tag for ECR (latest + commit hash)
+3. Login to ECR
+4. Push images
+5. Update Lambda function code
+6. Wait for update completion
+7. Run integration tests
+
+**Cold Start Optimization:**
+
+Strategies to achieve <3 second target:
+1. Arm64 architecture (Graviton2 faster cold starts)
+2. Module-level initialization (clients outside handler)
+3. Minimal dependencies in container
+4. Container image (faster than zip for large deps)
+5. Warm-up events (CloudWatch Events every 5 minutes)
+6. Lazy loading for heavy dependencies
+
+Expected cold start: ~3.1 seconds (just at target)
+Warm invocation: ~100-200ms
+
+**Memory Optimization:**
+
+Test memory allocations:
+- 1024 MB: May be too small
+- 2048 MB: Good starting point (2 vCPU) ← chosen
+- 3072 MB: If processing large documents
+- 4096 MB: Likely overkill
+
+Lambda pricing: Pay for GB-seconds, so right-sizing important
+
+**Environment Variables:**
+
+Configuration:
+- AWS_REGION, BEDROCK_MODEL_ID, BEDROCK_MAX_TOKENS
+- BEDROCK_TEMPERATURE, DATABASE_URL
+- LOG_LEVEL, ENVIRONMENT
+
+**Testing Strategy:**
+
+Unit Tests: Lambda handler routing, Request/response formatting,
+Error handling per route, Health check, Correlation ID tracking
+
+Integration Tests: Deploy to dev, Test each endpoint with real requests,
+Verify CloudWatch logs, Test cold start time, Test warm invocation,
+Verify error handling
+
+Load Testing: Concurrent requests, Response times,
+Lambda metrics (duration, errors, throttles), API Gateway integration
+
+**CI/CD Pipeline:**
+
+GitHub Actions workflow:
+1. Run tests with coverage
+2. Configure AWS credentials
+3. Build and deploy to dev on main branch push
+4. Run integration tests post-deployment
+
+**Monitoring:**
+
+CloudWatch metrics:
+- Invocation count, Duration (P50, P95, P99), Error rate
+- Throttle count, Cold start count, Memory usage
+- Bedrock API errors
+
+CloudWatch alarms:
+- Error rate >5% for 5 minutes
+- P99 duration >30 seconds
+- Throttle count >10 in 1 minute
+
+**Time Breakdown:**
+- Lambda handler with routing: 30 min, Dockerfile: 20 min, Deployment scripts: 30 min
+- Terraform config: 40 min, API Gateway: 25 min, Warm-up: 15 min
+- Environment config: 15 min, Unit tests: 30 min, Integration tests: 35 min
+- CI/CD pipeline: 30 min, Documentation: 25 min, Testing/optimization: 40 min
+- **Total: 335 minutes (5 hours 35 minutes)**
+
+**Risks/Challenges:**
+1. Cold start time may exceed 3 second target
+2. Memory requirements may need >2GB for document processing
+3. Lambda in VPC has slower cold starts
+4. Large container image may slow deployment
+5. AWS Lambda concurrent limits
+
+**Mitigation:**
+1. Warm-up events, optimize container size, lazy loading
+2. Test various memory settings, optimize for cost
+3. Use NAT Gateway, consider VPC endpoints
+4. Multi-stage build, minimize dependencies
+5. Request limit increase, implement queuing
+
+**Dependencies:**
+- PR-008, PR-009, PR-010 (all AI processing code) - MUST complete first
+- PR-003 (Terraform infrastructure) - For infrastructure updates
+
+**Notes:**
+- Container image simplifies dependency management vs. Lambda layers
+- Arm64 provides cost savings and better performance
+- Warm-up strategy trades cost for better UX
+- Single Lambda with routing simpler than multiple Lambdas
+- Following AWS Lambda best practices for production workloads
 
 ---
 
