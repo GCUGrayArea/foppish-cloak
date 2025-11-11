@@ -58,9 +58,11 @@ This establishes the foundation for all other work. Should include instructions 
 ---
 
 ### PR-002: PostgreSQL Database Schema and Migrations
-**Status:** Blocked-Ready
+**Status:** In Progress
 **Dependencies:** PR-001 (needs directory structure and package.json files)
 **Priority:** High
+**Assigned to:** Agent White
+**Started:** 2025-11-11
 
 **Description:**
 Design and implement database schema for users, firms, templates, documents, and demand letters. Set up migration system and connection pooling for both Node and Python services.
@@ -249,7 +251,8 @@ Critical foundation for all data persistence. Schema should support future real-
 ---
 
 ### PR-003: AWS Infrastructure Setup (Terraform/CDK)
-**Status:** Blocked-Ready
+**Status:** In Progress
+**Agent:** Orange
 **Dependencies:** PR-001 (recommended but not strictly required)
 **Priority:** High
 
@@ -496,23 +499,30 @@ LOG_LEVEL=debug
 ## Block 2: Authentication & Authorization (Depends on: Block 1)
 
 ### PR-004: User Authentication Service (Node.js)
-**Status:** New
+**Status:** Blocked-Ready
 **Dependencies:** PR-001, PR-002
 **Priority:** High
 
 **Description:**
 Implement JWT-based authentication with registration, login, password reset, and session management. Support firm-level user roles (admin, attorney, paralegal).
 
-**Files (ESTIMATED - will be refined during Planning):**
-- services/api/src/auth/AuthService.ts (create)
-- services/api/src/auth/jwt.ts (create) - JWT utilities
-- services/api/src/auth/password.ts (create) - bcrypt hashing
-- services/api/src/middleware/auth.ts (create) - auth middleware
-- services/api/src/middleware/permissions.ts (create) - role-based access
-- services/api/src/routes/auth.ts (create) - auth endpoints
-- services/api/src/types/auth.ts (create) - TypeScript types
-- tests/auth/AuthService.test.ts (create)
-- tests/auth/integration.test.ts (create)
+**Files (VERIFIED during Planning):**
+- services/api/src/auth/AuthService.ts (create) - Core auth business logic
+- services/api/src/auth/jwt.ts (create) - JWT generation and validation
+- services/api/src/auth/password.ts (create) - bcrypt hashing utilities
+- services/api/src/auth/token.ts (create) - Refresh token management
+- services/api/src/middleware/auth.ts (create) - Authentication middleware
+- services/api/src/middleware/permissions.ts (create) - Role-based access control
+- services/api/src/routes/auth.ts (create) - Auth API endpoints
+- services/api/src/types/auth.ts (create) - TypeScript types and interfaces
+- services/api/src/utils/validation.ts (create) - Input validation helpers
+- services/api/src/config/jwt.ts (create) - JWT configuration
+- tests/auth/AuthService.test.ts (create) - Unit tests for service
+- tests/auth/jwt.test.ts (create) - Unit tests for JWT utilities
+- tests/auth/password.test.ts (create) - Unit tests for password hashing
+- tests/auth/middleware.test.ts (create) - Unit tests for middleware
+- tests/auth/integration.test.ts (create) - Integration tests for auth flows
+- services/api/package.json (modify) - Add jsonwebtoken, bcrypt dependencies
 
 **Acceptance Criteria:**
 - [ ] POST /auth/register - create new user account
@@ -532,23 +542,415 @@ Essential for all user-facing features. Security-critical - follow OWASP guideli
 
 ---
 
+## Planning Notes: PR-004 (User Authentication Service)
+
+**Technology Decisions:**
+- **JWT Library:** jsonwebtoken (most popular, well-maintained)
+- **Password Hashing:** bcrypt with cost factor 12 (OWASP recommended)
+- **Validation:** Zod for runtime type validation and schema validation
+- **Token Storage:**
+  - Access tokens: In-memory on client (not localStorage for security)
+  - Refresh tokens: httpOnly cookies (XSS protection)
+- **Password Reset:** Time-limited tokens stored in database with expiration
+
+**Authentication Flow Design:**
+
+**1. Registration Flow:**
+```
+Client → POST /auth/register
+  Body: { email, password, firstName, lastName, firmId }
+
+Server:
+  1. Validate input (email format, password strength)
+  2. Check if user exists (firm_id + email unique)
+  3. Hash password with bcrypt (cost 12)
+  4. Create user in database (default role: attorney)
+  5. Return 201 Created
+
+Response: { userId, email, firmId }
+```
+
+**2. Login Flow:**
+```
+Client → POST /auth/login
+  Body: { email, password, firmId }
+
+Server:
+  1. Find user by firm_id + email
+  2. Compare password with bcrypt
+  3. Generate access token (JWT, 1hr expiry)
+  4. Generate refresh token (random, 30 day expiry)
+  5. Store refresh token hash in database
+  6. Return tokens
+
+Response: {
+  accessToken: "jwt...",
+  refreshToken: "uuid...",
+  user: { id, email, firstName, lastName, role, firmId }
+}
+```
+
+**3. Token Refresh Flow:**
+```
+Client → POST /auth/refresh
+  Body: { refreshToken }
+
+Server:
+  1. Find refresh token in database
+  2. Check if expired
+  3. Check if invalidated (logout)
+  4. Generate new access token
+  5. Optionally rotate refresh token
+  6. Return new tokens
+
+Response: { accessToken, refreshToken? }
+```
+
+**4. Logout Flow:**
+```
+Client → POST /auth/logout
+  Headers: Authorization: Bearer <accessToken>
+  Body: { refreshToken }
+
+Server:
+  1. Verify access token (get user)
+  2. Invalidate refresh token in database
+  3. Return 200 OK
+
+Response: { message: "Logged out successfully" }
+```
+
+**5. Forgot Password Flow:**
+```
+Client → POST /auth/forgot-password
+  Body: { email, firmId }
+
+Server:
+  1. Find user by firm_id + email
+  2. Generate password reset token (random UUID)
+  3. Store token hash in database with 1hr expiry
+  4. Send email with reset link
+  5. Return 200 OK (even if user not found - security)
+
+Response: { message: "Reset email sent if user exists" }
+```
+
+**6. Reset Password Flow:**
+```
+Client → POST /auth/reset-password
+  Body: { token, newPassword }
+
+Server:
+  1. Find valid reset token in database
+  2. Check if expired
+  3. Validate new password strength
+  4. Hash new password with bcrypt
+  5. Update user password
+  6. Invalidate reset token
+  7. Invalidate all refresh tokens (force re-login)
+  8. Return 200 OK
+
+Response: { message: "Password reset successful" }
+```
+
+**JWT Token Structure:**
+
+**Access Token Claims:**
+```typescript
+interface JWTPayload {
+  sub: string;        // user ID (UUID)
+  email: string;      // user email
+  firmId: string;     // firm ID (UUID) - CRITICAL for multi-tenancy
+  role: 'admin' | 'attorney' | 'paralegal';
+  iat: number;        // issued at (timestamp)
+  exp: number;        // expires at (timestamp, 1 hour)
+}
+```
+
+**Token Signing:**
+- Algorithm: HS256 (HMAC with SHA-256)
+- Secret: From environment variable JWT_SECRET (AWS Secrets Manager in prod)
+- Header: { alg: "HS256", typ: "JWT" }
+
+**Authentication Middleware:**
+
+```typescript
+// services/api/src/middleware/auth.ts
+export async function authenticate(req, res, next) {
+  // 1. Extract token from Authorization header
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  const token = authHeader.substring(7);
+
+  // 2. Verify JWT signature and expiration
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+
+    // 3. Attach user context to request
+    req.user = {
+      id: payload.sub,
+      email: payload.email,
+      firmId: payload.firmId,
+      role: payload.role
+    };
+
+    next();
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    }
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+}
+```
+
+**Role-Based Access Control Middleware:**
+
+```typescript
+// services/api/src/middleware/permissions.ts
+export function requireRole(...allowedRoles: Role[]) {
+  return (req, res, next) => {
+    // Assumes authenticate middleware has run first
+    if (!req.user) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+
+    next();
+  };
+}
+
+// Usage:
+// app.delete('/users/:id', authenticate, requireRole('admin'), deleteUser);
+```
+
+**Password Requirements:**
+- Minimum 8 characters
+- At least 1 uppercase letter
+- At least 1 lowercase letter
+- At least 1 number
+- At least 1 special character
+- Not in common password list (optional: use zxcvbn for strength check)
+
+**Security Considerations:**
+
+1. **Rate Limiting:**
+   - Login: 5 attempts per 15 minutes per email
+   - Password reset: 3 requests per hour per email
+   - Registration: 10 per hour per IP
+
+2. **Token Security:**
+   - Access tokens short-lived (1 hour)
+   - Refresh tokens long-lived but revokable
+   - Refresh token rotation on use (optional but recommended)
+   - Store only hashed versions of refresh tokens
+
+3. **Password Security:**
+   - Never log passwords (even in errors)
+   - Use constant-time comparison for tokens
+   - Bcrypt cost factor 12 (adjustable based on performance)
+   - Clear password from memory after hashing
+
+4. **Email Security:**
+   - Don't reveal if user exists (timing attacks)
+   - Password reset links expire in 1 hour
+   - One-time use tokens
+
+5. **Multi-Tenant Security:**
+   - Always validate firmId in JWT matches requested resources
+   - Prevent cross-firm user enumeration
+   - Firm-scoped email uniqueness
+
+**Error Handling:**
+
+**Standard Error Response:**
+```json
+{
+  "error": "User-friendly error message",
+  "code": "ERROR_CODE",
+  "statusCode": 400
+}
+```
+
+**Error Codes:**
+- `INVALID_CREDENTIALS` - Wrong email/password
+- `TOKEN_EXPIRED` - Access token expired
+- `INVALID_TOKEN` - Malformed or invalid token
+- `USER_ALREADY_EXISTS` - Registration conflict
+- `WEAK_PASSWORD` - Password doesn't meet requirements
+- `INVALID_RESET_TOKEN` - Reset token invalid or expired
+- `INSUFFICIENT_PERMISSIONS` - User lacks required role
+
+**Database Interactions:**
+
+**Tables Used:**
+- `users` - Read for authentication, write for registration
+- `refresh_tokens` - Write on login, read on refresh, delete on logout
+
+**Password Reset Extension (requires schema addition):**
+- Add `password_reset_tokens` table:
+  - id (UUID, PK)
+  - user_id (UUID, FK → users.id)
+  - token_hash (VARCHAR)
+  - expires_at (TIMESTAMP)
+  - used (BOOLEAN, default false)
+  - created_at (TIMESTAMP)
+
+**Indexes Required:**
+- `users(firm_id, email)` - Fast login lookups
+- `refresh_tokens(token_hash)` - Fast token validation
+- `refresh_tokens(user_id)` - Fast user token invalidation
+
+**API Endpoints Specification:**
+
+**POST /auth/register**
+- Request: `{ email, password, firstName, lastName, firmId }`
+- Response: `201 Created { userId, email, firmId }`
+- Errors: `400 Invalid input`, `409 User exists`
+
+**POST /auth/login**
+- Request: `{ email, password, firmId }`
+- Response: `200 OK { accessToken, refreshToken, user }`
+- Errors: `401 Invalid credentials`, `400 Invalid input`
+
+**POST /auth/refresh**
+- Request: `{ refreshToken }`
+- Response: `200 OK { accessToken, refreshToken? }`
+- Errors: `401 Invalid/expired token`
+
+**POST /auth/logout**
+- Headers: `Authorization: Bearer <token>`
+- Request: `{ refreshToken }`
+- Response: `200 OK { message }`
+- Errors: `401 Not authenticated`
+
+**POST /auth/forgot-password**
+- Request: `{ email, firmId }`
+- Response: `200 OK { message }` (always, for security)
+- No errors returned (security: don't reveal user existence)
+
+**POST /auth/reset-password**
+- Request: `{ token, newPassword }`
+- Response: `200 OK { message }`
+- Errors: `400 Invalid token/password`, `401 Token expired`
+
+**Dependencies:**
+
+**NPM Packages to Add:**
+```json
+{
+  "jsonwebtoken": "^9.0.2",
+  "bcrypt": "^5.1.1",
+  "zod": "^3.22.4",
+  "uuid": "^9.0.1"
+}
+```
+
+**Dev Dependencies:**
+```json
+{
+  "@types/jsonwebtoken": "^9.0.5",
+  "@types/bcrypt": "^5.0.2"
+}
+```
+
+**Time Breakdown:**
+- AuthService implementation (register, login, refresh, logout): 45 min
+- Password hashing utilities: 15 min
+- JWT utilities (generate, verify): 20 min
+- Refresh token management: 20 min
+- Password reset flow: 30 min
+- Authentication middleware: 15 min
+- Authorization/permissions middleware: 15 min
+- Route handlers: 20 min
+- Input validation schemas: 15 min
+- Unit tests (auth service, utilities): 45 min
+- Unit tests (middleware): 30 min
+- Integration tests (full auth flows): 45 min
+- Error handling and edge cases: 20 min
+- Documentation and code comments: 15 min
+- **Total: 350 minutes (5 hours 50 minutes)**
+
+**Risks/Challenges:**
+
+1. **Refresh Token Rotation:** Complex to implement correctly
+   - Mitigation: Start without rotation, add later if needed
+
+2. **Email Service Integration:** Password reset requires email
+   - Mitigation: Mock email service initially, integrate later
+
+3. **Rate Limiting on Lambda:** Requires distributed state (Redis)
+   - Mitigation: Use API Gateway throttling initially, add Redis later
+
+4. **Token Secret Rotation:** Invalidates all tokens
+   - Mitigation: Document process, plan for staged rollout
+
+5. **Multi-Tenant Edge Cases:** Cross-firm attacks
+   - Mitigation: Comprehensive integration tests, security review
+
+6. **Password Reset Table:** Not in original schema
+   - Mitigation: Add migration for password_reset_tokens table
+
+**Testing Strategy:**
+
+**Unit Tests:**
+- Password hashing and comparison
+- JWT generation and validation
+- Token expiration handling
+- Input validation schemas
+- Middleware logic (mock requests)
+
+**Integration Tests:**
+- Complete registration → login flow
+- Token refresh flow
+- Logout and token invalidation
+- Password reset flow (end-to-end)
+- Invalid credentials handling
+- Expired token handling
+- Role-based access control
+
+**Security Tests:**
+- SQL injection attempts
+- XSS in input fields
+- Timing attack resistance
+- Rate limiting enforcement
+- Cross-firm access prevention
+
+---
+
 ### PR-005: Firm and User Management API
-**Status:** New
+**Status:** Blocked-Ready
 **Dependencies:** PR-001, PR-002, PR-004
 **Priority:** High
 
 **Description:**
 Build API endpoints for managing firms, users, and firm-level settings. Support inviting users, managing roles, and firm configuration.
 
-**Files (ESTIMATED - will be refined during Planning):**
-- services/api/src/routes/firms.ts (create)
-- services/api/src/routes/users.ts (create)
-- services/api/src/services/FirmService.ts (create)
-- services/api/src/services/UserService.ts (create)
-- services/api/src/middleware/firmContext.ts (create) - tenant isolation
-- services/api/src/types/firm.ts (create)
-- tests/firms/FirmService.test.ts (create)
-- tests/integration/firm-management.test.ts (create)
+**Files (VERIFIED during Planning):**
+- services/api/src/routes/firms.ts (create) - Firm API endpoints
+- services/api/src/routes/users.ts (create) - User management endpoints
+- services/api/src/services/FirmService.ts (create) - Firm business logic
+- services/api/src/services/UserService.ts (create) - User management logic
+- services/api/src/services/InvitationService.ts (create) - User invitation logic
+- services/api/src/middleware/firmContext.ts (create) - Multi-tenant context middleware
+- services/api/src/middleware/firmOwnership.ts (create) - Verify resource ownership
+- services/api/src/types/firm.ts (create) - Firm-related types
+- services/api/src/types/user.ts (create) - User-related types
+- services/api/src/utils/email.ts (create) - Email sending utility
+- services/api/src/templates/invitation-email.html (create) - Invitation email template
+- tests/firms/FirmService.test.ts (create) - Unit tests for firm service
+- tests/users/UserService.test.ts (create) - Unit tests for user service
+- tests/users/InvitationService.test.ts (create) - Unit tests for invitations
+- tests/middleware/firmContext.test.ts (create) - Unit tests for middleware
+- tests/integration/firm-management.test.ts (create) - Integration tests
+- tests/integration/user-management.test.ts (create) - Integration tests
+- services/api/package.json (modify) - Add email dependencies (nodemailer)
 
 **Acceptance Criteria:**
 - [ ] GET /firms/:id - get firm details (admin only)
@@ -558,12 +960,551 @@ Build API endpoints for managing firms, users, and firm-level settings. Support 
 - [ ] DELETE /firms/:id/users/:userId - remove user (admin only)
 - [ ] PUT /users/:id - update user profile
 - [ ] PUT /users/:id/role - change user role (admin only)
+- [ ] GET /users/me - get current user profile
 - [ ] Firm-level data isolation enforced at middleware level
 - [ ] Email invitations sent for new users
 - [ ] Tests verify multi-tenant isolation
 
 **Notes:**
 Multi-tenant architecture is critical - all queries must be scoped to firm_id.
+
+---
+
+## Planning Notes: PR-005 (Firm and User Management API)
+
+**Technology Decisions:**
+- **Email Service:** nodemailer with AWS SES transport (or SMTP for development)
+- **Template Engine:** Handlebars for email templates (or plain HTML)
+- **Validation:** Zod for input validation (consistent with PR-004)
+- **Multi-Tenant Middleware:** Custom middleware to enforce firm context from JWT
+
+**Multi-Tenant Architecture:**
+
+**Firm Context Middleware:**
+```typescript
+// services/api/src/middleware/firmContext.ts
+export async function enforceFirmContext(req, res, next) {
+  // Assumes authenticate middleware has already run
+  if (!req.user || !req.user.firmId) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+
+  // Extract firmId from route params (if present)
+  const routeFirmId = req.params.firmId || req.body.firmId;
+
+  // If route specifies firmId, verify it matches user's firm
+  if (routeFirmId && routeFirmId !== req.user.firmId) {
+    return res.status(403).json({ error: 'Access denied to other firm resources' });
+  }
+
+  // Attach firm context to request for easy access
+  req.firmId = req.user.firmId;
+
+  next();
+}
+```
+
+**Firm Ownership Verification:**
+```typescript
+// services/api/src/middleware/firmOwnership.ts
+export async function verifyFirmOwnership(resourceType: string) {
+  return async (req, res, next) => {
+    const resourceId = req.params.id;
+    const firmId = req.user.firmId;
+
+    // Query database to verify resource belongs to firm
+    const resource = await db.query(
+      `SELECT firm_id FROM ${resourceType} WHERE id = $1`,
+      [resourceId]
+    );
+
+    if (!resource || resource.firm_id !== firmId) {
+      return res.status(404).json({ error: 'Resource not found' });
+    }
+
+    next();
+  };
+}
+```
+
+**API Endpoint Specifications:**
+
+**Firm Management Endpoints:**
+
+**GET /firms/:id**
+- **Auth:** Required (admin role)
+- **Purpose:** Get firm details and settings
+- **Request:** None
+- **Response:** `200 OK`
+```json
+{
+  "id": "uuid",
+  "name": "Acme Law Firm",
+  "settings": {
+    "logoUrl": "https://...",
+    "primaryColor": "#003366",
+    "defaultTemplate": "uuid"
+  },
+  "createdAt": "2024-01-01T00:00:00Z",
+  "updatedAt": "2024-01-15T10:30:00Z"
+}
+```
+- **Errors:** `401 Unauthorized`, `403 Forbidden (not admin)`, `404 Not found`
+
+**PUT /firms/:id**
+- **Auth:** Required (admin role)
+- **Purpose:** Update firm settings
+- **Request:**
+```json
+{
+  "name": "Updated Firm Name",
+  "settings": {
+    "logoUrl": "https://...",
+    "primaryColor": "#003366",
+    "defaultTemplate": "uuid"
+  }
+}
+```
+- **Response:** `200 OK` (same as GET)
+- **Errors:** `400 Invalid input`, `401 Unauthorized`, `403 Forbidden`, `404 Not found`
+
+**User Management Endpoints:**
+
+**GET /firms/:firmId/users**
+- **Auth:** Required (any role in firm)
+- **Purpose:** List all users in the firm
+- **Query Params:** `?role=admin&isActive=true` (filters)
+- **Response:** `200 OK`
+```json
+{
+  "users": [
+    {
+      "id": "uuid",
+      "email": "user@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "role": "attorney",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "total": 25,
+  "page": 1,
+  "limit": 50
+}
+```
+- **Errors:** `401 Unauthorized`, `403 Forbidden (wrong firm)`
+
+**POST /firms/:firmId/users/invite**
+- **Auth:** Required (admin role)
+- **Purpose:** Invite a new user to the firm
+- **Request:**
+```json
+{
+  "email": "newuser@example.com",
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "role": "paralegal"
+}
+```
+- **Response:** `201 Created`
+```json
+{
+  "invitation": {
+    "id": "uuid",
+    "email": "newuser@example.com",
+    "role": "paralegal",
+    "expiresAt": "2024-01-08T00:00:00Z",
+    "status": "pending"
+  },
+  "message": "Invitation email sent"
+}
+```
+- **Errors:** `400 Invalid input`, `401 Unauthorized`, `403 Forbidden`, `409 User already exists`
+
+**DELETE /firms/:firmId/users/:userId**
+- **Auth:** Required (admin role)
+- **Purpose:** Remove user from firm (soft delete - set is_active = false)
+- **Request:** None
+- **Response:** `200 OK`
+```json
+{
+  "message": "User removed successfully",
+  "userId": "uuid"
+}
+```
+- **Errors:** `401 Unauthorized`, `403 Forbidden`, `404 Not found`, `400 Cannot delete yourself`
+
+**GET /users/me**
+- **Auth:** Required (any role)
+- **Purpose:** Get current user's profile
+- **Request:** None
+- **Response:** `200 OK`
+```json
+{
+  "id": "uuid",
+  "email": "user@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "role": "attorney",
+  "firmId": "uuid",
+  "firmName": "Acme Law Firm",
+  "isActive": true,
+  "createdAt": "2024-01-01T00:00:00Z"
+}
+```
+- **Errors:** `401 Unauthorized`
+
+**PUT /users/:id**
+- **Auth:** Required (self or admin)
+- **Purpose:** Update user profile
+- **Request:**
+```json
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "newemail@example.com"
+}
+```
+- **Response:** `200 OK` (same as GET /users/me)
+- **Errors:** `400 Invalid input`, `401 Unauthorized`, `403 Forbidden`, `404 Not found`, `409 Email conflict`
+- **Note:** Users can update their own profile; admins can update any user in their firm
+
+**PUT /users/:id/role**
+- **Auth:** Required (admin role)
+- **Purpose:** Change user's role
+- **Request:**
+```json
+{
+  "role": "attorney"
+}
+```
+- **Response:** `200 OK` (updated user object)
+- **Errors:** `400 Invalid role`, `401 Unauthorized`, `403 Forbidden`, `404 Not found`, `400 Cannot change own role`
+
+**User Invitation Flow:**
+
+**1. Admin Invites User:**
+```
+POST /firms/:firmId/users/invite
+  Body: { email, firstName, lastName, role }
+
+Server:
+  1. Verify requester is admin
+  2. Check if user already exists in firm
+  3. Generate invitation token (UUID, 7-day expiry)
+  4. Store invitation in database (or password_reset_tokens table with type field)
+  5. Send invitation email with link
+  6. Return invitation details
+
+Email Link: https://app.example.com/accept-invitation?token=<uuid>
+```
+
+**2. User Accepts Invitation:**
+```
+GET /accept-invitation?token=<uuid>
+  → Frontend shows registration form (pre-filled email)
+
+POST /auth/register (from PR-004)
+  Body: { email, password, firstName, lastName, invitationToken }
+
+Server:
+  1. Validate invitation token
+  2. Extract firmId and role from invitation
+  3. Create user account with specified role
+  4. Mark invitation as used
+  5. Log user in (return JWT tokens)
+```
+
+**Service Layer Implementation:**
+
+**FirmService:**
+```typescript
+class FirmService {
+  async getFirmById(firmId: string): Promise<Firm> {
+    // Query firms table
+  }
+
+  async updateFirm(firmId: string, updates: FirmUpdate): Promise<Firm> {
+    // Validate updates
+    // Update firms table
+    // Return updated firm
+  }
+
+  async getFirmSettings(firmId: string): Promise<FirmSettings> {
+    // Extract JSONB settings field
+  }
+}
+```
+
+**UserService:**
+```typescript
+class UserService {
+  async listFirmUsers(firmId: string, filters: UserFilters): Promise<User[]> {
+    // Query users table with firm_id filter
+    // Apply role and isActive filters
+    // Paginate results
+  }
+
+  async getUserById(userId: string, firmId: string): Promise<User> {
+    // Query with firm_id enforcement
+  }
+
+  async updateUser(userId: string, firmId: string, updates: UserUpdate): Promise<User> {
+    // Verify user belongs to firm
+    // Validate updates (email uniqueness within firm)
+    // Update users table
+  }
+
+  async updateUserRole(userId: string, firmId: string, newRole: Role): Promise<User> {
+    // Verify requester is admin
+    // Verify target user in same firm
+    // Update role in users table
+  }
+
+  async removeUser(userId: string, firmId: string): Promise<void> {
+    // Soft delete: set is_active = false
+    // Invalidate all user's refresh tokens
+  }
+}
+```
+
+**InvitationService:**
+```typescript
+class InvitationService {
+  async inviteUser(firmId: string, invitation: InvitationRequest): Promise<Invitation> {
+    // Check if user already exists in firm
+    // Generate invitation token
+    // Store in database with expiration (7 days)
+    // Send invitation email
+    // Return invitation details
+  }
+
+  async validateInvitation(token: string): Promise<InvitationDetails> {
+    // Find invitation by token
+    // Check not expired
+    // Check not already used
+    // Return firmId, email, role
+  }
+
+  async acceptInvitation(token: string): Promise<void> {
+    // Mark invitation as used
+    // Called by auth/register endpoint
+  }
+}
+```
+
+**Email Templates:**
+
+**Invitation Email (invitation-email.html):**
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>You're invited to join {{firmName}}</title>
+</head>
+<body>
+  <h1>You've been invited!</h1>
+  <p>Hi {{firstName}},</p>
+  <p>{{inviterName}} has invited you to join <strong>{{firmName}}</strong> on Demand Letter Generator.</p>
+  <p>You've been invited as a <strong>{{role}}</strong>.</p>
+  <p>
+    <a href="{{invitationLink}}" style="background: #003366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">
+      Accept Invitation
+    </a>
+  </p>
+  <p>Or copy and paste this link: {{invitationLink}}</p>
+  <p>This invitation will expire in 7 days.</p>
+  <p>Thanks,<br>The Steno Team</p>
+</body>
+</html>
+```
+
+**Email Sending Utility:**
+```typescript
+// services/api/src/utils/email.ts
+import nodemailer from 'nodemailer';
+
+export async function sendInvitationEmail(to: string, data: InvitationEmailData) {
+  const transporter = nodemailer.createTransport({
+    // AWS SES in production
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT),
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
+    }
+  });
+
+  const html = renderTemplate('invitation-email.html', data);
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to,
+    subject: `You're invited to join ${data.firmName}`,
+    html
+  });
+}
+```
+
+**Database Interactions:**
+
+**Tables Used:**
+- `firms` - Read for firm details, write for settings updates
+- `users` - Read for listing, write for updates, soft delete
+- `invitations` table (new - requires schema addition):
+  - id (UUID, PK)
+  - firm_id (UUID, FK → firms.id)
+  - email (VARCHAR)
+  - first_name (VARCHAR)
+  - last_name (VARCHAR)
+  - role (ENUM: admin, attorney, paralegal)
+  - token (VARCHAR, unique)
+  - expires_at (TIMESTAMP)
+  - used (BOOLEAN, default false)
+  - invited_by (UUID, FK → users.id)
+  - created_at (TIMESTAMP)
+
+**Indexes Required:**
+- `users(firm_id, is_active)` - Fast listing of active users
+- `users(firm_id, role)` - Filter users by role
+- `invitations(token)` - Fast invitation lookup
+- `invitations(firm_id, email)` - Check duplicate invitations
+
+**Multi-Tenant Security Patterns:**
+
+**1. Implicit Firm Scoping:**
+Every service method takes firmId as parameter and includes it in WHERE clauses:
+```typescript
+async listUsers(firmId: string) {
+  return db.query('SELECT * FROM users WHERE firm_id = $1', [firmId]);
+}
+```
+
+**2. Authorization Checks:**
+```typescript
+async updateUser(userId: string, requestingUserId: string, firmId: string, updates: UserUpdate) {
+  // Can update if:
+  // 1. User is updating their own profile, OR
+  // 2. Requesting user is admin in the same firm
+
+  const requestingUser = await this.getUserById(requestingUserId, firmId);
+
+  if (userId !== requestingUserId && requestingUser.role !== 'admin') {
+    throw new ForbiddenError('Insufficient permissions');
+  }
+
+  // Proceed with update
+}
+```
+
+**3. Cross-Firm Attack Prevention:**
+All endpoints verify:
+- User's firmId (from JWT) matches resource's firmId
+- Route parameters don't allow specifying different firmId
+- Database queries always filter by firm_id
+
+**Error Handling:**
+
+**Standard Error Codes:**
+- `USER_NOT_FOUND` - User doesn't exist or not in requester's firm
+- `FIRM_NOT_FOUND` - Firm doesn't exist or access denied
+- `INVITATION_EXPIRED` - Invitation token expired
+- `INVITATION_USED` - Invitation already accepted
+- `USER_ALREADY_EXISTS` - User with email already in firm
+- `CANNOT_MODIFY_SELF` - Cannot delete/change own role
+- `INVALID_ROLE` - Invalid role value
+
+**Dependencies:**
+
+**NPM Packages to Add:**
+```json
+{
+  "nodemailer": "^6.9.7",
+  "handlebars": "^4.7.8"
+}
+```
+
+**Dev Dependencies:**
+```json
+{
+  "@types/nodemailer": "^6.4.14"
+}
+```
+
+**Time Breakdown:**
+- FirmService implementation: 30 min
+- UserService implementation: 45 min
+- InvitationService implementation: 40 min
+- Firm context middleware: 20 min
+- Firm ownership verification middleware: 15 min
+- Email utility and templates: 30 min
+- Route handlers (firms): 20 min
+- Route handlers (users): 30 min
+- Input validation schemas: 20 min
+- Unit tests (FirmService): 30 min
+- Unit tests (UserService): 40 min
+- Unit tests (InvitationService): 30 min
+- Unit tests (middleware): 25 min
+- Integration tests (firm management): 45 min
+- Integration tests (user management): 45 min
+- Integration tests (multi-tenant isolation): 30 min
+- Error handling and edge cases: 20 min
+- Documentation and code comments: 15 min
+- **Total: 470 minutes (7 hours 50 minutes)**
+
+**Risks/Challenges:**
+
+1. **Email Service Configuration:** AWS SES requires verification, may need sandbox exit
+   - Mitigation: Use SMTP in development, document SES setup process
+
+2. **Multi-Tenant Data Leaks:** Critical security risk
+   - Mitigation: Comprehensive testing, middleware enforcement, code review
+
+3. **Invitation Token Security:** Tokens must be unguessable and time-limited
+   - Mitigation: Use UUIDs, enforce expiration, one-time use
+
+4. **User Deletion Semantics:** Soft delete vs hard delete
+   - Decision: Soft delete (set is_active = false) to preserve audit trail
+
+5. **Firm Settings Schema:** JSONB flexibility vs type safety
+   - Mitigation: Define TypeScript interface, validate on update
+
+6. **Schema Addition:** Invitations table not in original PR-002 schema
+   - Mitigation: Create migration to add invitations table
+
+**Testing Strategy:**
+
+**Unit Tests:**
+- FirmService methods (CRUD operations)
+- UserService methods (list, update, role change, delete)
+- InvitationService (create, validate, accept)
+- Middleware (firm context, ownership verification)
+- Email utility (mock SMTP)
+
+**Integration Tests:**
+- Complete invitation flow (invite → email → accept → register)
+- Firm settings management
+- User listing with filters and pagination
+- User role changes
+- User deletion
+- Cross-firm access prevention (security critical)
+- Admin vs non-admin permissions
+
+**Security Tests:**
+- Attempt to access other firm's users
+- Attempt to invite user to wrong firm
+- Attempt to delete self
+- Attempt to change own role
+- SQL injection in filters
+- Email validation bypass attempts
+
+**Multi-Tenant Isolation Tests:**
+- User A in Firm 1 cannot list users from Firm 2
+- User A in Firm 1 cannot update user in Firm 2
+- Admin in Firm 1 cannot change role of user in Firm 2
+- Invitation tokens are firm-specific
 
 ---
 
