@@ -1550,21 +1550,30 @@ Security-critical. All uploads must be scanned and validated before storage.
 ---
 
 ### PR-007: Template Management System
-**Status:** Planning
-**Agent:** Blonde
-**Dependencies:** PR-001, PR-002, PR-004, PR-005
+**Status:** Blocked-Ready
+**Agent:** Blonde (Planning Complete)
+**Dependencies:** PR-001 (Complete), PR-002 (Complete), PR-004 (Blocked-Ready), PR-005 (In Progress)
 **Priority:** High
 
 **Description:**
 Build system for creating, editing, and managing firm-specific demand letter templates. Support template variables, versioning, and default templates.
 
-**Files (ESTIMATED - will be refined during Planning):**
-- services/api/src/services/TemplateService.ts (create)
-- services/api/src/routes/templates.ts (create)
-- services/api/src/types/template.ts (create)
-- services/api/src/utils/templateValidation.ts (create)
-- tests/templates/TemplateService.test.ts (create)
-- tests/integration/template-management.test.ts (create)
+**Files (VERIFIED during Planning):**
+- services/api/src/services/TemplateService.ts (create) - Core template business logic
+- services/api/src/routes/templates.ts (create) - Template API endpoints
+- services/api/src/types/template.ts (create) - TypeScript interfaces and types
+- services/api/src/utils/templateValidation.ts (create) - Template content validation
+- services/api/src/utils/variableExtraction.ts (create) - Variable parsing logic
+- services/api/src/middleware/templateOwnership.ts (create) - Verify template ownership
+- tests/templates/TemplateService.test.ts (create) - Unit tests for service
+- tests/templates/templateValidation.test.ts (create) - Unit tests for validation
+- tests/templates/variableExtraction.test.ts (create) - Unit tests for variable parser
+- tests/integration/template-management.test.ts (create) - Integration tests for CRUD
+- tests/integration/template-versioning.test.ts (create) - Integration tests for versioning
+- tests/fixtures/templates/personal-injury.txt (create) - Sample template for tests
+- tests/fixtures/templates/property-damage.txt (create) - Sample template for tests
+- services/api/package.json (modify) - No new dependencies needed (using Zod from PR-004)
+- services/database/seeds/001_default_templates.sql (create) - Optional seed data
 
 **Acceptance Criteria:**
 - [ ] GET /templates - list firm templates
@@ -1581,6 +1590,640 @@ Build system for creating, editing, and managing firm-specific demand letter tem
 
 **Notes:**
 Template system should be flexible enough to support various demand letter formats.
+
+---
+
+## Planning Notes: PR-007 (Template Management System)
+
+**Technology Decisions:**
+- **Template Variable Syntax:** Handlebars-style `{{variable_name}}` for consistency with common templating systems
+- **Variable Parsing:** Custom regex-based parser (no Handlebars library dependency for security and control)
+- **Template Validation:** Zod for input validation, custom validation for variable syntax
+- **Rich Text Storage:** Plain text with formatting markers (or HTML subset if needed)
+- **Versioning Strategy:** Automatic version creation on template updates, immutable version records
+
+**Template Variable Syntax Design:**
+
+**Supported Variable Format:**
+```
+{{variable_name}}
+```
+
+**Standard Template Variables:**
+- `{{plaintiff_name}}` - Name of the plaintiff/claimant
+- `{{plaintiff_address}}` - Address of plaintiff
+- `{{defendant_name}}` - Name of the defendant
+- `{{defendant_address}}` - Address of defendant
+- `{{case_number}}` - Case reference number
+- `{{incident_date}}` - Date of incident
+- `{{incident_location}}` - Location where incident occurred
+- `{{total_damages}}` - Total damages being claimed
+- `{{medical_expenses}}` - Medical costs
+- `{{property_damages}}` - Property damage costs
+- `{{lost_wages}}` - Lost income
+- `{{demand_amount}}` - Total amount being demanded
+- `{{deadline_date}}` - Response deadline date
+- `{{attorney_name}}` - Attorney name
+- `{{attorney_signature}}` - Attorney signature block
+- `{{firm_name}}` - Law firm name
+- `{{firm_address}}` - Firm address
+- `{{firm_phone}}` - Firm phone number
+- `{{date}}` - Current date (auto-populated)
+
+**Variable Extraction Algorithm:**
+```typescript
+// Extract all variables from template content
+function extractVariables(content: string): string[] {
+  const regex = /\{\{([a-z_][a-z0-9_]*)\}\}/gi;
+  const matches = content.matchAll(regex);
+  const variables = new Set<string>();
+
+  for (const match of matches) {
+    variables.add(match[1].toLowerCase());
+  }
+
+  return Array.from(variables).sort();
+}
+```
+
+**Template Versioning Strategy:**
+
+**Version Creation Rules:**
+1. **Initial Creation:** Version 1 created automatically
+2. **Content Updates:** New version created on any content change
+3. **Metadata Updates:** Name/description changes do NOT create new versions
+4. **Version Immutability:** Once created, versions never modified (audit trail)
+
+**Version Number Scheme:**
+- Sequential integers starting at 1
+- Version 1, Version 2, Version 3, etc.
+- Simple and predictable
+- No semantic versioning needed for templates
+
+**Rollback Strategy:**
+- Admin can set `current_version_id` to any previous version
+- Rollback is non-destructive (previous versions preserved)
+- Create new version if rolled-back version is modified
+
+**API Endpoint Specifications:**
+
+**GET /templates**
+- **Auth:** Required (any role)
+- **Purpose:** List all templates for the firm
+- **Query Params:**
+  - `?isDefault=true` - Filter for default templates
+  - `?page=1&limit=50` - Pagination
+  - `?search=personal%20injury` - Search by name/description
+- **Response:** `200 OK`
+```json
+{
+  "templates": [
+    {
+      "id": "uuid",
+      "name": "Personal Injury Demand Letter",
+      "description": "Standard template for personal injury claims",
+      "isDefault": true,
+      "currentVersion": {
+        "id": "uuid",
+        "versionNumber": 3,
+        "variableCount": 15,
+        "createdAt": "2024-01-15T10:30:00Z"
+      },
+      "createdBy": {
+        "id": "uuid",
+        "name": "John Doe"
+      },
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "total": 5,
+  "page": 1,
+  "limit": 50
+}
+```
+- **Errors:** `401 Unauthorized`
+
+**GET /templates/:id**
+- **Auth:** Required (any role)
+- **Purpose:** Get template details with current version content
+- **Response:** `200 OK`
+```json
+{
+  "id": "uuid",
+  "firmId": "uuid",
+  "name": "Personal Injury Demand Letter",
+  "description": "Standard template for personal injury claims",
+  "isDefault": true,
+  "currentVersion": {
+    "id": "uuid",
+    "versionNumber": 3,
+    "content": "Dear {{defendant_name}},\n\nThis letter serves as formal demand...",
+    "variables": [
+      "defendant_name",
+      "plaintiff_name",
+      "incident_date",
+      "total_damages"
+    ],
+    "createdBy": {
+      "id": "uuid",
+      "name": "Jane Smith"
+    },
+    "createdAt": "2024-01-15T10:30:00Z"
+  },
+  "versionHistory": [
+    {
+      "id": "uuid",
+      "versionNumber": 3,
+      "createdBy": "Jane Smith",
+      "createdAt": "2024-01-15T10:30:00Z"
+    },
+    {
+      "id": "uuid",
+      "versionNumber": 2,
+      "createdBy": "John Doe",
+      "createdAt": "2024-01-10T14:20:00Z"
+    },
+    {
+      "id": "uuid",
+      "versionNumber": 1,
+      "createdBy": "John Doe",
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "createdBy": {
+    "id": "uuid",
+    "name": "John Doe"
+  },
+  "createdAt": "2024-01-01T00:00:00Z",
+  "updatedAt": "2024-01-15T10:30:00Z"
+}
+```
+- **Errors:** `401 Unauthorized`, `403 Forbidden (wrong firm)`, `404 Not found`
+
+**POST /templates**
+- **Auth:** Required (admin role only)
+- **Purpose:** Create new template
+- **Request:**
+```json
+{
+  "name": "Contract Breach Demand Letter",
+  "description": "Template for breach of contract claims",
+  "content": "Dear {{defendant_name}},\n\nRe: Breach of Contract...",
+  "isDefault": false
+}
+```
+- **Response:** `201 Created`
+```json
+{
+  "id": "uuid",
+  "firmId": "uuid",
+  "name": "Contract Breach Demand Letter",
+  "description": "Template for breach of contract claims",
+  "isDefault": false,
+  "currentVersion": {
+    "id": "uuid",
+    "versionNumber": 1,
+    "content": "Dear {{defendant_name}}...",
+    "variables": ["defendant_name", "plaintiff_name"],
+    "createdBy": {
+      "id": "uuid",
+      "name": "Admin User"
+    },
+    "createdAt": "2024-01-20T09:00:00Z"
+  },
+  "createdBy": {
+    "id": "uuid",
+    "name": "Admin User"
+  },
+  "createdAt": "2024-01-20T09:00:00Z",
+  "updatedAt": "2024-01-20T09:00:00Z"
+}
+```
+- **Errors:** `400 Invalid input`, `401 Unauthorized`, `403 Forbidden (not admin)`, `409 Template name already exists`
+
+**PUT /templates/:id**
+- **Auth:** Required (admin role only)
+- **Purpose:** Update template (creates new version if content changed)
+- **Request:**
+```json
+{
+  "name": "Updated Template Name",
+  "description": "Updated description",
+  "content": "Updated content with {{new_variable}}...",
+  "isDefault": false
+}
+```
+- **Behavior:**
+  - If `content` changed: Create new version, increment version number
+  - If only `name`/`description` changed: Update template record only (no new version)
+- **Response:** `200 OK` (same structure as GET /templates/:id)
+- **Errors:** `400 Invalid input`, `401 Unauthorized`, `403 Forbidden`, `404 Not found`
+
+**PUT /templates/:id/rollback/:versionNumber**
+- **Auth:** Required (admin role only)
+- **Purpose:** Rollback template to a previous version
+- **Request:** None
+- **Response:** `200 OK` (updated template with rolled-back version as current)
+- **Errors:** `401 Unauthorized`, `403 Forbidden`, `404 Template/version not found`
+
+**DELETE /templates/:id**
+- **Auth:** Required (admin role only)
+- **Purpose:** Soft delete template (set is_deleted flag or remove current_version_id)
+- **Note:** Don't hard delete - templates may be referenced by demand letters
+- **Request:** None
+- **Response:** `200 OK`
+```json
+{
+  "message": "Template deleted successfully",
+  "templateId": "uuid"
+}
+```
+- **Errors:** `401 Unauthorized`, `403 Forbidden`, `404 Not found`, `400 Cannot delete default template (unset default first)`
+
+**GET /templates/:id/versions/:versionNumber**
+- **Auth:** Required (any role)
+- **Purpose:** Get specific version of template
+- **Response:** `200 OK`
+```json
+{
+  "id": "uuid",
+  "templateId": "uuid",
+  "versionNumber": 2,
+  "content": "Template content from version 2...",
+  "variables": ["plaintiff_name", "defendant_name"],
+  "createdBy": {
+    "id": "uuid",
+    "name": "John Doe"
+  },
+  "createdAt": "2024-01-10T14:20:00Z"
+}
+```
+- **Errors:** `401 Unauthorized`, `403 Forbidden`, `404 Not found`
+
+**Service Layer Design:**
+
+**TemplateService Class:**
+```typescript
+class TemplateService {
+  // List templates for a firm with optional filters
+  async listTemplates(
+    firmId: string,
+    filters: TemplateFilters
+  ): Promise<PaginatedResult<TemplateSummary>>;
+
+  // Get template by ID with current version content
+  async getTemplateById(
+    templateId: string,
+    firmId: string
+  ): Promise<TemplateWithVersion>;
+
+  // Create new template (admin only)
+  async createTemplate(
+    firmId: string,
+    userId: string,
+    data: CreateTemplateRequest
+  ): Promise<TemplateWithVersion>;
+
+  // Update template (creates new version if content changed)
+  async updateTemplate(
+    templateId: string,
+    firmId: string,
+    userId: string,
+    data: UpdateTemplateRequest
+  ): Promise<TemplateWithVersion>;
+
+  // Rollback to previous version
+  async rollbackToVersion(
+    templateId: string,
+    firmId: string,
+    versionNumber: number
+  ): Promise<TemplateWithVersion>;
+
+  // Soft delete template
+  async deleteTemplate(
+    templateId: string,
+    firmId: string
+  ): Promise<void>;
+
+  // Get specific version
+  async getTemplateVersion(
+    templateId: string,
+    firmId: string,
+    versionNumber: number
+  ): Promise<TemplateVersion>;
+
+  // Get all versions for a template
+  async getVersionHistory(
+    templateId: string,
+    firmId: string
+  ): Promise<TemplateVersion[]>;
+
+  // Extract variables from template content
+  private extractVariables(content: string): string[];
+
+  // Validate template content and variables
+  private validateTemplate(content: string): ValidationResult;
+}
+```
+
+**Template Validation Logic:**
+
+**Validation Rules:**
+1. **Name:** Required, 1-255 characters, unique within firm
+2. **Content:** Required, max 50,000 characters
+3. **Variables:** Must match `{{variable_name}}` format
+4. **Variable Names:** Lowercase letters, numbers, underscores only
+5. **Variable Names:** Must start with letter or underscore
+6. **Balanced Braces:** All `{{` must have matching `}}`
+
+**Validation Implementation:**
+```typescript
+interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+function validateTemplate(content: string): ValidationResult {
+  const result: ValidationResult = {
+    valid: true,
+    errors: [],
+    warnings: []
+  };
+
+  // Check length
+  if (content.length > 50000) {
+    result.valid = false;
+    result.errors.push('Template content exceeds maximum length of 50,000 characters');
+  }
+
+  // Check for unbalanced braces
+  const openCount = (content.match(/\{\{/g) || []).length;
+  const closeCount = (content.match(/\}\}/g) || []).length;
+  if (openCount !== closeCount) {
+    result.valid = false;
+    result.errors.push('Unbalanced template variable braces');
+  }
+
+  // Extract and validate variable names
+  const variables = extractVariables(content);
+  for (const variable of variables) {
+    if (!/^[a-z_][a-z0-9_]*$/.test(variable)) {
+      result.valid = false;
+      result.errors.push(`Invalid variable name: ${variable}`);
+    }
+  }
+
+  // Warn about common variables not present
+  const recommendedVars = ['plaintiff_name', 'defendant_name', 'date'];
+  for (const recommended of recommendedVars) {
+    if (!variables.includes(recommended)) {
+      result.warnings.push(`Recommended variable missing: ${recommended}`);
+    }
+  }
+
+  return result;
+}
+```
+
+**Database Interactions:**
+
+**Tables Used:**
+- `templates` - Read for listing, write for create/update/delete
+- `template_versions` - Write for version creation, read for version history
+- `users` - Read for created_by user details
+
+**Key Queries:**
+
+**List Templates:**
+```sql
+SELECT
+  t.id,
+  t.name,
+  t.description,
+  t.is_default,
+  t.created_at,
+  t.updated_at,
+  tv.id as current_version_id,
+  tv.version_number,
+  COALESCE(jsonb_array_length(tv.variables), 0) as variable_count,
+  u.first_name || ' ' || u.last_name as created_by_name
+FROM templates t
+LEFT JOIN template_versions tv ON t.current_version_id = tv.id
+LEFT JOIN users u ON t.created_by = u.id
+WHERE t.firm_id = $1
+  AND ($2::boolean IS NULL OR t.is_default = $2)
+  AND ($3::text IS NULL OR t.name ILIKE $3 OR t.description ILIKE $3)
+ORDER BY t.created_at DESC
+LIMIT $4 OFFSET $5;
+```
+
+**Get Template with Current Version:**
+```sql
+SELECT
+  t.id,
+  t.firm_id,
+  t.name,
+  t.description,
+  t.is_default,
+  t.created_at,
+  t.updated_at,
+  tv.id as version_id,
+  tv.version_number,
+  tv.content,
+  tv.variables,
+  tv.created_at as version_created_at,
+  u.id as created_by_id,
+  u.first_name || ' ' || u.last_name as created_by_name
+FROM templates t
+INNER JOIN template_versions tv ON t.current_version_id = tv.id
+LEFT JOIN users u ON tv.created_by = u.id
+WHERE t.id = $1 AND t.firm_id = $2;
+```
+
+**Create Template and Version (Transaction):**
+```sql
+BEGIN;
+
+-- Insert template
+INSERT INTO templates (firm_id, name, description, is_default, created_by)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id;
+
+-- Insert first version
+INSERT INTO template_versions (template_id, version_number, content, variables, created_by)
+VALUES ($6, 1, $7, $8, $5)
+RETURNING id;
+
+-- Update template with current_version_id
+UPDATE templates
+SET current_version_id = $9
+WHERE id = $6;
+
+COMMIT;
+```
+
+**Update Template Content (Creates New Version):**
+```sql
+BEGIN;
+
+-- Get current max version number
+SELECT MAX(version_number) FROM template_versions WHERE template_id = $1;
+
+-- Insert new version
+INSERT INTO template_versions (template_id, version_number, content, variables, created_by)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id;
+
+-- Update template with new current_version_id and metadata
+UPDATE templates
+SET
+  current_version_id = $6,
+  name = $7,
+  description = $8,
+  is_default = $9,
+  updated_at = CURRENT_TIMESTAMP
+WHERE id = $1 AND firm_id = $10;
+
+COMMIT;
+```
+
+**Multi-Tenant Security Patterns:**
+
+**Firm Context Enforcement:**
+- All template queries MUST include `WHERE firm_id = $firmId`
+- Use middleware from PR-005 to inject firm context
+- Verify template belongs to user's firm before any operation
+
+**Authorization Checks:**
+- **Create:** Admin role required
+- **Update:** Admin role required
+- **Delete:** Admin role required
+- **Read:** Any authenticated user in same firm
+
+**Implementation:**
+```typescript
+// In route handler
+router.post('/templates',
+  authenticate,              // From PR-004
+  enforceFirmContext,        // From PR-005
+  requireRole('admin'),      // From PR-004
+  async (req, res) => {
+    const template = await templateService.createTemplate(
+      req.firmId,  // From middleware
+      req.user.id, // From middleware
+      req.body
+    );
+    res.status(201).json(template);
+  }
+);
+```
+
+**Default Templates Strategy:**
+
+**System Default Templates:**
+- Provided as seed data in development
+- Each firm can have ONE template marked as default
+- When creating a new demand letter, default template is pre-selected
+- Default template can be changed by admin
+
+**Seed Templates to Create:**
+1. **Personal Injury Demand Letter**
+   - Variables: plaintiff_name, defendant_name, incident_date, incident_location, medical_expenses, property_damages, lost_wages, demand_amount, deadline_date
+2. **Property Damage Demand Letter**
+   - Variables: plaintiff_name, defendant_name, incident_date, property_address, repair_cost, replacement_cost, demand_amount, deadline_date
+3. **Contract Breach Demand Letter**
+   - Variables: plaintiff_name, defendant_name, contract_date, breach_date, breach_description, damages, demand_amount, deadline_date
+
+**Seed Data Implementation:**
+- Create migration or seed script
+- Only insert if firm has no templates
+- Mark first template as default
+
+**Files (VERIFIED):**
+- services/api/src/services/TemplateService.ts (create) - Core template business logic
+- services/api/src/routes/templates.ts (create) - Template API endpoints
+- services/api/src/types/template.ts (create) - TypeScript interfaces and types
+- services/api/src/utils/templateValidation.ts (create) - Template content validation
+- services/api/src/utils/variableExtraction.ts (create) - Variable parsing logic
+- services/api/src/middleware/templateOwnership.ts (create) - Verify template ownership
+- tests/templates/TemplateService.test.ts (create) - Unit tests for service
+- tests/templates/templateValidation.test.ts (create) - Unit tests for validation
+- tests/templates/variableExtraction.test.ts (create) - Unit tests for variable parser
+- tests/integration/template-management.test.ts (create) - Integration tests for CRUD
+- tests/integration/template-versioning.test.ts (create) - Integration tests for versioning
+- tests/fixtures/templates/personal-injury.txt (create) - Sample template for tests
+- tests/fixtures/templates/property-damage.txt (create) - Sample template for tests
+- services/api/package.json (modify) - No new dependencies needed (using Zod from PR-004)
+- services/database/seeds/001_default_templates.sql (create) - Optional seed data
+
+**Time Breakdown:**
+- TemplateService implementation (CRUD operations): 60 min
+- Template versioning logic: 30 min
+- Variable extraction and validation: 30 min
+- Route handlers: 30 min
+- Middleware (template ownership verification): 15 min
+- TypeScript types and interfaces: 20 min
+- Unit tests (TemplateService): 45 min
+- Unit tests (validation and extraction): 30 min
+- Integration tests (CRUD operations): 45 min
+- Integration tests (versioning and rollback): 30 min
+- Seed data templates: 20 min
+- Error handling and edge cases: 20 min
+- Documentation and code comments: 15 min
+- **Total: 390 minutes (6 hours 30 minutes)**
+
+**Risks/Challenges:**
+
+1. **Variable Extraction Complexity:** Regex parsing can be tricky with nested or malformed syntax
+   - Mitigation: Strict validation rules, comprehensive test cases
+
+2. **Version Proliferation:** Users might create many versions quickly
+   - Mitigation: Consider version cleanup policy (keep last N versions)
+   - Not implementing in P0, document for future
+
+3. **Rich Text vs Plain Text:** Templates may need formatting
+   - Decision: Start with plain text, add HTML subset support if needed (PR-017 frontend may influence)
+   - Store as plain text for now
+
+4. **Template Migration:** Changing variable names breaks existing letters
+   - Mitigation: Version immutability preserves history
+   - Consider variable aliasing in future
+
+5. **Circular Reference:** templates.current_version_id → template_versions.id → templates.id
+   - Mitigation: Already handled in schema with deferred constraint and SET NULL
+
+6. **Default Template Uniqueness:** Only one default per firm
+   - Mitigation: Application logic enforces (unset previous default when setting new one)
+
+**Testing Strategy:**
+
+**Unit Tests:**
+- TemplateService methods (list, get, create, update, delete)
+- Variable extraction from template content
+- Template validation (valid and invalid cases)
+- Version number increment logic
+- Rollback logic
+
+**Integration Tests:**
+- Complete template CRUD workflow
+- Version creation on content updates
+- No version creation on metadata-only updates
+- Rollback to previous version
+- Multi-tenant isolation (User A cannot access Firm B templates)
+- Admin vs non-admin permissions
+- Default template behavior
+- Variable extraction from real template samples
+
+**Edge Cases to Test:**
+- Template with no variables
+- Template with 50+ variables
+- Malformed variable syntax `{{{variable}}}` or `{{variable`
+- Rollback to version 1, then update (should create version 4, not version 2)
+- Delete default template (should fail or require unsetting default first)
+- Concurrent updates to same template
+- Template name conflicts within firm
 
 ---
 
