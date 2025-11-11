@@ -75,7 +75,7 @@ export class TemplateService {
       SELECT
         t.id, t.name, t.description, t.is_default,
         t.created_at, t.updated_at,
-        u.id as creator_id, u.full_name as creator_name,
+        u.id as creator_id, (u.first_name || ' ' || u.last_name) as creator_name,
         cv.id as version_id, cv.version_number,
         cv.variables, cv.created_at as version_created_at
       FROM templates t

@@ -58,10 +58,10 @@ export class DocumentService {
     const query = `
       INSERT INTO documents (
         id, firm_id, uploaded_by, filename, file_type, file_size,
-        s3_bucket, s3_key, local_path, virus_scan_status, metadata, status,
+        s3_bucket, s3_key, virus_scan_status, metadata,
         created_at, updated_at
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), NOW())
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
       RETURNING *
     `;
 
@@ -72,12 +72,10 @@ export class DocumentService {
       file.originalname,
       file.mimetype,
       file.size,
-      uploadResult.bucket,
-      uploadResult.key,
-      uploadResult.localPath,
+      uploadResult.bucket || 'local',
+      uploadResult.key || uploadResult.localPath || '',
       'pending' as VirusScanStatus, // Virus scan status
-      JSON.stringify(metadata),
-      'ready' as DocumentStatus
+      JSON.stringify(metadata)
     ];
 
     const result = await pool.query(query, values);

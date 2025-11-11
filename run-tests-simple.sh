@@ -46,7 +46,7 @@ fi
 echo -n "Test 2: User Registration... "
 RESP=$(curl -s -w "\n%{http_code}" -X POST "$API_URL/auth/register" \
     -H "Content-Type: application/json" \
-    -d "{\"email\":\"$TEST_EMAIL\",\"password\":\"SecurePass123!\",\"firstName\":\"Test\",\"lastName\":\"User\",\"firmId\":\"$FIRM_ID\"}")
+    -d "{\"email\":\"$TEST_EMAIL\",\"password\":\"SecurePass123!\",\"firstName\":\"Test\",\"lastName\":\"User\",\"role\":\"admin\",\"firmId\":\"$FIRM_ID\"}")
 CODE=$(echo "$RESP" | tail -n1)
 BODY=$(echo "$RESP" | head -n-1)
 if [ "$CODE" = "201" ]; then
