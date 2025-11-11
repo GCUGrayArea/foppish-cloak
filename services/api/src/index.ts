@@ -2,6 +2,12 @@ import express, { Application } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import authRoutes from './routes/auth';
+import firmRoutes from './routes/firms';
+import userRoutes from './routes/users';
+import documentRoutes from './routes/documents';
+import { authenticate } from './middleware/auth';
+import { enforceFirmContext } from './middleware/firmContext';
 
 dotenv.config();
 
@@ -18,6 +24,12 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// API Routes
+app.use('/auth', authRoutes);
+app.use('/firms', authenticate, enforceFirmContext, firmRoutes);
+app.use('/users', authenticate, enforceFirmContext, userRoutes);
+app.use('/documents', authenticate, enforceFirmContext, documentRoutes);
 
 // Start server
 if (process.env.NODE_ENV !== 'test') {
