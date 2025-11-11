@@ -6,6 +6,7 @@ import authRoutes from './routes/auth';
 import firmRoutes from './routes/firms';
 import userRoutes from './routes/users';
 import documentRoutes from './routes/documents';
+import templateRoutes from './routes/templates';
 import { authenticate } from './middleware/auth';
 import { enforceFirmContext } from './middleware/firmContext';
 
@@ -30,6 +31,7 @@ app.use('/auth', authRoutes);
 app.use('/firms', authenticate, enforceFirmContext, firmRoutes);
 app.use('/users', authenticate, enforceFirmContext, userRoutes);
 app.use('/documents', authenticate, enforceFirmContext, documentRoutes);
+app.use('/templates', authenticate, enforceFirmContext, templateRoutes);
 
 // Start server
 if (process.env.NODE_ENV !== 'test') {

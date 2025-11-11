@@ -1,0 +1,65 @@
+{{firm_name}}
+{{firm_address}}
+{{firm_phone}}
+
+{{date}}
+
+{{defendant_name}}
+{{defendant_address}}
+
+Re: Demand for Settlement - Personal Injury Claim
+Case Number: {{case_number}}
+
+Dear {{defendant_name}},
+
+This letter serves as formal demand for settlement of damages sustained by our client, {{plaintiff_name}}, as a result of the incident that occurred on {{incident_date}} at {{incident_location}}.
+
+STATEMENT OF FACTS
+
+On {{incident_date}}, {{plaintiff_name}} was lawfully present at {{incident_location}} when the incident occurred. As a direct result of your negligence and/or the negligence of those for whom you are responsible, our client sustained serious injuries and damages.
+
+INJURIES AND DAMAGES
+
+Our client suffered the following injuries:
+- Physical injuries requiring immediate medical attention
+- Ongoing medical treatment and rehabilitation
+- Pain and suffering
+- Loss of enjoyment of life
+
+MEDICAL EXPENSES
+
+Total medical expenses incurred to date: {{medical_expenses}}
+
+These expenses include:
+- Emergency room treatment
+- Follow-up medical appointments
+- Physical therapy
+- Prescription medications
+- Medical equipment and supplies
+
+PROPERTY DAMAGES
+
+Property damages sustained: {{property_damages}}
+
+LOST WAGES
+
+Due to the injuries sustained, our client was unable to work, resulting in lost wages of: {{lost_wages}}
+
+TOTAL DAMAGES
+
+The total damages sustained by our client amount to: {{total_damages}}
+
+DEMAND FOR SETTLEMENT
+
+Based on the foregoing, we hereby demand payment in the amount of {{demand_amount}} in full and final settlement of all claims arising from this incident.
+
+This offer remains open until {{deadline_date}}. If we do not receive your acceptance by this date, we will have no alternative but to pursue all available legal remedies, including filing a lawsuit seeking damages in excess of the amount stated herein, plus costs, interest, and attorney's fees.
+
+Please direct all communications regarding this matter to the undersigned.
+
+Sincerely,
+
+{{attorney_signature}}
+{{attorney_name}}
+Attorney at Law
+{{firm_name}}
