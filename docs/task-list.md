@@ -1550,7 +1550,8 @@ Security-critical. All uploads must be scanned and validated before storage.
 ---
 
 ### PR-007: Template Management System
-**Status:** New
+**Status:** Planning
+**Agent:** Orange
 **Dependencies:** PR-001, PR-002, PR-004, PR-005
 **Priority:** High
 
