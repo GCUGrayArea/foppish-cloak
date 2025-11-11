@@ -1,0 +1,3 @@
+"""Demand Letter AI Processor Service."""
+
+__version__ = "1.0.0"

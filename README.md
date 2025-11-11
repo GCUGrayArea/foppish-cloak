@@ -1,104 +1,324 @@
-## Picatrix: Multi-Agent Claude Code Coordination Template
+# Demand Letter Generator
 
-A meta-repository template for running multiple Claude Code agents in parallel with automatic coordination, source control safety, and quality control.
+AI-powered legal document generation system for creating professional demand letters using AWS Bedrock (Claude).
 
-## Features
+## Project Overview
 
-- **Parallel agent coordination** - Up to 6 agents working simultaneously without conflicts
-- **File locking** - Prevents agents from interfering with each other's work
-- **Automatic QC** - Quality control agent tests completed work
-- **Source control safety** - Atomic commits, race condition resolution, commit policies
-- **Planning workflow** - Generates PRD and task list from specs
-- **Persistent context memory** - Memory bank accumulates implementation knowledge across sessions
+The Demand Letter Generator is a microservices-based application that helps law firms streamline the creation of demand letters through AI-powered document analysis and generation. The system analyzes source documents, extracts relevant information, and generates professional demand letters using Claude AI.
 
-## Setup
+### Key Features
 
-1. **Fork this meta-repo** for your new project
-2. **Install Claude Code essentials plugin:**
-   ```bash
-   /plugin marketplace add https://github.com/wshobson/agents
-   ```
-3. **Initialize your project:**
-   ```bash
-   /plan <path-to-spec>
-   ```
-   This generates `docs/prd.md` and `docs/task-list.md` from your specification.
+- **AI-Powered Document Analysis**: Automatically extract facts, parties, and damages from source documents
+- **Template Management**: Create and manage firm-specific demand letter templates
+- **Intelligent Generation**: Generate professional demand letters with Claude AI
+- **Iterative Refinement**: Refine letters based on attorney feedback
+- **Multi-Tenant Architecture**: Secure firm-level data isolation
+- **Real-Time Collaboration** (P1): Concurrent editing with Yjs CRDT
+- **Document Export**: Export to Word (.docx) and PDF formats
 
-4. **Start parallel agents with `/work`:**
-   ```bash
-   # In terminal 1
-   claude /work
+## Technology Stack
 
-   # In terminal 2
-   claude /work
+### Frontend
+- **Framework**: React 18 + Vite
+- **Language**: TypeScript
+- **Routing**: React Router v6
+- **State Management**: React Query + Context API
+- **Testing**: Vitest + React Testing Library + Playwright
 
-   # In terminal 3
-   claude /work
-   ```
+### Backend - API Service (Node.js)
+- **Runtime**: Node.js 18+
+- **Framework**: Express.js
+- **Language**: TypeScript
+- **Authentication**: JWT with bcrypt
+- **Database Client**: node-postgres (pg)
+- **Testing**: Jest + Supertest
 
-5. **Monitor progress:**
-   ```bash
-   /status
-   ```
+### Backend - AI Processor (Python)
+- **Runtime**: Python 3.11+
+- **AI Provider**: AWS Bedrock (Claude)
+- **Validation**: Pydantic
+- **Testing**: pytest
 
-6. **Run quality control:**
-   ```bash
-   /qc
-   ```
+### Infrastructure
+- **Cloud**: AWS (Lambda, API Gateway, S3, RDS PostgreSQL)
+- **IaC**: Terraform
+- **CI/CD**: GitHub Actions
+- **Monitoring**: CloudWatch, Sentry
 
-## Important User Documentation
+## Repository Structure
 
-**READ THESE if you're running parallel agents:**
+```
+foppish-cloak/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                 # CI/CD pipeline
+├── docs/
+│   ├── prd.md                     # Product requirements
+│   ├── task-list.md               # Project task tracking
+│   └── memory/                    # Agent memory bank
+│       ├── systemPatterns.md      # Architecture decisions
+│       ├── techContext.md         # Tech stack details
+│       ├── activeContext.md       # Current work context
+│       └── progress.md            # Implementation status
+├── services/
+│   ├── api/                       # Node.js API service
+│   │   ├── src/
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   ├── ai-processor/              # Python AI service
+│   │   ├── src/
+│   │   ├── requirements.txt
+│   │   └── pyproject.toml
+│   └── collaboration/             # WebSocket collaboration service (P1)
+├── frontend/                      # React frontend
+│   ├── src/
+│   ├── package.json
+│   ├── vite.config.ts
+│   └── tsconfig.json
+├── infrastructure/                # Terraform configuration
+├── package.json                   # Root workspace config
+├── tsconfig.json                  # Root TypeScript config
+└── README.md
+```
 
-- **`.claude/timeout-policy.md`** - PR timeout rules, when agents can reclaim abandoned work, how to handle long debugging sessions
-- **`.claude/agent-identity.md`** - How agents claim and release identities (White, Orange, Blonde, Pink, Blue, Brown)
-- **`.claude/race-conditions.md`** - How agents avoid claiming the same PR simultaneously
-- **`.claude/emergency-stop.md`** - How to halt all agents immediately with `/halt` and resume with `/resume`
+## Prerequisites
 
-These documents contain important information about edge cases and best practices.
+### Required
+- **Node.js**: 18.0.0 or higher
+- **Python**: 3.11 or higher
+- **PostgreSQL**: 15 or higher (via Docker or native)
+- **AWS CLI**: Configured with credentials
+- **Git**: Latest version
 
-## Workflow Overview
+### Optional
+- **Docker & Docker Compose**: For local PostgreSQL
+- **Terraform CLI**: For infrastructure management
 
-1. **Planning Agent** (`/plan`) - Reads spec, generates PRD and task list
-2. **Work Agents** (`/work`) - Claim identity, select PR, implement, commit, release identity
-3. **QC Agent** (`/qc`) - Tests completed PRs, marks as Broken/Approved/Certified
+## Getting Started
 
-## Agent Coordination Files
+### 1. Clone the Repository
 
-- `docs/prd.md` - Product Requirements Document
-- `docs/task-list.md` - PR task list with statuses and file locks
-- `docs/memory/*.md` - Memory bank (systemPatterns, techContext, activeContext, progress)
-- `.claude/agent-identity.lock` - Tracks which agent identities are in use
+```bash
+git clone <repository-url>
+cd foppish-cloak
+```
 
-These files are auto-committed by agents. Implementation code always requires user approval before committing.
+### 2. Install Dependencies
 
-## Example Workflow
+#### Node.js Dependencies (Root + Services)
+```bash
+npm install
+```
 
-See `docs/example-task-list.md` for a realistic example of what task-list.md looks like during active development.
+This will install dependencies for the root workspace and all Node.js services (API, frontend).
 
-## Commands
+#### Python Dependencies (AI Processor)
+```bash
+cd services/ai-processor
+python -m venv venv
 
-- `/plan <spec>` - Generate PRD and task list from specification
-- `/work` - Start agent work session (claims identity, selects PR, implements)
-- `/qc` - Run quality control on completed PRs
-- `/status` - Show current project status
-- `/halt [reason]` - Emergency stop all running agents (suspends work, releases identities)
-- `/resume` - Resume normal operations after halt
+# Activate virtual environment
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
 
-## Customizing for Your Project
+pip install -r requirements.txt
+```
 
-Once you've initialized with `/plan` and started development:
+### 3. Set Up Local Database
 
-1. Replace this README with your project-specific README
-2. The `.claude/` directory contains the coordination rules
-3. The `docs/` directory contains your PRD, task list, and memory bank (implementation knowledge)
+#### Option A: Using Docker Compose (Recommended)
+```bash
+# Start PostgreSQL container
+docker-compose up -d postgres
+
+# Database will be available at localhost:5432
+```
+
+#### Option B: Native PostgreSQL
+Install PostgreSQL 15+ and create a database:
+```bash
+createdb demand_letters_dev
+```
+
+### 4. Configure Environment Variables
+
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Edit .env with your local configuration
+# IMPORTANT: Never commit .env files to git!
+```
+
+Required environment variables:
+- `DATABASE_URL`: PostgreSQL connection string
+- `JWT_SECRET`: Secret key for JWT tokens
+- `AWS_REGION`: AWS region for Bedrock and services
+- `BEDROCK_MODEL_ID`: Claude model identifier
+
+See `.env.example` for complete list.
+
+### 5. Run Database Migrations
+
+```bash
+# Run migrations (once PR-002 is complete)
+npm run migrate
+```
+
+### 6. Start Development Servers
+
+#### Start All Services
+```bash
+npm run dev
+```
+
+This starts:
+- **API Service**: http://localhost:3000
+- **Frontend**: http://localhost:5173
+
+#### Start Individual Services
+```bash
+# API only
+npm run api:dev
+
+# Frontend only
+npm run frontend:dev
+
+# Collaboration service (P1 feature)
+npm run collaboration:dev
+```
+
+## Development Workflow
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests for specific workspace
+npm test --workspace=services/api
+npm test --workspace=frontend
+
+# Python tests
+cd services/ai-processor
+pytest
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+### Linting and Formatting
+
+```bash
+# Lint all code
+npm run lint
+
+# Fix linting issues
+npm run lint:fix
+
+# Format all code
+npm run format
+
+# Check formatting
+npm run format:check
+```
+
+### Type Checking
+
+```bash
+# Type check all TypeScript
+npm run typecheck
+
+# Type check specific service
+npm run typecheck --workspace=services/api
+```
+
+### Building for Production
+
+```bash
+# Build all services
+npm run build
+
+# Build specific service
+npm run build --workspace=services/api
+npm run build --workspace=frontend
+```
+
+## Project Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start all services in development mode |
+| `npm run build` | Build all services for production |
+| `npm run test` | Run all tests |
+| `npm run lint` | Lint all code |
+| `npm run format` | Format all code with Prettier |
+| `npm run typecheck` | Type check all TypeScript code |
+| `npm run clean` | Clean build artifacts and node_modules |
 
 ## Architecture
 
-For details on how parallel agent coordination works, see:
+### Multi-Tenant Design
+All data is scoped by `firm_id` to ensure complete tenant isolation. Middleware enforces this at the API layer, and database foreign keys ensure referential integrity.
 
-- `.claude/rules/agent-defaults.md` - Agent workflow and rules
-- `.claude/rules/coding-standards.md` - Code quality standards (function/file size limits, etc.)
-- `.claude/rules/memory-bank.md` - Persistent context system
-- `.claude/rules/atomic-commits.md` - Commit discipline for coordination
-- `.claude/rules/commit-policy.md` - What agents can commit automatically
+### Service Communication
+- **API ↔ AI Processor**: Asynchronous via AWS Lambda invocation
+- **Frontend ↔ API**: REST over HTTPS with JWT authentication
+- **Frontend ↔ Collaboration**: WebSocket with JWT authentication (P1)
+
+### Security
+- JWT-based authentication with refresh tokens
+- bcrypt password hashing (cost factor 12)
+- All file uploads scanned for viruses
+- S3 signed URLs with 1-hour expiration
+- Multi-tenant data isolation enforced
+
+## AWS Infrastructure
+
+Infrastructure is managed with Terraform in the `infrastructure/` directory (PR-003).
+
+Key AWS services:
+- **Lambda**: Serverless compute for API and AI processing
+- **API Gateway**: HTTP/WebSocket API endpoints
+- **RDS PostgreSQL**: Relational data storage
+- **S3**: Document storage
+- **Bedrock**: Claude AI model access
+- **CloudWatch**: Logging and monitoring
+- **Secrets Manager**: Secure credential storage
+
+## Contributing
+
+### Code Standards
+- **Function size**: Maximum 75 lines
+- **File size**: Maximum 750 lines
+- **Formatting**: Prettier with 100 character line width
+- **Linting**: ESLint with TypeScript rules
+- **Testing**: >80% code coverage for critical paths
+
+### Commit Guidelines
+- Use clear, descriptive commit messages
+- Reference PR numbers in commits
+- Run tests before committing
+- Ensure CI passes before merging
+
+## Documentation
+
+- **[docs/prd.md](docs/prd.md)**: Product requirements and specifications
+- **[docs/task-list.md](docs/task-list.md)**: Project tasks and progress
+- **[docs/memory/](docs/memory/)**: Architecture decisions and context
+- **[.claude/rules/](.claude/rules/)**: Development rules and patterns
+
+## Support
+
+For technical questions or issues:
+1. Check documentation in `docs/`
+2. Review memory bank in `docs/memory/`
+3. Search existing issues
+4. Contact the development team
+
+## License
+
+PROPRIETARY - All rights reserved
