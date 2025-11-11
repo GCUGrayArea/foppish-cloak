@@ -128,11 +128,11 @@ export class TemplateService {
       SELECT
         t.id, t.firm_id, t.name, t.description, t.is_default,
         t.created_at, t.updated_at,
-        creator.id as creator_id, creator.full_name as creator_name,
+        creator.id as creator_id, (creator.first_name || ' ' || creator.last_name) as creator_name,
         cv.id as version_id, cv.version_number, cv.content,
         cv.variables, cv.created_at as version_created_at,
         version_creator.id as version_creator_id,
-        version_creator.full_name as version_creator_name
+        (version_creator.first_name || ' ' || version_creator.last_name) as version_creator_name
       FROM templates t
       JOIN users creator ON t.created_by = creator.id
       LEFT JOIN template_versions cv ON t.current_version_id = cv.id
@@ -155,7 +155,7 @@ export class TemplateService {
     const historyQuery = `
       SELECT
         tv.id, tv.version_number, tv.created_at,
-        u.full_name as creator_name
+        (u.first_name || ' ' || u.last_name) as creator_name
       FROM template_versions tv
       JOIN users u ON tv.created_by = u.id
       WHERE tv.template_id = $1
