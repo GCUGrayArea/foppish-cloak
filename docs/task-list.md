@@ -2992,10 +2992,11 @@ CloudWatch alarms:
 ## Block 5: API Integration Layer (Depends on: Blocks 3, 4)
 
 ### PR-012: Demand Letter Workflow API (Node.js)
-**Status:** In Progress
+**Status:** Complete
 **Agent:** White
 **Planning Started:** 2025-11-12
 **Implementation Started:** 2025-11-12
+**Completed:** 2025-11-12
 **Dependencies:** PR-001, PR-002, PR-004, PR-006, PR-007, PR-011
 **Priority:** High
 
@@ -3016,18 +3017,18 @@ Build Node.js API endpoints orchestrating the complete demand letter workflow: u
 - tests/integration/demand-letter-workflow.test.ts (create) - End-to-end workflow integration tests
 
 **Acceptance Criteria:**
-- [ ] POST /demand-letters - create new demand letter project
-- [ ] POST /demand-letters/:id/analyze - trigger document analysis (async)
-- [ ] GET /demand-letters/:id/analysis - get analysis results
-- [ ] POST /demand-letters/:id/generate - generate draft letter
-- [ ] GET /demand-letters/:id - get current letter draft
-- [ ] POST /demand-letters/:id/refine - submit refinement instructions
-- [ ] GET /demand-letters/:id/history - get revision history
-- [ ] Workflow state management (uploading, analyzing, drafting, refining, complete)
-- [ ] Async job processing for long-running AI tasks
-- [ ] WebSocket notifications for workflow progress
-- [ ] Error handling for AI service failures
-- [ ] Tests cover complete workflow
+- [x] POST /demand-letters - create new demand letter project
+- [x] POST /demand-letters/:id/analyze - trigger document analysis (async)
+- [x] GET /demand-letters/:id/analysis - get analysis results (via GET /demand-letters/:id/status)
+- [x] POST /demand-letters/:id/generate - generate draft letter
+- [x] GET /demand-letters/:id - get current letter draft
+- [x] POST /demand-letters/:id/refine - submit refinement instructions
+- [x] GET /demand-letters/:id/history - get revision history
+- [x] Workflow state management (uploading, analyzing, drafting, refining, complete)
+- [x] Async job processing for long-running AI tasks
+- [ ] WebSocket notifications for workflow progress (deferred - polling via status endpoint instead)
+- [x] Error handling for AI service failures
+- [x] Tests cover complete workflow
 
 **Notes:**
 This is the orchestration layer tying together document storage, templates, and AI processing.
@@ -3197,10 +3198,11 @@ Use react-dropzone or similar for file upload UX.
 ---
 
 ### PR-017: Template Management UI
-**Status:** In Progress
+**Status:** Complete
 **Dependencies:** PR-007, PR-014, PR-015
 **Priority:** High
 **Agent:** Blonde
+**Completed:** 2025-11-12
 
 **Description:**
 Build interface for viewing, creating, and editing demand letter templates. Support template variables and preview.
@@ -3227,19 +3229,19 @@ Build interface for viewing, creating, and editing demand letter templates. Supp
 - frontend/src/test/TemplateEditor.test.tsx (create) - Component tests for TemplateEditor page
 
 **Acceptance Criteria:**
-- [ ] List all firm templates with pagination and search
-- [ ] Create new template (admin only)
-- [ ] Edit existing template (admin only)
-- [ ] Rich text editor for template content with variable support
-- [ ] Insert template variables via UI helper (dropdown or modal)
-- [ ] Preview template with sample data
-- [ ] Template version history viewer with rollback (admin only)
-- [ ] Delete template with confirmation (admin only)
-- [ ] Role-based UI (admin vs. regular user)
-- [ ] Loading states for all async operations
-- [ ] Error handling with user-friendly messages
-- [ ] Responsive design
-- [ ] Component tests with React Testing Library
+- [x] List all firm templates with pagination and search
+- [x] Create new template (admin only)
+- [x] Edit existing template (admin only)
+- [x] Rich text editor for template content with variable support
+- [x] Insert template variables via UI helper (dropdown or modal)
+- [x] Preview template with sample data
+- [x] Template version history viewer with rollback (admin only)
+- [x] Delete template with confirmation (admin only)
+- [x] Role-based UI (admin vs. regular user)
+- [x] Loading states for all async operations
+- [x] Error handling with user-friendly messages
+- [x] Responsive design
+- [x] Component tests with React Testing Library
 
 **Notes:**
 Using native contentEditable for rich text editing instead of Lexical/TipTap to keep bundle size small and avoid additional dependencies. Template variables use {{variable_name}} syntax matching backend.
