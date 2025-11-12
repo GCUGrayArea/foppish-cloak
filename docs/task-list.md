@@ -3088,8 +3088,9 @@ This is a cleanup PR to fix test quality issues found during QC. Focuses on maki
 ---
 
 ### PR-013: Document Export Service (Word/PDF)
-**Status:** Blocked-Ready
+**Status:** In Progress
 **Dependencies:** PR-001 (Complete), PR-002 (Complete), PR-012 (Complete)
+**Agent:** White
 **Priority:** High
 **Planning Status:** COMPLETE
 **Planned by:** Agent White (2025-11-12)
@@ -4048,12 +4049,15 @@ Consider using API Gateway throttling as first line of defense.
 ## Block 11: Documentation & Deployment
 
 ### PR-025: Deployment Pipeline and CI/CD
-**Status:** Blocked-Ready → Ready to claim and implement
+**Status:** Complete ✅
+**Agent:** Blonde
 **Dependencies:** PR-003✅, PR-011✅, PR-014✅
 **Priority:** High
 
 **Planning Status:** COMPLETE
 **Planned by:** Agent White (2025-11-12)
+**Started:** 2025-11-12 by Agent Blonde
+**Completed:** 2025-11-12 by Agent Blonde
 
 **Description:**
 Create complete CI/CD pipeline for automated testing, building, and deployment to AWS using GitHub Actions.
