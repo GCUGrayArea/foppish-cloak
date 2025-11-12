@@ -3330,35 +3330,175 @@ This is a cleanup PR to fix test quality issues found during QC. Does not change
 ## Block 7: Frontend - Core Features (Depends on: Blocks 5, 6)
 
 ### PR-016: Document Upload UI
-**Status:** New
+**Status:** Blocked-Ready
+**Planning Status:** COMPLETE
+**Planned by:** Agent White (2025-11-12)
 **Dependencies:** PR-006, PR-014, PR-015
 **Priority:** High
 
 **Description:**
 Build drag-and-drop document upload interface with progress tracking, file validation, and preview capabilities.
 
-**Files (ESTIMATED - will be refined during Planning):**
-- frontend/src/pages/DocumentUpload.tsx (create)
-- frontend/src/components/documents/FileUploader.tsx (create)
-- frontend/src/components/documents/FilePreview.tsx (create)
-- frontend/src/components/documents/UploadProgress.tsx (create)
-- frontend/src/hooks/useDocumentUpload.ts (create)
-- frontend/src/tests/DocumentUpload.test.tsx (create)
+**Files (VERIFIED during Planning):**
+- frontend/src/types/document.ts (create) - TypeScript interfaces for document data
+- frontend/src/hooks/useDocuments.ts (create) - React Query hooks for document operations
+- frontend/src/pages/Documents.tsx (create) - Document list/upload page
+- frontend/src/components/documents/FileDropZone.tsx (create) - Drag-and-drop upload area (native HTML5)
+- frontend/src/components/documents/FileUploadItem.tsx (create) - Individual file upload progress
+- frontend/src/components/documents/DocumentListTable.tsx (create) - Table component for document list
+- frontend/src/components/documents/DocumentCard.tsx (create) - Card view for uploaded documents
+- frontend/src/components/documents/DeleteDocumentDialog.tsx (create) - Delete confirmation dialog
+- frontend/src/components/documents/FileDropZone.module.css (create) - Styles for drop zone
+- frontend/src/components/documents/FileUploadItem.module.css (create) - Styles for upload item
+- frontend/src/components/documents/DocumentListTable.module.css (create) - Styles for table
+- frontend/src/components/documents/DocumentCard.module.css (create) - Styles for card
+- frontend/src/pages/Documents.module.css (create) - Styles for Documents page
+- frontend/src/utils/fileValidation.ts (create) - Client-side file validation utilities
+- frontend/src/utils/fileIcons.ts (create) - File type icon mapping utilities
+- frontend/src/lib/router.tsx (modify) - Add document routes
+- frontend/src/test/Documents.test.tsx (create) - Component tests for Documents page
+- frontend/src/tests/components/documents/FileDropZone.test.tsx (create) - Tests for drop zone component
+
+**Implementation Notes:**
+
+**Technology Decisions:**
+- **File Upload Library:** Use native HTML5 drag-and-drop API (no react-dropzone dependency)
+  - Rationale: Package.json shows no react-dropzone installed, native API is sufficient for our needs
+  - Implementation: Use onDragEnter/onDragLeave/onDragOver/onDrop events with state management
+  - Also support click-to-upload via hidden file input element
+- **Upload Strategy:** XMLHttpRequest with progress tracking (not fetch API)
+  - Rationale: XMLHttpRequest provides native upload progress events (fetch does not)
+  - Implementation: Wrap in custom hook for React integration
+- **File Validation:** Client-side validation matching backend rules from services/api/src/utils/fileValidation.ts
+  - Max size: 50MB
+  - Allowed types: PDF, DOCX, DOC, TXT, images (JPEG, PNG, GIF, WEBP), spreadsheets (XLS, XLSX)
+  - Filename validation: No path traversal, null bytes, max 255 chars
+- **State Management:** React Query for document list, local state for upload progress
+- **Multiple Files:** Support uploading multiple files simultaneously with individual progress bars
+- **Preview Strategy:** File type icons (not thumbnails) to keep implementation simple
+  - PDF: PDF icon, DOCX: Word icon, Images: Image icon, etc.
+  - No image thumbnail generation (would require additional dependencies)
+
+**API Integration:**
+Backend endpoints already exist in services/api/src/routes/documents.ts:
+- POST /api/documents/upload - Upload document (multipart/form-data)
+- GET /api/documents - List documents with filtering
+- GET /api/documents/:id - Get document metadata
+- GET /api/documents/:id/download - Get signed download URL
+- DELETE /api/documents/:id - Delete document
+
+**Component Architecture:**
+1. **Documents.tsx (Page):**
+   - Main layout with upload area at top, document list below
+   - Manages upload queue state and document list
+   - Uses useDocuments hook for fetching document list
+   - Responsive layout (stacks on mobile)
+
+2. **FileDropZone.tsx:**
+   - Drag-and-drop area with visual feedback (highlight on drag over)
+   - Click to select files (hidden input)
+   - Multi-file selection support
+   - File validation before adding to queue
+   - Accessible with keyboard navigation (Space/Enter on focused area)
+
+3. **FileUploadItem.tsx:**
+   - Shows individual file upload with progress bar
+   - Displays file name, size, type icon
+   - Progress states: queued, uploading (with %), complete, error
+   - Cancel button (abort upload)
+   - Error messages for failed uploads
+
+4. **DocumentListTable.tsx:**
+   - Table view of uploaded documents
+   - Columns: Icon, Name, Type, Size, Uploaded By, Date, Actions
+   - Actions: Download, Delete
+   - Pagination support
+   - Search/filter by file type
+   - Empty state when no documents
+
+5. **DocumentCard.tsx:**
+   - Alternative card view for documents (optional, mobile-friendly)
+   - Shows icon, name, metadata, actions
+   - Grid layout
+
+6. **DeleteDocumentDialog.tsx:**
+   - Confirmation dialog before delete
+   - Shows document name
+   - Cancel/Confirm actions
+   - Uses Radix UI Dialog (already in package.json)
+
+**Form Validation:**
+Create frontend/src/utils/fileValidation.ts matching backend validation:
+- validateFileType(file: File): boolean
+- validateFileSize(file: File): boolean
+- validateFileName(name: string): boolean
+- getFileTypeIcon(mimeType: string): string
+- formatFileSize(bytes: number): string
+
+**Error Handling:**
+- Network errors: Retry button, clear error message
+- Validation errors: Show inline on FileUploadItem
+- Virus scan pending: Show status badge on document
+- Virus scan infected: Prevent download, show warning
+- File too large: Show before upload starts
+- Invalid file type: Show before upload starts
+
+**Accessibility:**
+- Drop zone focusable with keyboard
+- File input accessible with screen reader labels
+- Progress bars have aria-valuenow/aria-valuemax
+- Delete confirmation dialog properly announced
+- All interactive elements keyboard accessible
+- Color contrast meets WCAG AA
+
+**Testing Strategy:**
+- Test file drop handling (mock DataTransfer)
+- Test file input selection
+- Test upload progress tracking
+- Test file validation (size, type, name)
+- Test document list rendering
+- Test delete confirmation flow
+- Test error states
+- Test keyboard navigation
+
+**Time Estimate:** 320 minutes (5 hours 20 minutes)
+- Types and API hook: 40 minutes
+- FileDropZone component: 50 minutes
+- FileUploadItem component: 40 minutes
+- Documents page: 50 minutes
+- DocumentListTable component: 40 minutes
+- File validation utilities: 30 minutes
+- Delete dialog: 20 minutes
+- Styling (all CSS modules): 40 minutes
+- Component tests: 50 minutes
+- Integration and bug fixes: 30 minutes
 
 **Acceptance Criteria:**
-- [ ] Drag-and-drop upload area
-- [ ] Click to select files
-- [ ] Multiple file upload support
-- [ ] File type validation (PDF, DOCX, images)
-- [ ] File size validation (max 50MB)
-- [ ] Upload progress bar per file
-- [ ] Preview uploaded documents (thumbnail or icon)
+- [ ] Drag-and-drop upload area with visual feedback
+- [ ] Click to select files (fallback for non-drag-and-drop)
+- [ ] Multiple file upload support with individual progress tracking
+- [ ] File type validation (PDF, DOCX, images, spreadsheets)
+- [ ] File size validation (max 50MB) before upload starts
+- [ ] Upload progress bar per file (0-100%)
+- [ ] Cancel upload functionality (abort in-progress uploads)
+- [ ] Display uploaded documents in table view
+- [ ] Document metadata shown (name, type, size, upload date, uploaded by)
+- [ ] File type icons for different document types
+- [ ] Download document functionality (signed URLs)
+- [ ] Delete document with confirmation dialog
+- [ ] Virus scan status indicator (pending/clean/infected)
 - [ ] Error handling with user-friendly messages
-- [ ] Accessible keyboard navigation
-- [ ] Component tests
+- [ ] Empty state when no documents
+- [ ] Accessible keyboard navigation (WCAG AA compliance)
+- [ ] Component tests with React Testing Library
+- [ ] Responsive design (works on mobile/tablet)
 
 **Notes:**
-Use react-dropzone or similar for file upload UX.
+- Virus scanning status shown but scanning happens backend (PR-006)
+- Download URLs are pre-signed S3 URLs with 1-hour expiration
+- Multi-tenant isolation enforced by backend (firm_id scoping)
+- File icons use simple SVG icons (no icon library needed)
+- Using native HTML5 drag-and-drop (no react-dropzone dependency)
 
 ---
 
