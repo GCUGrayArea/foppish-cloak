@@ -15,10 +15,18 @@
   },
   "plugins": ["react-refresh"],
   "rules": {
-    "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }],
+    "react-refresh/only-export-components": ["warn", { "allowConstantExport": true, "allowExportNames": ["router"] }],
     "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-explicit-any": "warn",
     "max-lines": ["error", { "max": 750, "skipBlankLines": true, "skipComments": true }],
     "max-lines-per-function": ["error", { "max": 75, "skipBlankLines": true, "skipComments": true }]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/lib/auth-context.tsx", "src/lib/router.tsx", "src/lib/query-client.ts"],
+      "rules": {
+        "react-refresh/only-export-components": "off"
+      }
+    }
+  ]
 }
