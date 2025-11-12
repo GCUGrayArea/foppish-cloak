@@ -2281,9 +2281,9 @@ Follow patterns from .claude/rules/llm-architecture.md for robust LLM applicatio
 ---
 
 ### PR-009: Document Analysis and Extraction (Python)
-**Status:** Approved ⚠️
-**QC Status:** Approved with dependency fix (2025-11-11) - PyPDF2 installed, 1 test needs fix
-**QC Notes:** PyPDF2 dependency resolved, should migrate to pypdf (PyPDF2 deprecated)
+**Status:** Approved ✅
+**QC Status:** Certified (2025-11-11) - All tests passing, 73/73 unit tests
+**QC Notes:** Test mock fixed to match Bedrock API response structure. Should migrate to pypdf (PyPDF2 deprecated) in future refactor.
 **Agent:** Orange
 **Completed by:** Agent Orange (2025-11-11)
 **Planned by:** Agent Orange (2025-11-11)
@@ -2356,36 +2356,55 @@ Follow LLM architecture patterns for deterministic operations vs. creative gener
 ---
 
 ### PR-011: AI Service Lambda Deployment
-**Status:** Blocked-Ready
-**Agent:** Available for claim
-**Planned by:** Agent Orange (2025-11-11)
-**Dependencies:** PR-003, PR-008, PR-009, PR-010
+**Status:** Blocked-Ready → Ready (Planning Complete)
+**Agent:** White
+**Planned by:** Agent White (2025-11-11)
+**Dependencies:** PR-003 ✅, PR-008 ✅, PR-009 ⚠️ (1 test needs fix), PR-010 ✅
 **Priority:** High
 
 **Description:**
-Package Python AI processor as AWS Lambda function with proper layers, environment configuration, and cold start optimization.
+Package Python AI processor as AWS Lambda function with proper integration of DocumentAnalyzer and LetterGenerator, deployment automation, and cold start optimization.
 
-**Files (ESTIMATED - will be refined during Planning):**
-- services/ai-processor/lambda_handler.py (create) - Lambda entry point
-- services/ai-processor/Dockerfile (create) - Lambda container image
-- services/ai-processor/deploy.sh (create) - deployment script
-- infrastructure/lambda-ai.tf (modify) - add AI Lambda config
-- services/ai-processor/layers/ (create directory) - Lambda layers
+**Files (VERIFIED - 21 files):**
+- services/ai-processor/src/lambda_handler.py (modify) - Complete Lambda handler with routing
+- services/ai-processor/src/lambda_wrapper.py (create) - Lambda initialization wrapper
+- services/ai-processor/Dockerfile (create) - Container image for Lambda
+- services/ai-processor/.dockerignore (create) - Docker build exclusions
+- services/ai-processor/deploy.sh (create) - Deployment automation script
+- services/ai-processor/scripts/build-layer.sh (create) - Lambda layer builder (fallback)
+- services/ai-processor/scripts/test-local.sh (create) - Local Lambda testing
+- services/ai-processor/layer-requirements.txt (create) - Layer dependencies subset
+- infrastructure/lambda-ai.tf (modify) - Update for container image deployment
+- infrastructure/outputs.tf (modify) - Add Lambda ARN outputs
+- .github/workflows/deploy-lambda-ai.yml (create) - CI/CD for AI Lambda
+- services/ai-processor/event-samples/analyze.json (create) - Test event
+- services/ai-processor/event-samples/generate.json (create) - Test event
+- services/ai-processor/event-samples/refine.json (create) - Test event
+- services/ai-processor/tests/test_lambda_handler.py (create) - Handler tests
+- services/ai-processor/tests/test_lambda_wrapper.py (create) - Wrapper tests
+- services/ai-processor/.env.example (modify) - Add Lambda-specific vars
+- README.md (modify) - Document Lambda deployment
+- services/ai-processor/README.md (create) - AI processor specific docs
+- services/api/src/services/aiProcessorClient.ts (create) - Client for invoking AI Lambda
+- services/api/src/services/__tests__/aiProcessorClient.test.ts (create) - Client tests
 
 **Acceptance Criteria:**
-- [ ] Python dependencies packaged as Lambda layer
-- [ ] Lambda function handles document analysis requests
-- [ ] Lambda function handles letter generation requests
-- [ ] Environment variables configured (Bedrock region, model, DB connection)
-- [ ] Cold start time <3 seconds
-- [ ] Timeout configured appropriately (5 minutes max)
-- [ ] Memory allocation optimized (test 1024MB, 2048MB, 3072MB)
-- [ ] Error handling and logging to CloudWatch
-- [ ] Deployment script automates packaging and upload
-- [ ] Integration with API Gateway (async processing)
+- [ ] Lambda handler routes to DocumentAnalyzer and LetterGenerator correctly
+- [ ] Container image deployment with optimized layer caching
+- [ ] Cold start time <3 seconds (verified with test script)
+- [ ] Handles all three operations: analyze, generate, refine
+- [ ] Environment variables loaded from Secrets Manager
+- [ ] Error handling with structured responses and CloudWatch logs
+- [ ] Deployment script automates build, push to ECR, Lambda update
+- [ ] CI/CD pipeline deploys on merge to main
+- [ ] Local testing with Docker and sam-cli
+- [ ] Node.js API can invoke Lambda asynchronously
+- [ ] Integration tests pass with real Lambda invocation
+- [ ] Memory allocation tested (1024MB, 2048MB - recommend 2048MB)
+- [ ] Timeout tested (recommend 300s for complex documents)
 
 **Notes:**
-Consider using container image for Lambda to simplify dependency management.
+Using container image deployment (not Lambda layers) for simpler dependency management with pypdf and boto3.
 
 ---
 

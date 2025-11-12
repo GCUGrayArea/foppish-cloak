@@ -140,15 +140,20 @@ class TestDocumentAnalyzer:
         self, document_analyzer, sample_police_report_text, sample_extracted_data
     ):
         """Test successful document analysis."""
-        # Mock Bedrock response
+        # Mock Bedrock response with correct structure
         document_analyzer.bedrock_client.invoke.return_value = {
-            "content": [
-                {
-                    "type": "tool_use",
-                    "name": "extract_document_data",
-                    "input": sample_extracted_data.model_dump(mode="json"),
+            "output": {
+                "message": {
+                    "content": [
+                        {
+                            "toolUse": {
+                                "name": "extract_document_data",
+                                "input": sample_extracted_data.model_dump(mode="json"),
+                            }
+                        }
+                    ]
                 }
-            ],
+            },
             "usage": {"input_tokens": 1500, "output_tokens": 800},
         }
         document_analyzer.bedrock_client.config = Mock(
