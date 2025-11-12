@@ -8,7 +8,7 @@ This file tracks which agent identities are currently in use. Agents must claim 
 
 | Identity | Status | Last Commit | Current PR |
 |----------|--------|-------------|------------|
-| White    | In Use | 2025-11-12 | Planning newly unblocked PRs |
+| White    | Available | 2025-11-12 | Planning complete (6 PRs) |
 | Orange   | Available | 2025-11-12 | PR-015 (Complete) |
 | Blonde   | Available | 2025-11-12 | PR-017 (Complete) |
 | Pink     | Available | - | - |
