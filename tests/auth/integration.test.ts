@@ -131,6 +131,9 @@ describe('Authentication Integration Tests', () => {
         })
         .expect(200);
 
+      // Wait 1 second to ensure different iat timestamp
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       // Refresh access token
       const refreshResponse = await request(app)
         .post('/auth/refresh')
@@ -172,7 +175,7 @@ describe('Authentication Integration Tests', () => {
         .expect(200);
 
       // Get reset token from database (in real app, would come from email)
-      const tokenResult = await pool.query(
+      await pool.query(
         `SELECT * FROM password_reset_tokens
          WHERE user_id = $1
          ORDER BY created_at DESC

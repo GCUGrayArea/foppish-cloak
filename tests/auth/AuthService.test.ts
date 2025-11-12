@@ -31,8 +31,8 @@ describe('AuthService', () => {
 
     // Setup mock pool
     mockPool = {
-      query: jest.fn()
-    } as any;
+      query: jest.fn() as any
+    } as jest.Mocked<Pool>;
 
     // Mock getPool to return our mock pool
     const connectionModule = require('../../services/api/src/db/connection');
@@ -50,7 +50,7 @@ describe('AuthService', () => {
       (passwordModule.hashPassword as jest.Mock).mockResolvedValue(
         'hashed_password'
       );
-      mockPool.query
+      (mockPool.query as jest.Mock)
         .mockResolvedValueOnce({ rows: [] }) // Check existing user
         .mockResolvedValueOnce({ rows: [testUser] }); // Insert user
 
@@ -71,7 +71,7 @@ describe('AuthService', () => {
     });
 
     it('should throw error if user already exists', async () => {
-      mockPool.query.mockResolvedValueOnce({ rows: [testUser] });
+      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [testUser] });
 
       const request = {
         email: 'test@example.com',
@@ -116,7 +116,7 @@ describe('AuthService', () => {
       (tokenModule.storeRefreshToken as jest.Mock).mockResolvedValue(
         'token_id'
       );
-      mockPool.query.mockResolvedValueOnce({ rows: [testUser] });
+(mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [testUser] });
 
       const request = {
         email: 'test@example.com',
@@ -133,7 +133,7 @@ describe('AuthService', () => {
     });
 
     it('should throw error for invalid credentials', async () => {
-      mockPool.query.mockResolvedValueOnce({ rows: [] });
+(mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
 
       const request = {
         email: 'test@example.com',
@@ -148,7 +148,7 @@ describe('AuthService', () => {
 
     it('should throw error for inactive user', async () => {
       const inactiveUser = { ...testUser, is_active: false };
-      mockPool.query.mockResolvedValueOnce({ rows: [inactiveUser] });
+(mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [inactiveUser] });
 
       const request = {
         email: 'test@example.com',
@@ -161,7 +161,7 @@ describe('AuthService', () => {
 
     it('should throw error for wrong password', async () => {
       (passwordModule.verifyPassword as jest.Mock).mockResolvedValue(false);
-      mockPool.query.mockResolvedValueOnce({ rows: [testUser] });
+(mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [testUser] });
 
       const request = {
         email: 'test@example.com',
@@ -183,7 +183,7 @@ describe('AuthService', () => {
       (jwtModule.generateAccessToken as jest.Mock).mockReturnValue(
         'new_jwt_token'
       );
-      mockPool.query.mockResolvedValueOnce({ rows: [testUser] });
+(mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [testUser] });
 
       const result = await authService.refreshAccessToken('refresh_token');
 
@@ -203,7 +203,7 @@ describe('AuthService', () => {
       (tokenModule.verifyRefreshToken as jest.Mock).mockResolvedValue(
         testUser.id
       );
-      mockPool.query.mockResolvedValueOnce({ rows: [inactiveUser] });
+(mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [inactiveUser] });
 
       await expect(
         authService.refreshAccessToken('refresh_token')
@@ -231,7 +231,7 @@ describe('AuthService', () => {
       (passwordModule.hashPassword as jest.Mock).mockResolvedValue(
         'hashed_token'
       );
-      mockPool.query
+      (mockPool.query as jest.Mock)
         .mockResolvedValueOnce({ rows: [testUser] }) // Find user
         .mockResolvedValueOnce({ rows: [] }); // Insert token
 
@@ -241,7 +241,7 @@ describe('AuthService', () => {
     });
 
     it('should not throw error for non-existent user (security)', async () => {
-      mockPool.query.mockResolvedValueOnce({ rows: [] });
+(mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
 
       await expect(
         authService.forgotPassword('nonexistent@example.com', testUser.firm_id)
@@ -265,7 +265,7 @@ describe('AuthService', () => {
         .mockResolvedValue(testUser.id);
       authService['markResetTokenUsed'] = jest.fn().mockResolvedValue(undefined);
 
-      mockPool.query.mockResolvedValueOnce({ rows: [] }); // Update password
+(mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [] }); // Update password
 
       await authService.resetPassword('reset_token', 'NewP@ss123');
 

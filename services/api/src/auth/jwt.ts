@@ -30,7 +30,7 @@ export function generateAccessToken(
   return jwt.sign(payload, jwtConfig.secret, {
     expiresIn: jwtConfig.accessTokenExpiry,
     algorithm: jwtConfig.algorithm
-  });
+  } as jwt.SignOptions);
 }
 
 /**

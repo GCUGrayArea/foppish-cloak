@@ -1,6 +1,5 @@
 import crypto from 'crypto';
 import { hashPassword } from './password';
-import { Pool } from 'pg';
 import { getPool } from '../db/connection';
 
 /**

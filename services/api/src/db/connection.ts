@@ -1,4 +1,4 @@
-import { Pool, PoolClient, PoolConfig, QueryResult } from 'pg';
+import { Pool, PoolClient, PoolConfig, QueryResult, QueryResultRow } from 'pg';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -28,7 +28,7 @@ const poolConfig: PoolConfig = {
 const pool = new Pool(poolConfig);
 
 // Pool error handler
-pool.on('error', (err, client) => {
+pool.on('error', (err, _client) => {
   console.error('Unexpected error on idle client', err);
   process.exit(-1);
 });
@@ -54,7 +54,7 @@ if (process.env.NODE_ENV === 'development') {
  * @param params Query parameters
  * @returns Query result
  */
-export async function query<T = any>(
+export async function query<T extends QueryResultRow = any>(
   text: string,
   params?: any[]
 ): Promise<QueryResult<T>> {
@@ -210,7 +210,7 @@ export function buildFirmScopedWhere(
   // Adjust parameter placeholders in additional conditions
   const adjustedClause = additionalConditions.clause.replace(
     /\$(\d+)/g,
-    (match, num) => `$${parseInt(num) + 1}`
+    (_match, num) => `$${parseInt(num) + 1}`
   );
 
   return {
