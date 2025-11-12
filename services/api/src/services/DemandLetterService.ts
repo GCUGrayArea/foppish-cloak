@@ -14,7 +14,7 @@ import { pool } from '../db/connection';
 import { DemandLetterModel } from '../db/models/DemandLetter';
 import { DocumentService } from './DocumentService';
 import { AIServiceClient } from './AIServiceClient';
-import { WorkflowStateMachine, getNextState } from '../utils/workflowState';
+import { getNextState } from '../utils/workflowState';
 import type {
   CreateDemandLetterRequest,
   AnalyzeDemandLetterRequest,

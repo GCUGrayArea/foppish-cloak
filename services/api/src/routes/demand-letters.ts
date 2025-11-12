@@ -15,10 +15,12 @@
 import { Router, Response } from 'express';
 import { z } from 'zod';
 import { DemandLetterService } from '../services/DemandLetterService';
+import { ExportService } from '../services/ExportService';
 import { AuthenticatedRequest } from '../middleware/firmContext';
 
 const router = Router();
 const demandLetterService = new DemandLetterService();
+const exportService = new ExportService();
 
 /**
  * Validation schemas
@@ -420,3 +422,127 @@ router.get('/:id/history', async (req: AuthenticatedRequest, res: Response) => {
 });
 
 export default router;
+
+/**
+ * GET /demand-letters/:id/export/docx
+ * Export demand letter to Word format
+ */
+router.get('/:id/export/docx', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (!req.firmId) {
+      return res.status(401).json({
+        error: 'Not authenticated',
+        message: 'Firm context required',
+      });
+    }
+
+    const { id } = req.params;
+
+    // Validate UUID
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+      return res.status(400).json({
+        error: 'Invalid letter ID',
+        message: 'Letter ID must be a valid UUID',
+      });
+    }
+
+    // Export to DOCX
+    const result = await exportService.exportToDocx(id, req.firmId);
+
+    // Set headers for file download
+    res.setHeader('Content-Type', result.contentType);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${result.fileName}"`
+    );
+    res.setHeader('Content-Length', result.size);
+
+    return res.send(result.buffer);
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Demand letter not found') {
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'The requested demand letter does not exist',
+      });
+    }
+
+    if (
+      error instanceof Error &&
+      error.message.includes('has no content')
+    ) {
+      return res.status(400).json({
+        error: 'Export not available',
+        message: error.message,
+      });
+    }
+
+    console.error('Error exporting to DOCX:', error);
+    return res.status(500).json({
+      error: 'Export failed',
+      message:
+        error instanceof Error ? error.message : 'Failed to export document',
+    });
+  }
+});
+
+/**
+ * GET /demand-letters/:id/export/pdf
+ * Export demand letter to PDF format
+ */
+router.get('/:id/export/pdf', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (!req.firmId) {
+      return res.status(401).json({
+        error: 'Not authenticated',
+        message: 'Firm context required',
+      });
+    }
+
+    const { id } = req.params;
+
+    // Validate UUID
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+      return res.status(400).json({
+        error: 'Invalid letter ID',
+        message: 'Letter ID must be a valid UUID',
+      });
+    }
+
+    // Export to PDF
+    const result = await exportService.exportToPdf(id, req.firmId);
+
+    // Set headers for file download
+    res.setHeader('Content-Type', result.contentType);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${result.fileName}"`
+    );
+    res.setHeader('Content-Length', result.size);
+
+    return res.send(result.buffer);
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Demand letter not found') {
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'The requested demand letter does not exist',
+      });
+    }
+
+    if (
+      error instanceof Error &&
+      error.message.includes('has no content')
+    ) {
+      return res.status(400).json({
+        error: 'Export not available',
+        message: error.message,
+      });
+    }
+
+    console.error('Error exporting to PDF:', error);
+    return res.status(500).json({
+      error: 'Export failed',
+      message:
+        error instanceof Error ? error.message : 'Failed to export document',
+    });
+  }
+});
