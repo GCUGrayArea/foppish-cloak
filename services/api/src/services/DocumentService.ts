@@ -15,7 +15,6 @@ import type {
   DocumentDownloadResponse,
   DocumentListQuery,
   DocumentListResponse,
-  DocumentStatus,
   VirusScanStatus
 } from '../types/document';
 

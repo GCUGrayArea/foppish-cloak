@@ -1,6 +1,5 @@
-import { query, transaction } from '../connection';
+import { query } from '../connection';
 import { Firm, FirmDTO } from '../types';
-import { PoolClient } from 'pg';
 
 export class FirmModel {
   /**

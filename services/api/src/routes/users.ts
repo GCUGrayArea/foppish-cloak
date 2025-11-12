@@ -42,7 +42,7 @@ router.get('/me', async (req: AuthenticatedRequest, res: Response) => {
 
     const profile = await userService.getUserProfile(user.id, user.firmId);
 
-    res.json(profile);
+    return res.json(profile);
   } catch (error: any) {
     console.error('Get user profile error:', error);
 
@@ -50,7 +50,7 @@ router.get('/me', async (req: AuthenticatedRequest, res: Response) => {
       return res.status(404).json({ error: 'User not found', code: 'USER_NOT_FOUND' });
     }
 
-    res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
+    return res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
   }
 });
 
@@ -91,7 +91,7 @@ router.put('/:id', async (req: AuthenticatedRequest, res: Response) => {
 
     const response = userService.toResponse(updatedUser);
 
-    res.json(response);
+    return res.json(response);
   } catch (error: any) {
     console.error('Update user error:', error);
 
@@ -107,7 +107,7 @@ router.put('/:id', async (req: AuthenticatedRequest, res: Response) => {
       return res.status(409).json({ error: 'Email already in use', code: 'EMAIL_CONFLICT' });
     }
 
-    res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
+    return res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
   }
 });
 
@@ -152,7 +152,7 @@ router.put('/:id/role', async (req: AuthenticatedRequest, res: Response) => {
 
     const response = userService.toResponse(updatedUser);
 
-    res.json(response);
+    return res.json(response);
   } catch (error: any) {
     console.error('Update user role error:', error);
 
@@ -168,7 +168,7 @@ router.put('/:id/role', async (req: AuthenticatedRequest, res: Response) => {
       return res.status(403).json({ error: 'Insufficient permissions', code: 'INSUFFICIENT_PERMISSIONS' });
     }
 
-    res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
+    return res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
   }
 });
 

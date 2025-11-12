@@ -13,7 +13,6 @@ import {
   InvitationResponse,
   InviteUserRequest
 } from '../types/user';
-import { UserRole } from '../types/auth';
 
 export class InvitationService {
   private pool: Pool;

@@ -58,13 +58,13 @@ router.post(
         uploadedBy: req.user.id
       });
 
-      res.status(201).json({
+      return res.status(201).json({
         message: 'Document uploaded successfully',
         document
       });
     } catch (error) {
       console.error('Error uploading document:', error);
-      res.status(500).json({
+      return res.status(500).json({
         error: 'Upload failed',
         message: error instanceof Error ? error.message : 'Failed to upload document'
       });
@@ -102,10 +102,10 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
       ...query
     });
 
-    res.json(result);
+    return res.json(result);
   } catch (error) {
     console.error('Error listing documents:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'List failed',
       message: error instanceof Error ? error.message : 'Failed to list documents'
     });
@@ -144,10 +144,10 @@ router.get('/:id', async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
-    res.json({ document });
+    return res.json({ document });
   } catch (error) {
     console.error('Error getting document:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Retrieval failed',
       message: error instanceof Error ? error.message : 'Failed to retrieve document'
     });
@@ -197,14 +197,14 @@ router.get('/:id/download', async (req: AuthenticatedRequest, res: Response) => 
     // Get download URL
     const downloadInfo = await documentService.getDownloadUrl(id, req.firmId);
 
-    res.json({
+    return res.json({
       url: downloadInfo.url,
       expiresAt: downloadInfo.expiresAt,
       filename: document.filename
     });
   } catch (error) {
     console.error('Error generating download URL:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Download failed',
       message: error instanceof Error ? error.message : 'Failed to generate download URL'
     });
@@ -236,7 +236,7 @@ router.delete('/:id', async (req: AuthenticatedRequest, res: Response) => {
 
     await documentService.deleteDocument(id, req.firmId);
 
-    res.json({
+    return res.json({
       message: 'Document deleted successfully',
       documentId: id
     });
@@ -250,7 +250,7 @@ router.delete('/:id', async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Delete failed',
       message: error instanceof Error ? error.message : 'Failed to delete document'
     });

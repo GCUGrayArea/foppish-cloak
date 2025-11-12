@@ -68,7 +68,7 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
     // Get templates
     const result = await templateService.listTemplates(user.firmId, params);
 
-    res.json({
+    return res.json({
       templates: result.templates,
       total: result.total,
       page: params.page || 1,
@@ -76,7 +76,7 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
     });
   } catch (error: any) {
     console.error('List templates error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Internal server error',
       code: 'INTERNAL_ERROR'
     });
@@ -107,7 +107,7 @@ router.get(
         user.firmId
       );
 
-      res.json(template);
+      return res.json(template);
     } catch (error: any) {
       console.error('Get template error:', error);
 
@@ -118,7 +118,7 @@ router.get(
         });
       }
 
-      res.status(500).json({
+      return res.status(500).json({
         error: 'Internal server error',
         code: 'INTERNAL_ERROR'
       });
@@ -178,7 +178,7 @@ router.post('/', async (req: AuthenticatedRequest, res: Response) => {
       data
     );
 
-    res.status(201).json(template);
+    return res.status(201).json(template);
   } catch (error: any) {
     console.error('Create template error:', error);
 
@@ -189,7 +189,7 @@ router.post('/', async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Internal server error',
       code: 'INTERNAL_ERROR'
     });
@@ -258,7 +258,7 @@ router.put(
         data
       );
 
-      res.json(template);
+      return res.json(template);
     } catch (error: any) {
       console.error('Update template error:', error);
 
@@ -276,7 +276,7 @@ router.put(
         });
       }
 
-      res.status(500).json({
+      return res.status(500).json({
         error: 'Internal server error',
         code: 'INTERNAL_ERROR'
       });
@@ -332,7 +332,7 @@ router.post(
         versionId
       );
 
-      res.json(template);
+      return res.json(template);
     } catch (error: any) {
       console.error('Rollback template error:', error);
 
@@ -350,7 +350,7 @@ router.post(
         });
       }
 
-      res.status(500).json({
+      return res.status(500).json({
         error: 'Internal server error',
         code: 'INTERNAL_ERROR'
       });
@@ -390,7 +390,7 @@ router.delete(
       // Delete template
       await templateService.deleteTemplate(templateId, user.firmId);
 
-      res.status(204).send();
+      return res.status(204).send();
     } catch (error: any) {
       console.error('Delete template error:', error);
 
@@ -401,7 +401,7 @@ router.delete(
         });
       }
 
-      res.status(500).json({
+      return res.status(500).json({
         error: 'Internal server error',
         code: 'INTERNAL_ERROR'
       });

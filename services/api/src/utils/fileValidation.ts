@@ -62,7 +62,7 @@ export function validateFileType(
   // Check if file extension matches MIME type
   const fileExtension = path.extname(filename).toLowerCase();
 
-  if (!allowedExtensions.includes(fileExtension)) {
+  if (!(allowedExtensions as readonly string[]).includes(fileExtension)) {
     return {
       valid: false,
       error: `File extension '${fileExtension}' does not match MIME type '${mimeType}'.`

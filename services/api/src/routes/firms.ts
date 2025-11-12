@@ -70,7 +70,7 @@ router.get('/:id', async (req: AuthenticatedRequest, res: Response) => {
     const firm = await firmService.getFirmById(firmId);
     const response = firmService.toResponse(firm);
 
-    res.json(response);
+    return res.json(response);
   } catch (error: any) {
     console.error('Get firm error:', error);
 
@@ -78,7 +78,7 @@ router.get('/:id', async (req: AuthenticatedRequest, res: Response) => {
       return res.status(404).json({ error: 'Firm not found', code: 'FIRM_NOT_FOUND' });
     }
 
-    res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
+    return res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
   }
 });
 
@@ -119,7 +119,7 @@ router.put('/:id', async (req: AuthenticatedRequest, res: Response) => {
     const updatedFirm = await firmService.updateFirm(firmId, updates);
     const response = firmService.toResponse(updatedFirm);
 
-    res.json(response);
+    return res.json(response);
   } catch (error: any) {
     console.error('Update firm error:', error);
 
@@ -127,7 +127,7 @@ router.put('/:id', async (req: AuthenticatedRequest, res: Response) => {
       return res.status(404).json({ error: 'Firm not found', code: 'FIRM_NOT_FOUND' });
     }
 
-    res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
+    return res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
   }
 });
 
@@ -162,10 +162,10 @@ router.get('/:firmId/users', async (req: AuthenticatedRequest, res: Response) =>
     const filters = validation.data;
     const result = await userService.listFirmUsers(firmId, filters);
 
-    res.json(result);
+    return res.json(result);
   } catch (error: any) {
     console.error('List users error:', error);
-    res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
+    return res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
   }
 });
 
@@ -230,7 +230,7 @@ router.post('/:firmId/users/invite', async (req: AuthenticatedRequest, res: Resp
       // Continue anyway - invitation was created
     }
 
-    res.status(201).json({
+    return res.status(201).json({
       invitation,
       message: 'Invitation email sent'
     });
@@ -245,7 +245,7 @@ router.post('/:firmId/users/invite', async (req: AuthenticatedRequest, res: Resp
       return res.status(409).json({ error: 'Invitation already pending for this email', code: 'INVITATION_ALREADY_PENDING' });
     }
 
-    res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
+    return res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
   }
 });
 
@@ -275,7 +275,7 @@ router.delete('/:firmId/users/:userId', async (req: AuthenticatedRequest, res: R
 
     await userService.removeUser(userId, firmId, user.id, user.role);
 
-    res.json({
+    return res.json({
       message: 'User removed successfully',
       userId
     });
@@ -294,7 +294,7 @@ router.delete('/:firmId/users/:userId', async (req: AuthenticatedRequest, res: R
       return res.status(403).json({ error: 'Insufficient permissions', code: 'INSUFFICIENT_PERMISSIONS' });
     }
 
-    res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
+    return res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
   }
 });
 

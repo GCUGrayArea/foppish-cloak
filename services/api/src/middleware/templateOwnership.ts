@@ -7,7 +7,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { getPool } from '../db/connection';
-import { AuthRequest } from './auth';
+import { AuthenticatedRequest } from './firmContext';
 
 /**
  * Verify template ownership by firm
@@ -25,8 +25,15 @@ export async function verifyTemplateOwnership(
   next: NextFunction
 ): Promise<void> {
   try {
-    const authReq = req as AuthRequest;
-    const { firmId, userId } = authReq.user;
+    const authReq = req as AuthenticatedRequest;
+    if (!authReq.user) {
+      res.status(401).json({
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required'
+      });
+      return;
+    }
+    const { firmId } = authReq.user;
 
     // Get template ID from params (supports both :id and :templateId)
     const templateId = req.params.id || req.params.templateId;
@@ -91,7 +98,14 @@ export async function verifyTemplateVersionOwnership(
   next: NextFunction
 ): Promise<void> {
   try {
-    const authReq = req as AuthRequest;
+    const authReq = req as AuthenticatedRequest;
+    if (!authReq.user) {
+      res.status(401).json({
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required'
+      });
+      return;
+    }
     const { firmId } = authReq.user;
 
     // Get version ID from params
