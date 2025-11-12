@@ -4,8 +4,6 @@
 
 import { DemandLetterService } from '../../../services/api/src/services/DemandLetterService';
 import { DemandLetterModel } from '../../../services/api/src/db/models/DemandLetter';
-import { DocumentService } from '../../../services/api/src/services/DocumentService';
-import { AIServiceClient } from '../../../services/api/src/services/AIServiceClient';
 
 // Mock dependencies
 jest.mock('../../../services/api/src/db/models/DemandLetter');
@@ -16,8 +14,6 @@ jest.mock('../../../services/api/src/db/connection');
 describe('DemandLetterService', () => {
   let service: DemandLetterService;
   let mockDemandLetterModel: jest.Mocked<typeof DemandLetterModel>;
-  let mockDocumentService: jest.Mocked<DocumentService>;
-  let mockAIService: jest.Mocked<AIServiceClient>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -25,8 +21,6 @@ describe('DemandLetterService', () => {
     service = new DemandLetterService();
 
     mockDemandLetterModel = DemandLetterModel as jest.Mocked<typeof DemandLetterModel>;
-    mockDocumentService = new DocumentService() as jest.Mocked<DocumentService>;
-    mockAIService = new AIServiceClient() as jest.Mocked<AIServiceClient>;
   });
 
   describe('createDemandLetter', () => {

@@ -2992,98 +2992,38 @@ CloudWatch alarms:
 ## Block 5: API Integration Layer (Depends on: Blocks 3, 4)
 
 ### PR-012: Demand Letter Workflow API (Node.js)
-**Status:** Complete
-**QC Status:** Approved ✓ (2025-11-12) - All PR-012 tests passing. Fixed by PR-012a. Minor: 2 TypeScript lint warnings (TS6133) in test skeletons - non-blocking. Coding standards: DemandLetterService.ts is 718 lines (close to 750 line limit - needs monitoring).
-**Agent:** White
-**Planning Started:** 2025-11-12
-**Implementation Started:** 2025-11-12
-**Completed:** 2025-11-12
+**Status:** New
 **Dependencies:** PR-001, PR-002, PR-004, PR-006, PR-007, PR-011
 **Priority:** High
 
 **Description:**
 Build Node.js API endpoints orchestrating the complete demand letter workflow: upload documents → analyze → generate draft → refine → export.
 
-**Files (VERIFIED during Planning):**
-- services/api/src/services/DemandLetterService.ts (create) - Main workflow orchestration service
-- services/api/src/services/AIServiceClient.ts (create) - Client for invoking Python AI Lambda functions
-- services/api/src/routes/demand-letters.ts (create) - Express router for demand letter endpoints
-- services/api/src/types/demand-letter.ts (create) - TypeScript types for demand letter workflow
-- services/api/src/types/ai-service.ts (create) - Types for AI service requests/responses
-- services/api/src/utils/workflowState.ts (create) - Workflow state machine and transitions
-- services/api/src/utils/lambdaClient.ts (create) - Generic AWS Lambda invocation utility
-- tests/unit/services/DemandLetterService.test.ts (create) - Unit tests for DemandLetterService
-- tests/unit/services/AIServiceClient.test.ts (create) - Unit tests for AIServiceClient
-- tests/unit/utils/workflowState.test.ts (create) - Unit tests for workflow state machine
-- tests/integration/demand-letter-workflow.test.ts (create) - End-to-end workflow integration tests
+**Files (ESTIMATED - will be refined during Planning):**
+- services/api/src/services/DemandLetterService.ts (create)
+- services/api/src/services/AIServiceClient.ts (create) - calls Python Lambda
+- services/api/src/routes/demand-letters.ts (create)
+- services/api/src/types/demand-letter.ts (create)
+- services/api/src/utils/workflowState.ts (create) - state machine
+- tests/demand-letters/DemandLetterService.test.ts (create)
+- tests/integration/demand-letter-workflow.test.ts (create)
 
 **Acceptance Criteria:**
-- [x] POST /demand-letters - create new demand letter project
-- [x] POST /demand-letters/:id/analyze - trigger document analysis (async)
-- [x] GET /demand-letters/:id/analysis - get analysis results (via GET /demand-letters/:id/status)
-- [x] POST /demand-letters/:id/generate - generate draft letter
-- [x] GET /demand-letters/:id - get current letter draft
-- [x] POST /demand-letters/:id/refine - submit refinement instructions
-- [x] GET /demand-letters/:id/history - get revision history
-- [x] Workflow state management (uploading, analyzing, drafting, refining, complete)
-- [x] Async job processing for long-running AI tasks
-- [ ] WebSocket notifications for workflow progress (deferred - polling via status endpoint instead)
-- [x] Error handling for AI service failures
-- [x] Tests cover complete workflow
+- [ ] POST /demand-letters - create new demand letter project
+- [ ] POST /demand-letters/:id/analyze - trigger document analysis (async)
+- [ ] GET /demand-letters/:id/analysis - get analysis results
+- [ ] POST /demand-letters/:id/generate - generate draft letter
+- [ ] GET /demand-letters/:id - get current letter draft
+- [ ] POST /demand-letters/:id/refine - submit refinement instructions
+- [ ] GET /demand-letters/:id/history - get revision history
+- [ ] Workflow state management (uploading, analyzing, drafting, refining, complete)
+- [ ] Async job processing for long-running AI tasks
+- [ ] WebSocket notifications for workflow progress
+- [ ] Error handling for AI service failures
+- [ ] Tests cover complete workflow
 
 **Notes:**
 This is the orchestration layer tying together document storage, templates, and AI processing.
-
----
-
-### PR-012a: Fix Demand Letter Workflow API Test Failures
-**Status:** Complete
-**QC Status:** Approved ✓ (2025-11-12)
-**Agent:** QC Agent
-**Started:** 2025-11-12
-**Completed:** 2025-11-12
-**Dependencies:** PR-012
-**Priority:** High (Blocker - fixes test failures in PR-012)
-
-**Description:**
-Fix failing tests in PR-012 by adding missing AWS SDK dependency and cleaning up test skeletons.
-
-**Files to Modify:**
-- services/api/package.json (modify) - Add @aws-sdk/client-lambda dependency
-- tests/unit/utils/workflowState.test.ts (modify) - Remove unused imports
-- tests/integration/demand-letter-workflow.test.ts (modify) - Initialize variables or mark as skipped
-- tests/unit/services/DemandLetterService.test.ts (modify) - Use or remove mock services
-
-**Issues to Fix:**
-1. **Missing Dependency:**
-   - Error: `Cannot find module '@aws-sdk/client-lambda'`
-   - Solution: `npm install @aws-sdk/client-lambda`
-
-2. **workflowState.test.ts:**
-   - Error: `TS6192: All imports in import declaration are unused`
-   - Unused: `WorkflowState, WorkflowAction` imports
-   - Solution: Remove unused imports or use them in tests
-
-3. **demand-letter-workflow.test.ts:**
-   - Error: Multiple `TS6133` (unused variables) and `TS2454` (used before assigned)
-   - Variables: `firmId`, `userId`, `authToken`, `documentId`
-   - Solution: Initialize variables in beforeEach or mark tests as skipped with proper setup
-
-4. **DemandLetterService.test.ts:**
-   - Error: `TS6133` for `mockDocumentService` and `mockAIService`
-   - Solution: Use the mocks or remove them
-
-**Acceptance Criteria:**
-- [x] @aws-sdk/client-lambda dependency installed ✓
-- [x] All critical test suite TypeScript errors resolved ✓ (2 minor lint warnings remain - non-blocking)
-- [x] workflowState.test.ts compiling and passing ✓
-- [x] demand-letter-workflow.test.ts compiling (tests properly skipped) ✓
-- [x] DemandLetterService.test.ts compiling and passing ✓
-- [x] AIServiceClient.test.ts compiling and passing ✓
-- [x] PR-012 test suites: All passing ✓ (4 failures are in TemplateService from PR-007)
-
-**Notes:**
-This is a cleanup PR to fix test quality issues found during QC. Focuses on making tests compile and run, not on adding new test coverage.
 
 ---
 
@@ -3161,96 +3101,38 @@ Avoid Tailwind CSS per project preferences. Consider CSS modules or styled-compo
 ---
 
 ### PR-015: Authentication UI (Login, Register)
-**Status:** Complete
-**QC Status:** Approved ✓ (2025-11-12) - All authentication tests passing (28/28). Fixed by PR-015a. Minor act() warnings in Login and Register tests (non-blocking).
+**Status:** New
 **Dependencies:** PR-001, PR-004, PR-014
 **Priority:** High
-**Assigned to:** Agent Orange
-**Completed:** 2025-11-12
 
 **Description:**
 Build login, registration, and password reset UI components with form validation and error handling.
 
-**Files (VERIFIED during Planning - Agent Orange 2025-11-12):**
+**Files (ESTIMATED - will be refined during Planning):**
 - frontend/src/pages/Login.tsx (create)
-- frontend/src/pages/Login.module.css (create)
 - frontend/src/pages/Register.tsx (create)
-- frontend/src/pages/Register.module.css (create)
 - frontend/src/pages/ForgotPassword.tsx (create)
-- frontend/src/pages/ForgotPassword.module.css (create)
 - frontend/src/pages/ResetPassword.tsx (create)
-- frontend/src/pages/ResetPassword.module.css (create)
 - frontend/src/components/auth/LoginForm.tsx (create)
-- frontend/src/components/auth/LoginForm.module.css (create)
 - frontend/src/components/auth/RegisterForm.tsx (create)
-- frontend/src/components/auth/RegisterForm.module.css (create)
-- frontend/src/components/auth/PasswordStrengthIndicator.tsx (create)
-- frontend/src/components/auth/PasswordStrengthIndicator.module.css (create)
-- frontend/src/lib/router.tsx (modify) - replace placeholder components with real ones
-- frontend/src/tests/pages/Login.test.tsx (create)
-- frontend/src/tests/pages/Register.test.tsx (create)
-- frontend/src/tests/pages/ForgotPassword.test.tsx (create)
-- frontend/src/tests/pages/ResetPassword.tsx (create)
-- frontend/src/tests/components/auth/LoginForm.test.tsx (create)
-- frontend/src/tests/components/auth/RegisterForm.test.tsx (create)
-
-**Notes on existing files:**
-- frontend/src/hooks/useAuth.ts already exists (PR-014)
-- frontend/src/utils/validation.ts already exists with all schemas (PR-014)
-- frontend/src/lib/auth-context.tsx already has login/register/logout functions (PR-014)
+- frontend/src/hooks/useAuth.ts (create)
+- frontend/src/utils/validation.ts (create) - form validation
+- frontend/src/tests/Login.test.tsx (create)
 
 **Acceptance Criteria:**
-- [x] Login form with email and password
-- [x] Registration form with validation (password strength, email format)
-- [x] Forgot password flow
-- [x] Reset password with token validation
-- [x] Form validation with clear error messages
-- [x] Loading states during API calls
-- [x] Redirect after successful login
-- [x] Remember me functionality
-- [x] Accessibility (WCAG AA compliance)
-- [x] Component tests with React Testing Library (all 8 Login tests passing)
+- [ ] Login form with email and password
+- [ ] Registration form with validation (password strength, email format)
+- [ ] Forgot password flow
+- [ ] Reset password with token validation
+- [ ] Form validation with clear error messages
+- [ ] Loading states during API calls
+- [ ] Redirect after successful login
+- [ ] Remember me functionality
+- [ ] Accessibility (WCAG AA compliance)
+- [ ] Component tests with React Testing Library
 
 **Notes:**
 Security: validate all input client-side, but rely on server-side validation as source of truth.
-
----
-
-### PR-015a: Fix Authentication UI Test Failures
-**Status:** Complete
-**QC Status:** Approved ✓ (2025-11-12)
-**Agent:** QC Agent
-**Started:** 2025-11-12
-**Completed:** 2025-11-12
-**Dependencies:** PR-015
-**Priority:** High (Blocker - fixes test failures in PR-015)
-
-**Description:**
-Fix failing tests in ResetPassword.test.tsx and address React Testing Library act() warnings in Login tests.
-
-**Files to Modify:**
-- frontend/src/tests/pages/ResetPassword.test.tsx (modify) - Fix ambiguous label queries
-- frontend/src/tests/pages/Login.test.tsx (modify) - Wrap state updates in act() to fix warnings
-
-**Issues to Fix:**
-1. ResetPassword.test.tsx: 2 failing tests
-   - "renders reset password form when token is present"
-   - "displays error when passwords don't match"
-   - Root cause: `getByLabelText(/new password/i)` matches both "New Password" and "Confirm New Password" fields
-   - Solution: Use more specific queries or getAllByLabelText
-
-2. Login.test.tsx: React Testing Library act() warnings
-   - Warning: "An update to LoginForm inside a test was not wrapped in act(...)"
-   - Solution: Properly wrap async state updates in act()
-
-**Acceptance Criteria:**
-- [x] All ResetPassword tests passing (2/2)
-- [x] Login tests still passing (8/8) - act() warnings remain but non-blocking
-- [x] All other authentication tests still passing
-- [x] PR-015 authentication tests: 28/28 passing (Login: 8, Register: 9, ForgotPassword: 4, ResetPassword: 2, LoginForm: 5)
-
-**Notes:**
-This is a cleanup PR to fix test quality issues found during QC. Does not change any application code, only test code.
 
 ---
 
@@ -3290,87 +3172,36 @@ Use react-dropzone or similar for file upload UX.
 ---
 
 ### PR-017: Template Management UI
-**Status:** Complete
-**QC Status:** Approved ✓ (2025-11-12) - All tests passing (2/2). Fixed by PR-017a.
+**Status:** New
 **Dependencies:** PR-007, PR-014, PR-015
 **Priority:** High
-**Agent:** Blonde
-**Completed:** 2025-11-12
 
 **Description:**
 Build interface for viewing, creating, and editing demand letter templates. Support template variables and preview.
 
-**Files (VERIFIED during Planning):**
-- frontend/src/types/template.ts (create) - TypeScript interfaces for template data
-- frontend/src/hooks/useTemplates.ts (create) - React Query hooks for template operations
-- frontend/src/pages/Templates.tsx (create) - Template list page
-- frontend/src/pages/TemplateEditor.tsx (create) - Template create/edit page
-- frontend/src/components/templates/TemplateListTable.tsx (create) - Table component for template list
-- frontend/src/components/templates/TemplateForm.tsx (create) - Form for template metadata
-- frontend/src/components/templates/TemplateContent.tsx (create) - Rich text editor for template content
-- frontend/src/components/templates/VariableInserter.tsx (create) - UI for inserting template variables
-- frontend/src/components/templates/TemplatePreview.tsx (create) - Preview template with sample data
-- frontend/src/components/templates/VersionHistory.tsx (create) - Version history viewer
-- frontend/src/components/templates/DeleteConfirmDialog.tsx (create) - Delete confirmation dialog
-- frontend/src/components/templates/TemplateListTable.module.css (create) - Styles for table
-- frontend/src/components/templates/TemplateForm.module.css (create) - Styles for form
-- frontend/src/components/templates/TemplateContent.module.css (create) - Styles for editor
-- frontend/src/pages/Templates.module.css (create) - Styles for Templates page
-- frontend/src/pages/TemplateEditor.module.css (create) - Styles for TemplateEditor page
-- frontend/src/lib/router.tsx (modify) - Add template routes
-- frontend/src/test/Templates.test.tsx (create) - Component tests for Templates page
-- frontend/src/test/TemplateEditor.test.tsx (create) - Component tests for TemplateEditor page
+**Files (ESTIMATED - will be refined during Planning):**
+- frontend/src/pages/Templates.tsx (create)
+- frontend/src/pages/TemplateEditor.tsx (create)
+- frontend/src/components/templates/TemplateList.tsx (create)
+- frontend/src/components/templates/TemplateForm.tsx (create)
+- frontend/src/components/templates/VariableInserter.tsx (create)
+- frontend/src/hooks/useTemplates.ts (create)
+- frontend/src/tests/Templates.test.tsx (create)
 
 **Acceptance Criteria:**
-- [x] List all firm templates with pagination and search
-- [x] Create new template (admin only)
-- [x] Edit existing template (admin only)
-- [x] Rich text editor for template content with variable support
-- [x] Insert template variables via UI helper (dropdown or modal)
-- [x] Preview template with sample data
-- [x] Template version history viewer with rollback (admin only)
-- [x] Delete template with confirmation (admin only)
-- [x] Role-based UI (admin vs. regular user)
-- [x] Loading states for all async operations
-- [x] Error handling with user-friendly messages
-- [x] Responsive design
-- [x] Component tests with React Testing Library
+- [ ] List all firm templates
+- [ ] Create new template (admin only)
+- [ ] Edit existing template
+- [ ] Rich text editor for template content
+- [ ] Insert template variables via UI helper
+- [ ] Preview template with sample data
+- [ ] Template version history viewer
+- [ ] Delete template (with confirmation)
+- [ ] Role-based UI (admin vs. regular user)
+- [ ] Component tests
 
 **Notes:**
-Using native contentEditable for rich text editing instead of Lexical/TipTap to keep bundle size small and avoid additional dependencies. Template variables use {{variable_name}} syntax matching backend.
-
----
-
-### PR-017a: Fix Template Management UI Test Failures
-**Status:** Complete
-**QC Status:** Approved ✓ (2025-11-12)
-**Agent:** QC Agent
-**Started:** 2025-11-12
-**Completed:** 2025-11-12
-**Dependencies:** PR-017
-**Priority:** High (Blocker - fixes test failures in PR-017)
-
-**Description:**
-Fix failing tests in TemplateEditor.test.tsx by properly mocking the useTemplate hook.
-
-**Files Modified:**
-- frontend/src/test/TemplateEditor.test.tsx (modify) - Add proper mock setup for useTemplate hooks
-
-**Issues Fixed:**
-1. TemplateEditor.test.tsx: 2 failing tests
-   - "renders for admin users"
-   - "does not render for non-admin users"
-   - Root cause: `useTemplate()` hook returns undefined (missing mock in test setup)
-   - Error: "Cannot destructure property 'data' of 'useTemplate(...)' as it is undefined."
-   - Solution: Mock all useTemplates hooks (useTemplate, useCreateTemplate, useUpdateTemplate, useRollbackTemplate) with proper return values
-
-**Acceptance Criteria:**
-- [x] All TemplateEditor tests passing (2/2)
-- [x] All other template tests still passing
-- [x] Frontend test suite: 30/30 tests passing ✓
-
-**Notes:**
-This is a cleanup PR to fix test quality issues found during QC. Does not change any application code, only test code.
+Consider using Lexical or TipTap for rich text editing with variable support.
 
 ---
 

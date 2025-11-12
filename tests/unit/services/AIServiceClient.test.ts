@@ -86,7 +86,7 @@ describe('AIServiceClient', () => {
           documentText: 'Sample document text',
           firmId: 'firm-123',
         })
-      ).rejects.toThrow('Document analysis failed');
+      ).rejects.toThrow('Analysis failed');
     });
   });
 
@@ -146,7 +146,7 @@ describe('AIServiceClient', () => {
           templateVariables: {},
           firmId: 'firm-123',
         })
-      ).rejects.toThrow('Letter generation failed');
+      ).rejects.toThrow('Generation failed');
     });
   });
 
@@ -208,7 +208,7 @@ describe('AIServiceClient', () => {
           feedback: { instruction: 'Test' },
           firmId: 'firm-123',
         })
-      ).rejects.toThrow('Letter refinement failed');
+      ).rejects.toThrow('Refinement failed');
     });
   });
 

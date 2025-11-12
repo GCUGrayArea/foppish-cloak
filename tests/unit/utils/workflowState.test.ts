@@ -12,7 +12,6 @@ import {
   isProcessingState,
   getStateDescription,
 } from '../../../services/api/src/utils/workflowState';
-import { WorkflowState, WorkflowAction } from '../../../services/api/src/types/demand-letter';
 
 describe('WorkflowStateMachine', () => {
   describe('State Transitions', () => {
