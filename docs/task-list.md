@@ -3240,7 +3240,7 @@ Use react-dropzone or similar for file upload UX.
 
 ### PR-017: Template Management UI
 **Status:** Complete
-**QC Status:** Broken ⚠️ (2025-11-12) - TemplateEditor.test.tsx has 2 failing tests: useTemplate hook returns undefined (missing mock setup). Error: "Cannot destructure property 'data' of 'useTemplate(...)' as it is undefined."
+**QC Status:** Approved ✓ (2025-11-12) - All tests passing (2/2). Fixed by PR-017a.
 **Dependencies:** PR-007, PR-014, PR-015
 **Priority:** High
 **Agent:** Blonde
