@@ -932,9 +932,10 @@ export function requireRole(...allowedRoles: Role[]) {
 ---
 
 ### PR-005: Firm and User Management API
-**Status:** In Progress
+**Status:** Complete
 **Agent:** Orange
-**Dependencies:** PR-001, PR-002, PR-004
+**Completed on:** 2025-11-11
+**Dependencies:** PR-001 (Complete), PR-002 (Complete), PR-004 (Complete)
 **Priority:** High
 
 **Description:**
@@ -2322,7 +2323,7 @@ This is the core AI capability. Quality of extraction directly impacts letter qu
 **Status:** Blocked-Ready
 **Agent:** Available for claim
 **Planned by:** Agent Orange (2025-11-11)
-**Dependencies:** PR-001, PR-002, PR-007, PR-008, PR-009
+**Dependencies:** PR-001 (Complete), PR-002 (Complete), PR-007 (Approved ⚠️), PR-008 (Complete), PR-009 (Approved ⚠️)
 **Priority:** High
 
 **Description:**
