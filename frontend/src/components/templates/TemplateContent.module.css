@@ -1,0 +1,116 @@
+.container {
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+  padding: var(--spacing-sm);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.toolbarButton {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toolbarButton:hover:not(:disabled) {
+  background: var(--bg-secondary);
+  border-color: var(--color-primary-500);
+}
+
+.toolbarButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.toolbarButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.toolbarDivider {
+  width: 1px;
+  height: 1.5rem;
+  background: var(--border-primary);
+  margin: 0 var(--spacing-xs);
+}
+
+.editor {
+  min-height: 400px;
+  max-height: 600px;
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.editor:empty:before {
+  content: attr(data-placeholder);
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.editor.disabled {
+  background: var(--bg-secondary);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Template variable highlighting */
+.editor :global(.template-variable) {
+  padding: 0.125rem 0.375rem;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: var(--color-primary-700);
+  background: var(--color-primary-100);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+/* Basic text formatting */
+.editor strong,
+.editor b {
+  font-weight: 600;
+}
+
+.editor em,
+.editor i {
+  font-style: italic;
+}
+
+.editor u {
+  text-decoration: underline;
+}
+
+/* Scrollbar styling */
+.editor::-webkit-scrollbar {
+  width: 8px;
+}
+
+.editor::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.editor::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 4px;
+}
+
+.editor::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
