@@ -978,6 +978,8 @@ Build API endpoints for managing firms, users, and firm-level settings. Support 
 **Notes:**
 Multi-tenant architecture is critical - all queries must be scoped to firm_id.
 
+⚠️ **IMPORTANT:** Integration test files (`tests/integration/firm-management.test.ts`, `tests/integration/user-management.test.ts`) are currently skeletons with `@ts-expect-error` directives. When implementing these tests, **REMOVE all @ts-expect-error directives** to ensure proper type checking.
+
 ---
 
 ## Planning Notes: PR-005 (Firm and User Management API)
@@ -1605,6 +1607,8 @@ Build system for creating, editing, and managing firm-specific demand letter tem
 
 **Notes:**
 Template system should be flexible enough to support various demand letter formats.
+
+⚠️ **IMPORTANT:** Integration test files (`tests/integration/template-management.test.ts`, `tests/integration/template-versioning.test.ts`) are currently skeletons with `@ts-expect-error` directives. When implementing these tests, **REMOVE all @ts-expect-error directives** to ensure proper type checking.
 
 ---
 
