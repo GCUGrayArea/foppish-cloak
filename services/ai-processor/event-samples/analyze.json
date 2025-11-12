@@ -1,0 +1,11 @@
+{
+  "resource": "/ai/analyze",
+  "path": "/ai/analyze",
+  "httpMethod": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "X-Correlation-ID": "test-correlation-123"
+  },
+  "body": "{\"document_id\":\"doc-001\",\"document_text\":\"POLICE REPORT\\n\\nIncident Date: 2024-01-15\\nParties Involved:\\nPlaintiff: John Smith\\nDefendant: Acme Corp\\n\\nIncident Description:\\nRear-end collision at intersection.\\n\\nDamages:\\n- Vehicle repair: $5000\\n- Medical bills: $3000\\n- Lost wages: $2000\",\"document_type\":\"police_report\",\"firm_id\":1,\"user_id\":100}",
+  "isBase64Encoded": false
+}

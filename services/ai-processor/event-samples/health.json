@@ -1,0 +1,9 @@
+{
+  "resource": "/ai/health",
+  "path": "/ai/health",
+  "httpMethod": "GET",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "isBase64Encoded": false
+}

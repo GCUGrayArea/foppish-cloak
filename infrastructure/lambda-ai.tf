@@ -1,42 +1,20 @@
 # Lambda Function Configuration - AI Processor Service
-# Defines the Python AI processor Lambda function
-
-# Placeholder Lambda deployment package for AI processor
-data "archive_file" "lambda_ai_placeholder" {
-  type        = "zip"
-  output_path = "${path.module}/.terraform/lambda-ai-placeholder.zip"
-
-  source {
-    content  = <<-EOT
-      import json
-      import os
-
-      def handler(event, context):
-          return {
-              'statusCode': 200,
-              'body': json.dumps({
-                  'message': 'AI Processor Lambda placeholder - deploy actual code via CI/CD',
-                  'environment': os.environ.get('ENVIRONMENT', 'unknown')
-              })
-          }
-    EOT
-    filename = "lambda_function.py"
-  }
-}
+# Defines the Python AI processor Lambda function using container image
 
 # AI Processor Lambda Function
 resource "aws_lambda_function" "ai_processor" {
   function_name = "${local.name_prefix}-ai-processor"
   description   = "AI processor Lambda function for document analysis and letter generation"
 
-  # Deployment package
-  filename         = data.archive_file.lambda_ai_placeholder.output_path
-  source_code_hash = data.archive_file.lambda_ai_placeholder.output_base64sha256
+  # Container image deployment
+  package_type = "Image"
+  image_uri    = "${aws_ecr_repository.ai_processor.repository_url}:latest"
 
-  # Runtime configuration
-  runtime = var.lambda_runtime_python
-  handler = "lambda_function.handler"
-  role    = aws_iam_role.lambda_ai.arn
+  # Architecture
+  architectures = ["arm64"]
+
+  # Role
+  role = aws_iam_role.lambda_ai.arn
 
   # Performance configuration
   # AI processing requires more memory and longer timeout
@@ -86,9 +64,8 @@ resource "aws_lambda_function" "ai_processor" {
 
   lifecycle {
     ignore_changes = [
-      # Ignore changes to the code after initial creation (CI/CD will update)
-      filename,
-      source_code_hash,
+      # Ignore changes to image after initial creation (CI/CD will update)
+      image_uri,
       last_modified
     ]
   }

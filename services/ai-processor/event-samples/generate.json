@@ -1,0 +1,11 @@
+{
+  "resource": "/ai/generate",
+  "path": "/ai/generate",
+  "httpMethod": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "X-Correlation-ID": "test-correlation-456"
+  },
+  "body": "{\"case_id\":\"case-001\",\"extracted_data\":{\"metadata\":{\"document_type\":\"police_report\",\"document_date\":\"2024-01-15\",\"author\":\"Officer Smith\",\"document_number\":\"PR-2024-001\"},\"parties\":[{\"party_type\":\"plaintiff\",\"name\":\"John Smith\",\"contact_info\":\"john@example.com\",\"role\":\"victim\"}],\"incident\":{\"incident_date\":\"2024-01-15\",\"location\":\"Main St & 5th Ave\",\"description\":\"Rear-end collision\",\"incident_type\":\"car_accident\"},\"damages\":[{\"damage_type\":\"property\",\"description\":\"Vehicle repair\",\"amount\":5000.0},{\"damage_type\":\"medical\",\"description\":\"Medical bills\",\"amount\":3000.0}],\"case_facts\":[],\"summary\":\"Traffic accident case\",\"total_damages_estimate\":8000.0},\"template_variables\":{\"plaintiff_name\":\"John Smith\",\"defendant_name\":\"Unknown Driver\",\"firm_name\":\"Smith & Associates\",\"firm_address\":\"123 Legal St, City, State 12345\",\"incident_date\":\"January 15, 2024\",\"settlement_deadline\":\"February 15, 2024\"},\"firm_id\":1,\"user_id\":100}",
+  "isBase64Encoded": false
+}
