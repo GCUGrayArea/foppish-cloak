@@ -131,9 +131,9 @@ variable "lambda_runtime_python" {
 
 # Bedrock Configuration
 variable "bedrock_model_id" {
-  description = "AWS Bedrock model ID"
+  description = "AWS Bedrock model ID (inference profile)"
   type        = string
-  default     = "anthropic.claude-3-5-sonnet-20240620-v1:0"
+  default     = "us.anthropic.claude-sonnet-4-5-20250929-v1:0"  # Claude Sonnet 4.5 (latest)
 }
 
 variable "bedrock_region" {
