@@ -3088,32 +3088,105 @@ This is a cleanup PR to fix test quality issues found during QC. Focuses on maki
 ---
 
 ### PR-013: Document Export Service (Word/PDF)
-**Status:** New
-**Dependencies:** PR-001, PR-002, PR-012
+**Status:** Blocked-Ready
+**Dependencies:** PR-001 (Complete), PR-002 (Complete), PR-012 (Complete)
 **Priority:** High
+**Planning Status:** COMPLETE
+**Planned by:** Agent White (2025-11-12)
 
 **Description:**
-Implement export functionality to generate properly formatted Word documents (.docx) from demand letter drafts. Support PDF export as well.
+Implement export functionality to generate properly formatted Word documents (.docx) from demand letter drafts. Support PDF export as well using HTML-to-PDF conversion.
 
-**Files (ESTIMATED - will be refined during Planning):**
-- services/api/src/services/ExportService.ts (create)
-- services/api/src/utils/docx-generator.ts (create) - use docx library
-- services/api/src/utils/pdf-generator.ts (create) - use puppeteer or similar
-- services/api/src/routes/export.ts (create)
-- services/api/src/templates/letter-template.docx (create) - base template
-- tests/export/ExportService.test.ts (create)
+**Files (VERIFIED during Planning):**
+- services/api/src/services/ExportService.ts (create) - Export orchestration service
+- services/api/src/utils/docx-generator.ts (create) - Word document generation with docx library
+- services/api/src/utils/pdf-generator.ts (create) - PDF generation using puppeteer
+- services/api/src/utils/document-formatter.ts (create) - Shared formatting utilities for both exports
+- services/api/src/routes/demand-letters.ts (modify) - Add export endpoints
+- services/api/src/types/export.ts (create) - Export-related TypeScript types
+- services/api/package.json (modify) - Add puppeteer dependency
+- tests/unit/services/ExportService.test.ts (create) - Service unit tests
+- tests/unit/utils/docx-generator.test.ts (create) - DOCX generator tests
+- tests/unit/utils/pdf-generator.test.ts (create) - PDF generator tests
+- tests/integration/document-export.test.ts (create) - Integration tests for export endpoints
 
 **Acceptance Criteria:**
 - [ ] GET /demand-letters/:id/export/docx - export to Word format
 - [ ] GET /demand-letters/:id/export/pdf - export to PDF format
 - [ ] Proper formatting: letterhead, paragraphs, signatures
-- [ ] Template styling preserved in export
-- [ ] Firm logo/branding included (if configured)
-- [ ] File download with proper content-type headers
-- [ ] Tests verify document structure and content
+- [ ] Template styling preserved in export (from template variables)
+- [ ] Firm branding included (firm name, settings from firm.settings JSONB)
+- [ ] File download with proper content-type headers and filename
+- [ ] Proper multi-tenant scoping (firm_id validation)
+- [ ] Error handling for missing letters or incomplete generation
+- [ ] Tests verify document structure, content, and headers
+- [ ] Both export formats include extracted data and generated content
 
-**Notes:**
-Use docx library for Word export. Consider using Lambda for PDF generation (headless Chrome).
+**Implementation Notes:**
+
+**Technology Decisions:**
+1. **Word Export:** Use `docx@8.5.0` library (already installed)
+   - Programmatic document generation with full control
+   - Support for headers, footers, tables, styling
+   - No template file needed - generate dynamically
+2. **PDF Export:** Use `puppeteer` (headless Chrome)
+   - Generate HTML from letter content, then convert to PDF
+   - Better rendering quality than pure PDF libraries
+   - Supports complex layouts and CSS styling
+3. **Architecture:** Service layer pattern (consistent with existing codebase)
+   - ExportService orchestrates export logic
+   - Separate generator utilities for DOCX and PDF
+   - Shared formatter for common operations (date formatting, content sanitization)
+
+**Export Routes (added to demand-letters.ts):**
+- GET /demand-letters/:id/export/docx - Returns .docx file with content-disposition header
+- GET /demand-letters/:id/export/pdf - Returns .pdf file with content-disposition header
+- Both routes validate firm_id, check letter exists and has content
+- Filename pattern: {title}-{date}.{ext} (sanitized)
+
+**Document Structure:**
+1. **Header:**
+   - Firm name (from firms table)
+   - Date of letter generation
+   - Optional firm logo (if configured in firm.settings)
+2. **Content Sections:**
+   - Recipient information (from extracted_data)
+   - Letter body (from current_content)
+   - Signature block (attorney name from users table)
+3. **Footer:**
+   - Firm contact information (from firm.settings)
+   - Page numbers
+
+**Data Flow:**
+1. Client requests export endpoint with letter ID
+2. Route validates letter exists, belongs to firm, has content
+3. Route calls ExportService with letter data
+4. ExportService fetches related data (firm, template, user)
+5. ExportService calls appropriate generator (DOCX or PDF)
+6. Generator creates formatted document
+7. Route returns file with appropriate headers
+
+**Error Handling:**
+- 404 if letter not found or doesn't belong to firm
+- 400 if letter has no content (status not 'complete' or 'refining')
+- 500 for document generation failures (with detailed error logging)
+
+**Testing Strategy:**
+- Unit tests for ExportService with mocked generators
+- Unit tests for each generator (DOCX, PDF) with snapshot testing
+- Integration tests for endpoints (verify headers, file downloads)
+- Test data: sample letter with various formatting (lists, bold, paragraphs)
+
+**Time Estimate:** 180 minutes (3 hours)
+- ExportService implementation: 40 minutes
+- DOCX generator implementation: 50 minutes
+- PDF generator implementation: 50 minutes
+- Route modifications and types: 20 minutes
+- Test suite: 20 minutes
+
+**Dependencies to Install:**
+- puppeteer@^23.0.0
+- @types/puppeteer (dev dependency)
 
 ---
 
