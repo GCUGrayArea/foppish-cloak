@@ -1,0 +1,74 @@
+CITY OF SPRINGFIELD POLICE DEPARTMENT
+TRAFFIC ACCIDENT REPORT
+
+Report Number: SPD-2024-001234
+Date of Report: January 15, 2024
+Officer: Sergeant John Martinez, Badge #4567
+Location: Intersection of Main Street and Oak Avenue, Springfield, IL
+
+INCIDENT INFORMATION:
+Date of Accident: January 15, 2024
+Time of Accident: 2:45 PM
+Weather Conditions: Clear, Dry
+Road Conditions: Good
+Traffic Control: Traffic Signal
+
+VEHICLE 1:
+Driver: Sarah Johnson
+DOB: 05/12/1985
+Address: 123 Maple Street, Springfield, IL 62701
+Phone: (217) 555-0123
+License: IL DL M234-5678-9012
+Vehicle: 2020 Honda Accord, Silver
+License Plate: IL ABC 1234
+Insurance: State Farm Insurance
+Policy Number: SF-789456123
+Insurance Agent: Mike Chen, (217) 555-9876
+
+VEHICLE 2:
+Driver: Robert Williams
+DOB: 08/20/1978
+Address: 456 Oak Drive, Springfield, IL 62702
+Phone: (217) 555-0456
+License: IL DL M876-5432-1098
+Vehicle: 2019 Ford F-150, Blue
+License Plate: IL XYZ 5678
+Insurance: Allstate Insurance
+Policy Number: AS-456789321
+Insurance Agent: Jennifer Lopez, (217) 555-6543
+
+WITNESS:
+Name: Emily Davis
+Address: 789 Pine Lane, Springfield, IL 62703
+Phone: (217) 555-7890
+
+NARRATIVE:
+On January 15, 2024, at approximately 2:45 PM, I responded to a two-vehicle traffic accident at the intersection of Main Street and Oak Avenue. Upon arrival, I observed two damaged vehicles in the intersection.
+
+Vehicle 1 (Honda Accord driven by Sarah Johnson) was traveling northbound on Main Street. Vehicle 2 (Ford F-150 driven by Robert Williams) was traveling eastbound on Oak Avenue.
+
+According to witness Emily Davis, who was standing at the northeast corner of the intersection, Vehicle 2 (F-150) proceeded through the intersection while the traffic signal displayed a red light. Vehicle 1 (Accord) had a green light and entered the intersection when struck by Vehicle 2.
+
+The point of impact was in the center of the intersection. Vehicle 1 sustained major damage to the driver's side doors and quarter panel. Vehicle 2 sustained major damage to the front bumper, hood, and right fender.
+
+Driver Sarah Johnson complained of neck and back pain. Springfield Fire Department EMS was on scene and transported Johnson to Springfield Memorial Hospital for evaluation and treatment.
+
+Driver Robert Williams stated he "didn't see the light change" and admitted he may have been distracted by his phone. Williams exhibited no signs of injury and declined medical treatment.
+
+CITATIONS ISSUED:
+Robert Williams was cited for:
+- Failure to Obey Traffic Control Device (625 ILCS 5/11-306)
+- Distracted Driving - Electronic Device Use (625 ILCS 5/12-610.2)
+
+PROPERTY DAMAGE ESTIMATE:
+Vehicle 1 (Honda Accord): Estimated $8,500 damage
+Vehicle 2 (Ford F-150): Estimated $6,200 damage
+
+DIAGRAM:
+[Diagram indicates Vehicle 2 struck Vehicle 1 on driver's side, with Vehicle 1 positioned northbound and Vehicle 2 positioned eastbound at time of impact]
+
+INVESTIGATING OFFICER:
+Sergeant John Martinez, Badge #4567
+Springfield Police Department
+Signature: [Signed]
+Date: January 15, 2024
