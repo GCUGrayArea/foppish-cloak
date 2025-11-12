@@ -933,6 +933,7 @@ export function requireRole(...allowedRoles: Role[]) {
 
 ### PR-005: Firm and User Management API
 **Status:** Complete
+**QC Status:** Broken (2025-11-11) - Integration tests fail TypeScript compilation (unused variables). Unit tests pass (35/35).
 **Agent:** Orange
 **Completed on:** 2025-11-11
 **Dependencies:** PR-001 (Complete), PR-002 (Complete), PR-004 (Complete)
@@ -2321,6 +2322,7 @@ This is the core AI capability. Quality of extraction directly impacts letter qu
 
 ### PR-010: Demand Letter Generation (Python)
 **Status:** Complete
+**QC Status:** Approved (2025-11-11) - 41/43 tests passing (2 integration tests skipped). Unit test coverage: 96%+ for core modules.
 **Agent:** Orange
 **Completed on:** 2025-11-11
 **Planned by:** Agent Orange (2025-11-11)
@@ -2357,6 +2359,7 @@ Follow LLM architecture patterns for deterministic operations vs. creative gener
 
 ### PR-011: AI Service Lambda Deployment
 **Status:** Complete
+**QC Status:** Approved with cleanup needed (2025-11-11) - All 11 tests passing. ⚠ Coding standards: 3 functions exceed 75 lines (handle_analyze: 84, handle_generate: 89, handle_refine: 102). Needs refactoring.
 **Agent:** White
 **Completed on:** 2025-11-11
 **Planned by:** Agent Orange (2025-11-11)
@@ -3054,6 +3057,7 @@ Use docx library for Word export. Consider using Lambda for PDF generation (head
 
 ### PR-014: React App Setup with Vite
 **Status:** Complete
+**QC Status:** Approved (2025-11-11) - No tests present (frontend foundation PR). Coding standards: all files compliant. Build successful.
 **Agent:** White
 **Completed on:** 2025-11-11
 **Planned by:** Agent White (2025-11-11)
