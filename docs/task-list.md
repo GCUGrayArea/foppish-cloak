@@ -3108,7 +3108,7 @@ Avoid Tailwind CSS per project preferences. Consider CSS modules or styled-compo
 ---
 
 ### PR-015: Authentication UI (Login, Register)
-**Status:** Planning
+**Status:** In Progress
 **Dependencies:** PR-001, PR-004, PR-014
 **Priority:** High
 **Assigned to:** Agent Orange
@@ -3116,16 +3116,33 @@ Avoid Tailwind CSS per project preferences. Consider CSS modules or styled-compo
 **Description:**
 Build login, registration, and password reset UI components with form validation and error handling.
 
-**Files (ESTIMATED - will be refined during Planning):**
+**Files (VERIFIED during Planning - Agent Orange 2025-11-12):**
 - frontend/src/pages/Login.tsx (create)
+- frontend/src/pages/Login.module.css (create)
 - frontend/src/pages/Register.tsx (create)
+- frontend/src/pages/Register.module.css (create)
 - frontend/src/pages/ForgotPassword.tsx (create)
+- frontend/src/pages/ForgotPassword.module.css (create)
 - frontend/src/pages/ResetPassword.tsx (create)
+- frontend/src/pages/ResetPassword.module.css (create)
 - frontend/src/components/auth/LoginForm.tsx (create)
+- frontend/src/components/auth/LoginForm.module.css (create)
 - frontend/src/components/auth/RegisterForm.tsx (create)
-- frontend/src/hooks/useAuth.ts (create)
-- frontend/src/utils/validation.ts (create) - form validation
-- frontend/src/tests/Login.test.tsx (create)
+- frontend/src/components/auth/RegisterForm.module.css (create)
+- frontend/src/components/auth/PasswordStrengthIndicator.tsx (create)
+- frontend/src/components/auth/PasswordStrengthIndicator.module.css (create)
+- frontend/src/lib/router.tsx (modify) - replace placeholder components with real ones
+- frontend/src/tests/pages/Login.test.tsx (create)
+- frontend/src/tests/pages/Register.test.tsx (create)
+- frontend/src/tests/pages/ForgotPassword.test.tsx (create)
+- frontend/src/tests/pages/ResetPassword.tsx (create)
+- frontend/src/tests/components/auth/LoginForm.test.tsx (create)
+- frontend/src/tests/components/auth/RegisterForm.test.tsx (create)
+
+**Notes on existing files:**
+- frontend/src/hooks/useAuth.ts already exists (PR-014)
+- frontend/src/utils/validation.ts already exists with all schemas (PR-014)
+- frontend/src/lib/auth-context.tsx already has login/register/logout functions (PR-014)
 
 **Acceptance Criteria:**
 - [ ] Login form with email and password
@@ -3180,7 +3197,7 @@ Use react-dropzone or similar for file upload UX.
 ---
 
 ### PR-017: Template Management UI
-**Status:** Planning
+**Status:** In Progress
 **Dependencies:** PR-007, PR-014, PR-015
 **Priority:** High
 **Agent:** Blonde
@@ -3188,31 +3205,44 @@ Use react-dropzone or similar for file upload UX.
 **Description:**
 Build interface for viewing, creating, and editing demand letter templates. Support template variables and preview.
 
-**Files (ESTIMATED - will be refined during Planning):**
-- frontend/src/pages/Templates.tsx (create)
-- frontend/src/pages/TemplateEditor.tsx (create)
-- frontend/src/components/templates/TemplateList.tsx (create)
-- frontend/src/components/templates/TemplateForm.tsx (create)
-- frontend/src/components/templates/VariableInserter.tsx (create)
-- frontend/src/hooks/useTemplates.ts (create)
-- frontend/src/tests/Templates.test.tsx (create)
+**Files (VERIFIED during Planning):**
+- frontend/src/types/template.ts (create) - TypeScript interfaces for template data
+- frontend/src/hooks/useTemplates.ts (create) - React Query hooks for template operations
+- frontend/src/pages/Templates.tsx (create) - Template list page
+- frontend/src/pages/TemplateEditor.tsx (create) - Template create/edit page
+- frontend/src/components/templates/TemplateListTable.tsx (create) - Table component for template list
+- frontend/src/components/templates/TemplateForm.tsx (create) - Form for template metadata
+- frontend/src/components/templates/TemplateContent.tsx (create) - Rich text editor for template content
+- frontend/src/components/templates/VariableInserter.tsx (create) - UI for inserting template variables
+- frontend/src/components/templates/TemplatePreview.tsx (create) - Preview template with sample data
+- frontend/src/components/templates/VersionHistory.tsx (create) - Version history viewer
+- frontend/src/components/templates/DeleteConfirmDialog.tsx (create) - Delete confirmation dialog
+- frontend/src/components/templates/TemplateListTable.module.css (create) - Styles for table
+- frontend/src/components/templates/TemplateForm.module.css (create) - Styles for form
+- frontend/src/components/templates/TemplateContent.module.css (create) - Styles for editor
+- frontend/src/pages/Templates.module.css (create) - Styles for Templates page
+- frontend/src/pages/TemplateEditor.module.css (create) - Styles for TemplateEditor page
+- frontend/src/lib/router.tsx (modify) - Add template routes
+- frontend/src/test/Templates.test.tsx (create) - Component tests for Templates page
+- frontend/src/test/TemplateEditor.test.tsx (create) - Component tests for TemplateEditor page
 
 **Acceptance Criteria:**
-- [ ] List all firm templates
+- [ ] List all firm templates with pagination and search
 - [ ] Create new template (admin only)
-- [ ] Edit existing template
-- [ ] Rich text editor for template content
-- [ ] Insert template variables via UI helper
+- [ ] Edit existing template (admin only)
+- [ ] Rich text editor for template content with variable support
+- [ ] Insert template variables via UI helper (dropdown or modal)
 - [ ] Preview template with sample data
-- [ ] Template version history viewer
-- [ ] Delete template (with confirmation)
+- [ ] Template version history viewer with rollback (admin only)
+- [ ] Delete template with confirmation (admin only)
 - [ ] Role-based UI (admin vs. regular user)
-- [ ] Component tests
+- [ ] Loading states for all async operations
+- [ ] Error handling with user-friendly messages
+- [ ] Responsive design
+- [ ] Component tests with React Testing Library
 
 **Notes:**
-Consider using Lexical or TipTap for rich text editing with variable support.
-
----
+Using native contentEditable for rich text editing instead of Lexical/TipTap to keep bundle size small and avoid additional dependencies. Template variables use {{variable_name}} syntax matching backend.
 
 ### PR-018: Demand Letter Workspace UI
 **Status:** New
