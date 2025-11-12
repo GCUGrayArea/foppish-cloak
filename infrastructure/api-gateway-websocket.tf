@@ -203,48 +203,25 @@ resource "aws_lambda_permission" "websocket_connect" {
 }
 
 # WebSocket Routes
+# NOTE: These routes now use the collaboration service integrations defined in lambda-websocket.tf
 resource "aws_apigatewayv2_route" "connect" {
   api_id    = aws_apigatewayv2_api.websocket.id
   route_key = "$connect"
-  target    = "integrations/${aws_apigatewayv2_integration.connect.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.collaboration_connect.id}"
 
-  # Authorization (optional, uncomment to enable JWT auth)
-  # authorization_type = "CUSTOM"
-  # authorizer_id      = aws_apigatewayv2_authorizer.websocket.id
+  # Authorization handled in Lambda via JWT token in query string
 }
 
 resource "aws_apigatewayv2_route" "disconnect" {
   api_id    = aws_apigatewayv2_api.websocket.id
   route_key = "$disconnect"
-  target    = "integrations/${aws_apigatewayv2_integration.disconnect.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.collaboration_disconnect.id}"
 }
 
 resource "aws_apigatewayv2_route" "default" {
   api_id    = aws_apigatewayv2_api.websocket.id
   route_key = "$default"
-  target    = "integrations/${aws_apigatewayv2_integration.default.id}"
-}
-
-# WebSocket Integrations
-resource "aws_apigatewayv2_integration" "connect" {
-  api_id             = aws_apigatewayv2_api.websocket.id
-  integration_type   = "AWS_PROXY"
-  integration_uri    = aws_lambda_function.websocket_handler.invoke_arn
-  integration_method = "POST"
-}
-
-resource "aws_apigatewayv2_integration" "disconnect" {
-  api_id             = aws_apigatewayv2_api.websocket.id
-  integration_type   = "AWS_PROXY"
-  integration_uri    = aws_lambda_function.websocket_handler.invoke_arn
-  integration_method = "POST"
-}
-
-resource "aws_apigatewayv2_integration" "default" {
-  api_id             = aws_apigatewayv2_api.websocket.id
-  integration_type   = "AWS_PROXY"
-  integration_uri    = aws_lambda_function.websocket_handler.invoke_arn
-  integration_method = "POST"
+  target    = "integrations/${aws_apigatewayv2_integration.collaboration_default.id}"
 }
 
 # WebSocket Stage

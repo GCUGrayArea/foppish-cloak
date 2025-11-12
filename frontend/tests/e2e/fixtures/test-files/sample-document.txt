@@ -1,0 +1,11 @@
+This is a sample document for testing file upload functionality.
+
+It contains multiple lines of text to simulate a real document.
+
+Test data includes:
+- Party information
+- Incident details
+- Damage claims
+- Contact information
+
+This document is used for E2E testing purposes only.

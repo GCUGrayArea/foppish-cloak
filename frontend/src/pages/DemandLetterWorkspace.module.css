@@ -1,0 +1,181 @@
+.workspace {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f3f4f6;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.headerRight {
+  min-width: 400px;
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 300px 1fr 350px;
+  gap: 16px;
+  flex: 1;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.leftColumn,
+.centerColumn,
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.leftColumn {
+  grid-column: 1;
+  overflow-y: auto;
+}
+
+.centerColumn {
+  grid-column: 2;
+}
+
+.rightColumn {
+  grid-column: 3;
+  overflow-y: auto;
+}
+
+.panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel:first-child {
+  flex: 0 0 300px;
+}
+
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #f3f4f6;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingContainer p,
+.errorContainer p {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.errorContainer h2 {
+  margin: 0 0 16px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.errorContainer p {
+  margin: 0 0 24px;
+  color: #6b7280;
+}
+
+@media (max-width: 1400px) {
+  .container {
+    grid-template-columns: 280px 1fr 320px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .leftColumn,
+  .centerColumn,
+  .rightColumn {
+    grid-column: 1;
+  }
+
+  .leftColumn {
+    grid-row: 1;
+    flex-direction: row;
+    overflow-x: auto;
+    max-height: 400px;
+  }
+
+  .centerColumn {
+    grid-row: 2;
+  }
+
+  .rightColumn {
+    grid-row: 3;
+    max-height: 500px;
+  }
+
+  .panel:first-child {
+    flex: 1;
+    min-width: 280px;
+  }
+
+  .headerRight {
+    min-width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .headerRight {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .container {
+    padding: 12px;
+    gap: 12px;
+  }
+}

@@ -1,0 +1,293 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.header {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.analyzing,
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 32px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.emptyHint {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+.section {
+  margin-bottom: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.sectionHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.sectionHeader:hover {
+  background: #f9fafb;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.sectionCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 10px;
+}
+
+.chevron {
+  font-size: 10px;
+  color: #6b7280;
+}
+
+.sectionContent {
+  padding: 0 12px 12px;
+}
+
+.partiesList,
+.damagesList,
+.timelineList,
+.claimsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.partyItem,
+.damageItem,
+.timelineItem,
+.claimItem {
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+
+.partyHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.partyType {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #dbeafe;
+  color: #1e40af;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 4px;
+}
+
+.partyName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.partyRole {
+  font-size: 13px;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.contactInfo {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+.contactInfo div {
+  margin-top: 2px;
+}
+
+.incidentInfo {
+  font-size: 13px;
+}
+
+.infoRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.description {
+  margin-top: 12px;
+  padding: 12px;
+  background: #ffffff;
+  border-left: 3px solid #3b82f6;
+  border-radius: 4px;
+  line-height: 1.5;
+  color: #374151;
+}
+
+.damageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.damageType {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 4px;
+}
+
+.damageAmount {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.damageCategory {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.damageDescription {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.timelineDate {
+  font-size: 12px;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 4px;
+}
+
+.timelineEvent {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.timelineSignificance {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.claimType {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.claimBasis {
+  font-size: 13px;
+  color: #374151;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.claimStatute {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.claimElements {
+  font-size: 12px;
+  color: #374151;
+}
+
+.claimElements ul {
+  margin: 4px 0 0 0;
+  padding-left: 20px;
+}
+
+.claimElements li {
+  margin-top: 2px;
+  line-height: 1.4;
+}
