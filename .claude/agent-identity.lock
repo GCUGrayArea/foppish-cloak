@@ -10,7 +10,7 @@ This file tracks which agent identities are currently in use. Agents must claim 
 |----------|--------|-------------|------------|
 | White    | In Use | 2025-11-12 15:50 | Coordination/Planning |
 | Orange   | Available | - | - |
-| Blonde   | In Use | 2025-11-12 16:30 | PR-018 (Demand Letter Workspace UI) |
+| Blonde   | Available | - | - |
 | Pink     | Available | - | - |
 | Blue     | Available | - | - |
 | Brown    | Available | - | - |
