@@ -3045,8 +3045,10 @@ Use docx library for Word export. Consider using Lambda for PDF generation (head
 ## Block 6: Frontend Foundation (Depends on: Block 2)
 
 ### PR-014: React App Setup with Vite
-**Status:** New
-**Dependencies:** PR-001
+**Status:** Blocked-Ready
+**Agent:** Available for claim
+**Planned by:** Agent White (2025-11-11)
+**Dependencies:** PR-001 (Complete)
 **Priority:** High
 
 **Description:**
@@ -3692,5 +3694,259 @@ All data queries must be scoped by `firm_id` to ensure tenant isolation. Middlew
 
 ---
 
+## Planning Notes: PR-014 (React App Setup with Vite)
+
+**Planning by:** Agent White
+**Planned on:** 2025-11-11
+**Status:** Blocked-Ready → Ready to claim and implement
+
+**Current State Analysis:**
+The frontend directory exists with basic Vite + React + TypeScript skeleton from PR-001. However, it lacks:
+- React Router routing system
+- API client with authentication
+- Auth state management
+- UI component library
+- Layout components
+- Protected routes
+
+**Technology Decisions:**
+
+**UI Component Library:**
+- **Decision:** Radix UI primitives (headless, accessible)
+- **Rationale:**
+  - No Tailwind dependency (user requirement)
+  - Unstyled primitives allow custom CSS
+  - WCAG AA accessibility built-in
+  - TypeScript support excellent
+  - Can style with CSS Modules
+- **Alternative considered:** Material-UI (too opinionated), Chakra UI (requires styled-system)
+
+**Styling Solution:**
+- **Decision:** CSS Modules
+- **Rationale:**
+  - Scoped styles without runtime overhead
+  - Standard CSS syntax (no learning curve)
+  - TypeScript typings available
+  - No Tailwind (user requirement)
+  - Works well with Vite
+- **File structure:** `ComponentName.module.css` alongside component files
+
+**State Management:**
+- **Decision:** TanStack React Query + React Context API
+- **Rationale:**
+  - React Query already in package.json (great for server state)
+  - Context API for auth state (simple, built-in)
+  - No need for Redux/Zustand complexity yet
+- **Pattern:** Separate concerns - server state (React Query) vs client state (Context)
+
+**Form Library:**
+- **Decision:** React Hook Form
+- **Rationale:**
+  - Best performance (uncontrolled components)
+  - Excellent TypeScript support
+  - Works well with Zod validation (already in package.json)
+  - Less re-renders than Formik
+- **Integration:** Will use in PR-015 (Authentication UI)
+
+**API Client:**
+- **Decision:** Fetch API with custom wrapper
+- **Rationale:**
+  - Built-in, no extra dependencies
+  - Easy JWT token injection
+  - Works great with React Query
+  - Type-safe with TypeScript generics
+- **Features needed:**
+  - Automatic token refresh logic
+  - Request/response interceptors for auth
+  - Error handling with typed responses
+  - Base URL from environment variables
+
+**File Structure:**
+```
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── layout/
+│   │   │   ├── Header.tsx
+│   │   │   ├── Header.module.css
+│   │   │   ├── Sidebar.tsx
+│   │   │   ├── Sidebar.module.css
+│   │   │   ├── MainLayout.tsx
+│   │   │   └── MainLayout.module.css
+│   │   └── ui/           # Radix UI wrappers
+│   │       ├── Button.tsx
+│   │       ├── Button.module.css
+│   │       └── ...
+│   ├── pages/
+│   │   ├── Home.tsx
+│   │   ├── NotFound.tsx
+│   │   └── ...
+│   ├── lib/
+│   │   ├── api-client.ts      # Fetch wrapper with auth
+│   │   ├── auth-context.tsx   # Auth state management
+│   │   ├── query-client.ts    # React Query config
+│   │   └── router.tsx         # React Router config
+│   ├── hooks/
+│   │   ├── useAuth.ts         # Auth hook
+│   │   └── useApi.ts          # API hook wrapper
+│   ├── types/
+│   │   ├── api.ts             # API response types
+│   │   └── auth.ts            # Auth types
+│   ├── styles/
+│   │   ├── globals.css        # Global styles, CSS variables
+│   │   └── reset.css          # CSS reset
+│   ├── App.tsx                # Root component with providers
+│   ├── main.tsx               # Entry point
+│   └── vite-env.d.ts          # Vite types
+├── .env.example               # Environment variables template
+└── .env.local                 # Local environment (gitignored)
+```
+
+**Verified File List (23 files):**
+- frontend/src/components/layout/Header.tsx (create)
+- frontend/src/components/layout/Header.module.css (create)
+- frontend/src/components/layout/Sidebar.tsx (create)
+- frontend/src/components/layout/Sidebar.module.css (create)
+- frontend/src/components/layout/MainLayout.tsx (create)
+- frontend/src/components/layout/MainLayout.module.css (create)
+- frontend/src/components/ui/Button.tsx (create)
+- frontend/src/components/ui/Button.module.css (create)
+- frontend/src/pages/Home.tsx (create)
+- frontend/src/pages/NotFound.tsx (create)
+- frontend/src/lib/api-client.ts (create)
+- frontend/src/lib/auth-context.tsx (create)
+- frontend/src/lib/query-client.ts (create)
+- frontend/src/lib/router.tsx (create)
+- frontend/src/hooks/useAuth.ts (create)
+- frontend/src/hooks/useApi.ts (create)
+- frontend/src/types/api.ts (create)
+- frontend/src/types/auth.ts (create)
+- frontend/src/styles/globals.css (create)
+- frontend/src/styles/reset.css (create)
+- frontend/src/App.tsx (modify) - wrap with providers
+- frontend/package.json (modify) - add dependencies
+- frontend/.env.example (create)
+
+**Dependencies to Add:**
+```json
+{
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-toast": "^1.1.5",
+    "react-hook-form": "^7.50.0"
+  }
+}
+```
+
+**API Client Design:**
+
+```typescript
+// frontend/src/lib/api-client.ts
+export class ApiClient {
+  private baseUrl: string;
+  private getToken: () => string | null;
+  private setToken: (token: string) => void;
+  private clearToken: () => void;
+
+  async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
+    // Add Authorization header
+    // Handle token refresh on 401
+    // Throw typed errors
+  }
+
+  // Convenience methods
+  get<T>(endpoint: string): Promise<T>
+  post<T>(endpoint: string, data: unknown): Promise<T>
+  put<T>(endpoint: string, data: unknown): Promise<T>
+  delete<T>(endpoint: string): Promise<T>
+}
+```
+
+**Auth Context Design:**
+
+```typescript
+// frontend/src/lib/auth-context.tsx
+interface AuthContextValue {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  refreshAuth: () => Promise<void>;
+}
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }>;
+export const useAuth: () => AuthContextValue;
+```
+
+**Router Design:**
+
+Protected routes pattern:
+```typescript
+// frontend/src/lib/router.tsx
+<Route element={<ProtectedRoute />}>
+  <Route path="/dashboard" element={<Dashboard />} />
+  <Route path="/templates" element={<Templates />} />
+  {/* ... other protected routes */}
+</Route>
+
+<Route path="/login" element={<Login />} />
+<Route path="/register" element={<Register />} />
+```
+
+**Environment Variables:**
+
+```env
+# frontend/.env.example
+VITE_API_URL=http://localhost:3000/api
+VITE_APP_NAME=Demand Letter Generator
+```
+
+**Testing Requirements:**
+- Unit tests for API client (token refresh, error handling)
+- Unit tests for Auth context (login, logout, token management)
+- Component tests for layout components
+- Integration test: Protected route redirects to login when not authenticated
+
+**Time Estimate:** 240 minutes (4 hours)
+- API client with auth: 60 minutes
+- Auth context and hooks: 60 minutes
+- Router setup with protected routes: 40 minutes
+- Layout components (Header, Sidebar, Main): 50 minutes
+- UI component wrappers (Button, etc.): 20 minutes
+- Testing: 10 minutes (basic tests, comprehensive in PR-022)
+
+**Dependencies:**
+- ✅ PR-001 (Complete) - Frontend directory structure exists
+
+**Blocks PRs:**
+- PR-015 (Authentication UI) - depends on auth context and router
+- PR-016 (Document Upload UI) - depends on layout and router
+- PR-017 (Template Management UI) - depends on layout and router
+- PR-018 (Demand Letter Workspace UI) - depends on layout and router
+
+**Key Implementation Notes:**
+
+1. **Token Storage:** Use localStorage for JWT (simpler) or httpOnly cookies (more secure, but needs backend support)
+2. **Token Refresh:** Implement refresh token logic in API client (retry failed requests after refresh)
+3. **Protected Routes:** ProtectedRoute component checks auth state, redirects to /login if not authenticated
+4. **CSS Variables:** Define design system in globals.css (colors, spacing, typography)
+5. **Radix UI Styling:** Wrap Radix primitives with custom styles in ui/ directory
+6. **React Query Setup:** Configure staleTime, cacheTime, retry logic in query-client.ts
+
+**Success Criteria:**
+- ✅ npm run dev starts successfully
+- ✅ npm run build completes without errors
+- ✅ npm run typecheck passes
+- ✅ Protected routes redirect to login when not authenticated
+- ✅ API client successfully handles token injection
+- ✅ Layout renders correctly (Header, Sidebar, Main content area)
+- ✅ Basic UI components (Button) styled and functional
+
+---
+
 **Generated:** 2025-11-10
+**Last Updated:** 2025-11-11 (PR-014 planning added)
 **Ready for parallel agent execution**
