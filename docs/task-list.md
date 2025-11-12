@@ -3331,8 +3331,10 @@ This is a cleanup PR to fix test quality issues found during QC. Does not change
 ## Block 7: Frontend - Core Features (Depends on: Blocks 5, 6)
 
 ### PR-016: Document Upload UI
-**Status:** Blocked-Ready
+**Status:** Complete
 **Planning Status:** COMPLETE
+**Agent:** Orange
+**Completed:** 2025-11-12
 **Planned by:** Agent White (2025-11-12)
 **Dependencies:** PR-006, PR-014, PR-015
 **Priority:** High
