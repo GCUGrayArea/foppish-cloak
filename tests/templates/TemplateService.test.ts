@@ -4,6 +4,8 @@
  * Tests for template business logic and database operations
  */
 
+// @ts-nocheck - Test file with extensive jest mocking
+
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { Pool } from 'pg';
 import { TemplateService } from '../../services/api/src/services/TemplateService';
@@ -11,13 +13,7 @@ import { CreateTemplateRequest, UpdateTemplateRequest } from '../../services/api
 
 // Mock pool for testing
 class MockPool {
-  private mockData: any = {
-    templates: [],
-    versions: [],
-    users: []
-  };
-
-  query = jest.fn(async (query: string, values?: any[]) => {
+  query = jest.fn(async (_query: string, _values?: any[]) => {
     // Simulate database queries
     return { rows: [], rowCount: 0 };
   });
@@ -91,10 +87,12 @@ describe('TemplateService', () => {
 
   describe('createTemplate', () => {
     it('should throw error if template name already exists', async () => {
-      const client = {
+      const client: any = {
         query: jest.fn()
-          .mockResolvedValueOnce(undefined) // BEGIN
-          .mockResolvedValueOnce({ rows: [{ id: 'existing' }] }), // duplicate check
+          // @ts-expect-error - mock return value
+          .mockResolvedValueOnce({ rows: [], rowCount: 0 }) // BEGIN
+          // @ts-expect-error - mock return value
+          .mockResolvedValueOnce({ rows: [{ id: 'existing' }], rowCount: 1 }), // duplicate check
         release: jest.fn()
       };
 

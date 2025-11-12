@@ -8,9 +8,7 @@
 import { Pool } from 'pg';
 import { getPool } from '../db/connection';
 import {
-  Template,
   TemplateVersion,
-  TemplateWithVersion,
   CreateTemplateRequest,
   UpdateTemplateRequest,
   TemplateQueryParams,

@@ -10,8 +10,9 @@
  * Matches: {{variable_name}} where variable_name follows:
  * - Starts with lowercase letter or underscore
  * - Contains only lowercase letters, numbers, and underscores
+ * - Must have exactly two opening and closing braces (not 3+)
  */
-const VARIABLE_REGEX = /\{\{([a-z_][a-z0-9_]*)\}\}/gi;
+const VARIABLE_REGEX = /(?<!\{)\{\{([a-z_][a-z0-9_]*)\}\}(?!\})/gi;
 
 /**
  * Extract all unique variables from template content

@@ -13,12 +13,12 @@ import { extractVariables } from './variableExtraction';
  */
 export const createTemplateSchema = z.object({
   name: z.string()
-    .min(1, 'Template name is required')
-    .max(255, 'Template name must be 255 characters or less')
-    .trim(),
-  description: z.string()
-    .max(1000, 'Description must be 1000 characters or less')
     .trim()
+    .min(1, 'Template name is required')
+    .max(255, 'Template name must be 255 characters or less'),
+  description: z.string()
+    .trim()
+    .max(1000, 'Description must be 1000 characters or less')
     .optional(),
   content: z.string()
     .min(1, 'Template content is required'),
@@ -30,13 +30,13 @@ export const createTemplateSchema = z.object({
  */
 export const updateTemplateSchema = z.object({
   name: z.string()
+    .trim()
     .min(1, 'Template name cannot be empty')
     .max(255, 'Template name must be 255 characters or less')
-    .trim()
     .optional(),
   description: z.string()
-    .max(1000, 'Description must be 1000 characters or less')
     .trim()
+    .max(1000, 'Description must be 1000 characters or less')
     .optional(),
   content: z.string()
     .min(1, 'Template content cannot be empty')
@@ -108,11 +108,10 @@ export function validateTemplateContent(content: string): ValidationResult {
 
   // Extract variables to check for invalid patterns
   try {
-    const variables = extractVariables(content);
+    extractVariables(content);
 
     // Check if there are any malformed variable-like patterns
     const allBracePatterns = content.match(/\{\{[^}]*\}\}/g) || [];
-    const validVariableCount = variables.length;
 
     // Count unique valid variables in content
     const validPatternCount = allBracePatterns.filter(pattern => {
@@ -145,14 +144,14 @@ export function validateTemplateContent(content: string): ValidationResult {
  * @returns True if valid
  */
 export function isValidTemplateName(name: string): boolean {
-  return name && name.trim().length > 0 && name.trim().length <= 255;
+  return Boolean(name && name.trim().length > 0 && name.trim().length <= 255);
 }
 
 /**
  * Sanitize template content for safe storage
  *
  * - Normalizes line endings to \n
- * - Trims trailing whitespace from lines
+ * - Trims leading and trailing whitespace from lines
  * - Removes excessive blank lines
  *
  * @param content - Raw template content
@@ -162,7 +161,7 @@ export function sanitizeTemplateContent(content: string): string {
   return content
     .replace(/\r\n/g, '\n') // Normalize line endings
     .split('\n')
-    .map(line => line.trimEnd()) // Remove trailing whitespace from each line
+    .map(line => line.trim()) // Remove leading and trailing whitespace from each line
     .join('\n')
     .replace(/\n{3,}/g, '\n\n') // Collapse excessive blank lines
     .trim();
