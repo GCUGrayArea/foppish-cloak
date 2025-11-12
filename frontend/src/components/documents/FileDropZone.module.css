@@ -1,0 +1,99 @@
+/**
+ * FileDropZone Component Styles
+ */
+
+.dropZone {
+  border: 2px dashed var(--color-border, #cbd5e1);
+  border-radius: 8px;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: var(--color-surface, #f8fafc);
+}
+
+.dropZone:hover:not(.disabled) {
+  border-color: var(--color-primary, #3b82f6);
+  background-color: var(--color-surface-hover, #f1f5f9);
+}
+
+.dropZone:focus {
+  outline: 2px solid var(--color-primary, #3b82f6);
+  outline-offset: 2px;
+}
+
+.dropZone.dragOver {
+  border-color: var(--color-primary, #3b82f6);
+  background-color: var(--color-primary-light, #dbeafe);
+  border-style: solid;
+}
+
+.dropZone.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--color-disabled, #f1f5f9);
+}
+
+.fileInput {
+  display: none;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.primary {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+  margin: 0;
+}
+
+.secondary {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary, #64748b);
+  margin: 0;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.supportedTypes,
+.maxSize {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary, #94a3b8);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .dropZone {
+    padding: 2rem 1rem;
+  }
+
+  .icon {
+    font-size: 2rem;
+  }
+
+  .primary {
+    font-size: 1rem;
+  }
+}

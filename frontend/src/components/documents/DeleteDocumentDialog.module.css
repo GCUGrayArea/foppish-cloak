@@ -1,0 +1,181 @@
+/**
+ * DeleteDocumentDialog Component Styles
+ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.2s ease;
+  z-index: 1000;
+}
+
+.content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 450px;
+  max-height: 85vh;
+  padding: 1.5rem;
+  background-color: var(--color-surface, #ffffff);
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.2s ease;
+  z-index: 1001;
+}
+
+.content:focus {
+  outline: none;
+}
+
+.title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.description {
+  margin: 0 0 1.5rem 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary, #64748b);
+  line-height: 1.5;
+}
+
+.documentInfo {
+  padding: 1rem;
+  background-color: var(--color-surface-secondary, #f8fafc);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.documentName {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary, #1e293b);
+  word-break: break-word;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.button {
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary, #1e293b);
+  background-color: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.button:hover:not(:disabled) {
+  background-color: var(--color-surface-hover, #f1f5f9);
+  border-color: var(--color-border-hover, #94a3b8);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.button:focus {
+  outline: 2px solid var(--color-primary, #3b82f6);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.buttonDanger {
+  color: var(--color-error-contrast, #ffffff);
+  background-color: var(--color-error, #dc2626);
+  border-color: var(--color-error, #dc2626);
+}
+
+.buttonDanger:hover:not(:disabled) {
+  background-color: var(--color-error-hover, #b91c1c);
+  border-color: var(--color-error-hover, #b91c1c);
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--color-text-secondary, #64748b);
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover:not(:disabled) {
+  background-color: var(--color-surface-hover, #f1f5f9);
+  color: var(--color-text-primary, #1e293b);
+}
+
+.closeButton:focus {
+  outline: 2px solid var(--color-primary, #3b82f6);
+  outline-offset: 2px;
+}
+
+.closeButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .content {
+    width: 95vw;
+    padding: 1.25rem;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .button {
+    width: 100%;
+  }
+}
