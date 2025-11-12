@@ -2992,7 +2992,9 @@ CloudWatch alarms:
 ## Block 5: API Integration Layer (Depends on: Blocks 3, 4)
 
 ### PR-012: Demand Letter Workflow API (Node.js)
-**Status:** New
+**Status:** Planning
+**Agent:** White
+**Planning Started:** 2025-11-12
 **Dependencies:** PR-001, PR-002, PR-004, PR-006, PR-007, PR-011
 **Priority:** High
 
