@@ -1,0 +1,2022 @@
+<testsuites id="" name="" tests="490" failures="0" skipped="490" errors="0" time="0.42266599999999993">
+<testsuite name="auth.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="chromium" tests="14" failures="0" skipped="14" time="0" errors="0">
+<testcase name="Authentication Flow › Login › should successfully login with valid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should show error with invalid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should validate required fields" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should validate email format" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should toggle password visibility" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should successfully register new user" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate password strength" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate password confirmation match" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate all required fields" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Password Reset › should request password reset" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Password Reset › should validate email in forgot password" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Logout › should successfully logout" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should persist session after page reload" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should redirect to login when accessing protected route without auth" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="collaboration.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="chromium" tests="13" failures="0" skipped="13" time="0" errors="0">
+<testcase name="Real-Time Collaboration › User Presence › should show active users on document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › User Presence › should update presence when user leaves" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › User Presence › should show user cursor positions" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should sync edits between users in real-time" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should handle concurrent edits without conflicts" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should show editing indicator" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Document Locking › should show warning when editing locked document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Document Locking › should allow admin to unlock document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Comments and Mentions › should notify user when mentioned in comment" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Comments and Mentions › should sync comments in real-time" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Offline Support › should queue changes when offline" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Offline Support › should show conflict resolution UI for conflicting offline changes" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Version Sync › should reload when document updated remotely" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="document-upload.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="chromium" tests="15" failures="0" skipped="15" time="0" errors="0">
+<testcase name="Document Upload › File Selection › should upload document via file input" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Selection › should upload multiple documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Drag and Drop › should upload document via drag and drop" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Drag and Drop › should show drag over state" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Validation › should reject invalid file types" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Validation › should reject files exceeding size limit" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Upload Progress › should show upload progress indicator" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Upload Progress › should allow canceling upload" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should display uploaded documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should filter documents by type" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should search documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should sort documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should view document details" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should download document" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should delete document" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="export.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="chromium" tests="18" failures="0" skipped="18" time="0" errors="0">
+<testcase name="Export and Download › Letter Export › should export letter as Word document" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should export letter as PDF" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should customize export settings" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should handle export errors gracefully" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Bulk Export › should export multiple letters" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Bulk Export › should show progress for bulk export" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Print Preview › should show print preview" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Print Preview › should apply print settings" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should prepare letter for email" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should validate email addresses" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should attach letter as PDF by default" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Document Download › should download original uploaded document" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Document Download › should handle download errors" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export History › should view export history" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export History › should re-download from export history" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export Settings › should save export preferences" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Template Export › should export template" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Template Export › should import template" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="letter-workflow.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="chromium" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="Demand Letter Workflow › Letter Creation › should create new demand letter from scratch" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Creation › should create letter from existing document" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should edit letter content" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should auto-save changes" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should track changes history" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should revert to previous version" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should request AI refinement" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should show refinement suggestions" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should apply individual suggestions" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Variable Population › should populate template variables from documents" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Variable Population › should manually edit variables" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Workflow Status › should move letter through workflow stages" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Workflow Status › should filter letters by status" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Comments and Collaboration › should add comment to letter" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Comments and Collaboration › should reply to comment" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should search letters" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should filter by date range" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should sort letters" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Deletion › should delete letter with confirmation" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="template-management.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="chromium" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="Template Management › Template Creation › should create new template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should validate required fields" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should insert variables into template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should preview template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should edit existing template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should preserve unsaved changes warning" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should duplicate template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should view version history" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should restore previous version" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should compare versions" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should filter templates by category" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should search templates" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should sort templates" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should delete template with confirmation" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should cancel template deletion" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should prevent deleting template in use" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Variables › should list available variables" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Variables › should validate variable syntax" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Sharing › should make template public" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="auth.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="firefox" tests="14" failures="0" skipped="14" time="0" errors="0">
+<testcase name="Authentication Flow › Login › should successfully login with valid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should show error with invalid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should validate required fields" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should validate email format" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should toggle password visibility" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should successfully register new user" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate password strength" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate password confirmation match" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate all required fields" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Password Reset › should request password reset" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Password Reset › should validate email in forgot password" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Logout › should successfully logout" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should persist session after page reload" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should redirect to login when accessing protected route without auth" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="collaboration.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="firefox" tests="13" failures="0" skipped="13" time="0" errors="0">
+<testcase name="Real-Time Collaboration › User Presence › should show active users on document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › User Presence › should update presence when user leaves" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › User Presence › should show user cursor positions" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should sync edits between users in real-time" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should handle concurrent edits without conflicts" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should show editing indicator" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Document Locking › should show warning when editing locked document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Document Locking › should allow admin to unlock document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Comments and Mentions › should notify user when mentioned in comment" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Comments and Mentions › should sync comments in real-time" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Offline Support › should queue changes when offline" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Offline Support › should show conflict resolution UI for conflicting offline changes" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Version Sync › should reload when document updated remotely" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="document-upload.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="firefox" tests="15" failures="0" skipped="15" time="0" errors="0">
+<testcase name="Document Upload › File Selection › should upload document via file input" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Selection › should upload multiple documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Drag and Drop › should upload document via drag and drop" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Drag and Drop › should show drag over state" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Validation › should reject invalid file types" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Validation › should reject files exceeding size limit" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Upload Progress › should show upload progress indicator" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Upload Progress › should allow canceling upload" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should display uploaded documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should filter documents by type" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should search documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should sort documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should view document details" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should download document" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should delete document" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="export.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="firefox" tests="18" failures="0" skipped="18" time="0" errors="0">
+<testcase name="Export and Download › Letter Export › should export letter as Word document" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should export letter as PDF" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should customize export settings" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should handle export errors gracefully" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Bulk Export › should export multiple letters" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Bulk Export › should show progress for bulk export" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Print Preview › should show print preview" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Print Preview › should apply print settings" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should prepare letter for email" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should validate email addresses" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should attach letter as PDF by default" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Document Download › should download original uploaded document" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Document Download › should handle download errors" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export History › should view export history" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export History › should re-download from export history" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export Settings › should save export preferences" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Template Export › should export template" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Template Export › should import template" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="letter-workflow.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="firefox" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="Demand Letter Workflow › Letter Creation › should create new demand letter from scratch" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Creation › should create letter from existing document" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should edit letter content" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should auto-save changes" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should track changes history" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should revert to previous version" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should request AI refinement" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should show refinement suggestions" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should apply individual suggestions" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Variable Population › should populate template variables from documents" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Variable Population › should manually edit variables" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Workflow Status › should move letter through workflow stages" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Workflow Status › should filter letters by status" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Comments and Collaboration › should add comment to letter" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Comments and Collaboration › should reply to comment" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should search letters" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should filter by date range" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should sort letters" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Deletion › should delete letter with confirmation" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="template-management.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="firefox" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="Template Management › Template Creation › should create new template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should validate required fields" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should insert variables into template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should preview template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should edit existing template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should preserve unsaved changes warning" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should duplicate template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should view version history" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should restore previous version" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should compare versions" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should filter templates by category" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should search templates" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should sort templates" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should delete template with confirmation" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should cancel template deletion" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should prevent deleting template in use" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Variables › should list available variables" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Variables › should validate variable syntax" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Sharing › should make template public" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="auth.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Mobile Chrome" tests="14" failures="0" skipped="14" time="0" errors="0">
+<testcase name="Authentication Flow › Login › should successfully login with valid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should show error with invalid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should validate required fields" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should validate email format" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should toggle password visibility" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should successfully register new user" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate password strength" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate password confirmation match" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate all required fields" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Password Reset › should request password reset" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Password Reset › should validate email in forgot password" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Logout › should successfully logout" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should persist session after page reload" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should redirect to login when accessing protected route without auth" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="collaboration.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Mobile Chrome" tests="13" failures="0" skipped="13" time="0" errors="0">
+<testcase name="Real-Time Collaboration › User Presence › should show active users on document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › User Presence › should update presence when user leaves" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › User Presence › should show user cursor positions" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should sync edits between users in real-time" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should handle concurrent edits without conflicts" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should show editing indicator" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Document Locking › should show warning when editing locked document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Document Locking › should allow admin to unlock document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Comments and Mentions › should notify user when mentioned in comment" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Comments and Mentions › should sync comments in real-time" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Offline Support › should queue changes when offline" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Offline Support › should show conflict resolution UI for conflicting offline changes" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Version Sync › should reload when document updated remotely" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="document-upload.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Mobile Chrome" tests="15" failures="0" skipped="15" time="0" errors="0">
+<testcase name="Document Upload › File Selection › should upload document via file input" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Selection › should upload multiple documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Drag and Drop › should upload document via drag and drop" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Drag and Drop › should show drag over state" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Validation › should reject invalid file types" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Validation › should reject files exceeding size limit" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Upload Progress › should show upload progress indicator" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Upload Progress › should allow canceling upload" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should display uploaded documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should filter documents by type" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should search documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should sort documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should view document details" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should download document" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should delete document" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="export.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Mobile Chrome" tests="18" failures="0" skipped="18" time="0" errors="0">
+<testcase name="Export and Download › Letter Export › should export letter as Word document" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should export letter as PDF" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should customize export settings" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should handle export errors gracefully" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Bulk Export › should export multiple letters" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Bulk Export › should show progress for bulk export" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Print Preview › should show print preview" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Print Preview › should apply print settings" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should prepare letter for email" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should validate email addresses" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should attach letter as PDF by default" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Document Download › should download original uploaded document" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Document Download › should handle download errors" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export History › should view export history" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export History › should re-download from export history" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export Settings › should save export preferences" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Template Export › should export template" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Template Export › should import template" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="letter-workflow.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Mobile Chrome" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="Demand Letter Workflow › Letter Creation › should create new demand letter from scratch" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Creation › should create letter from existing document" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should edit letter content" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should auto-save changes" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should track changes history" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should revert to previous version" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should request AI refinement" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should show refinement suggestions" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should apply individual suggestions" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Variable Population › should populate template variables from documents" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Variable Population › should manually edit variables" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Workflow Status › should move letter through workflow stages" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Workflow Status › should filter letters by status" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Comments and Collaboration › should add comment to letter" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Comments and Collaboration › should reply to comment" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should search letters" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should filter by date range" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should sort letters" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Deletion › should delete letter with confirmation" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="template-management.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Mobile Chrome" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="Template Management › Template Creation › should create new template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should validate required fields" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should insert variables into template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should preview template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should edit existing template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should preserve unsaved changes warning" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should duplicate template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should view version history" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should restore previous version" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should compare versions" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should filter templates by category" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should search templates" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should sort templates" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should delete template with confirmation" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should cancel template deletion" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should prevent deleting template in use" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Variables › should list available variables" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Variables › should validate variable syntax" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Sharing › should make template public" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="auth.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Mobile Safari" tests="14" failures="0" skipped="14" time="0" errors="0">
+<testcase name="Authentication Flow › Login › should successfully login with valid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should show error with invalid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should validate required fields" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should validate email format" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should toggle password visibility" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should successfully register new user" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate password strength" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate password confirmation match" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate all required fields" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Password Reset › should request password reset" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Password Reset › should validate email in forgot password" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Logout › should successfully logout" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should persist session after page reload" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should redirect to login when accessing protected route without auth" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="collaboration.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Mobile Safari" tests="13" failures="0" skipped="13" time="0" errors="0">
+<testcase name="Real-Time Collaboration › User Presence › should show active users on document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › User Presence › should update presence when user leaves" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › User Presence › should show user cursor positions" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should sync edits between users in real-time" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should handle concurrent edits without conflicts" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should show editing indicator" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Document Locking › should show warning when editing locked document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Document Locking › should allow admin to unlock document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Comments and Mentions › should notify user when mentioned in comment" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Comments and Mentions › should sync comments in real-time" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Offline Support › should queue changes when offline" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Offline Support › should show conflict resolution UI for conflicting offline changes" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Version Sync › should reload when document updated remotely" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="document-upload.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Mobile Safari" tests="15" failures="0" skipped="15" time="0" errors="0">
+<testcase name="Document Upload › File Selection › should upload document via file input" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Selection › should upload multiple documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Drag and Drop › should upload document via drag and drop" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Drag and Drop › should show drag over state" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Validation › should reject invalid file types" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Validation › should reject files exceeding size limit" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Upload Progress › should show upload progress indicator" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Upload Progress › should allow canceling upload" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should display uploaded documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should filter documents by type" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should search documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should sort documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should view document details" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should download document" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should delete document" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="export.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Mobile Safari" tests="18" failures="0" skipped="18" time="0" errors="0">
+<testcase name="Export and Download › Letter Export › should export letter as Word document" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should export letter as PDF" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should customize export settings" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should handle export errors gracefully" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Bulk Export › should export multiple letters" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Bulk Export › should show progress for bulk export" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Print Preview › should show print preview" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Print Preview › should apply print settings" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should prepare letter for email" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should validate email addresses" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should attach letter as PDF by default" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Document Download › should download original uploaded document" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Document Download › should handle download errors" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export History › should view export history" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export History › should re-download from export history" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export Settings › should save export preferences" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Template Export › should export template" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Template Export › should import template" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="letter-workflow.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Mobile Safari" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="Demand Letter Workflow › Letter Creation › should create new demand letter from scratch" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Creation › should create letter from existing document" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should edit letter content" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should auto-save changes" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should track changes history" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should revert to previous version" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should request AI refinement" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should show refinement suggestions" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should apply individual suggestions" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Variable Population › should populate template variables from documents" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Variable Population › should manually edit variables" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Workflow Status › should move letter through workflow stages" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Workflow Status › should filter letters by status" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Comments and Collaboration › should add comment to letter" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Comments and Collaboration › should reply to comment" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should search letters" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should filter by date range" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should sort letters" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Deletion › should delete letter with confirmation" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="template-management.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Mobile Safari" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="Template Management › Template Creation › should create new template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should validate required fields" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should insert variables into template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should preview template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should edit existing template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should preserve unsaved changes warning" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should duplicate template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should view version history" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should restore previous version" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should compare versions" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should filter templates by category" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should search templates" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should sort templates" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should delete template with confirmation" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should cancel template deletion" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should prevent deleting template in use" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Variables › should list available variables" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Variables › should validate variable syntax" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Sharing › should make template public" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="auth.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Tablet" tests="14" failures="0" skipped="14" time="0" errors="0">
+<testcase name="Authentication Flow › Login › should successfully login with valid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should show error with invalid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should validate required fields" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should validate email format" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login › should toggle password visibility" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should successfully register new user" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate password strength" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate password confirmation match" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration › should validate all required fields" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Password Reset › should request password reset" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Password Reset › should validate email in forgot password" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Logout › should successfully logout" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should persist session after page reload" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should redirect to login when accessing protected route without auth" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="collaboration.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Tablet" tests="13" failures="0" skipped="13" time="0" errors="0">
+<testcase name="Real-Time Collaboration › User Presence › should show active users on document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › User Presence › should update presence when user leaves" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › User Presence › should show user cursor positions" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should sync edits between users in real-time" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should handle concurrent edits without conflicts" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Real-Time Editing › should show editing indicator" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Document Locking › should show warning when editing locked document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Document Locking › should allow admin to unlock document" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Comments and Mentions › should notify user when mentioned in comment" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Comments and Mentions › should sync comments in real-time" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Offline Support › should queue changes when offline" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Offline Support › should show conflict resolution UI for conflicting offline changes" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Real-Time Collaboration › Version Sync › should reload when document updated remotely" classname="collaboration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="document-upload.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Tablet" tests="15" failures="0" skipped="15" time="0" errors="0">
+<testcase name="Document Upload › File Selection › should upload document via file input" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Selection › should upload multiple documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Drag and Drop › should upload document via drag and drop" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Drag and Drop › should show drag over state" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Validation › should reject invalid file types" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › File Validation › should reject files exceeding size limit" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Upload Progress › should show upload progress indicator" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Upload Progress › should allow canceling upload" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should display uploaded documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should filter documents by type" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should search documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document List › should sort documents" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should view document details" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should download document" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Document Upload › Document Actions › should delete document" classname="document-upload.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="export.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Tablet" tests="18" failures="0" skipped="18" time="0" errors="0">
+<testcase name="Export and Download › Letter Export › should export letter as Word document" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should export letter as PDF" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should customize export settings" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Letter Export › should handle export errors gracefully" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Bulk Export › should export multiple letters" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Bulk Export › should show progress for bulk export" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Print Preview › should show print preview" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Print Preview › should apply print settings" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should prepare letter for email" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should validate email addresses" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Email Export › should attach letter as PDF by default" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Document Download › should download original uploaded document" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Document Download › should handle download errors" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export History › should view export history" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export History › should re-download from export history" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Export Settings › should save export preferences" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Template Export › should export template" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Export and Download › Template Export › should import template" classname="export.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="letter-workflow.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Tablet" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="Demand Letter Workflow › Letter Creation › should create new demand letter from scratch" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Creation › should create letter from existing document" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should edit letter content" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should auto-save changes" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should track changes history" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Editing › should revert to previous version" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should request AI refinement" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should show refinement suggestions" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › AI Refinement › should apply individual suggestions" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Variable Population › should populate template variables from documents" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Variable Population › should manually edit variables" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Workflow Status › should move letter through workflow stages" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Workflow Status › should filter letters by status" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Comments and Collaboration › should add comment to letter" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Comments and Collaboration › should reply to comment" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should search letters" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should filter by date range" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Search and Organization › should sort letters" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Demand Letter Workflow › Letter Deletion › should delete letter with confirmation" classname="letter-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="template-management.spec.ts" timestamp="2025-11-12T20:36:52.222Z" hostname="Tablet" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="Template Management › Template Creation › should create new template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should validate required fields" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should insert variables into template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Creation › should preview template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should edit existing template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should preserve unsaved changes warning" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Editing › should duplicate template" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should view version history" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should restore previous version" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Versioning › should compare versions" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should filter templates by category" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should search templates" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Organization › should sort templates" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should delete template with confirmation" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should cancel template deletion" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Deletion › should prevent deleting template in use" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Variables › should list available variables" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Variables › should validate variable syntax" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Template Management › Template Sharing › should make template public" classname="template-management.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+</testsuites>
