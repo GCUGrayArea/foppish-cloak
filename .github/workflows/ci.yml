@@ -99,6 +99,51 @@ jobs:
       - name: Run tests
         run: pytest
 
+  test-collaboration:
+    name: Test Collaboration Service
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run collaboration tests
+        run: npm run test --workspace=services/collaboration --if-present
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high --production || true
+
+      - name: Check for vulnerable dependencies
+        run: |
+          if npm audit --audit-level=critical --production; then
+            echo "No critical vulnerabilities found"
+          else
+            echo "Critical vulnerabilities found!"
+            exit 1
+          fi
+
   build-api:
     name: Build API Service
     runs-on: ubuntu-latest
@@ -118,6 +163,74 @@ jobs:
       - name: Build API
         run: npm run build --workspace=services/api
 
+      - name: Create Lambda package
+        run: |
+          chmod +x scripts/build-api.sh
+          bash scripts/build-api.sh
+
+      - name: Upload API artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-lambda
+          path: deploy/api-lambda.zip
+          retention-days: 7
+
+  build-ai:
+    name: Build AI Service
+    runs-on: ubuntu-latest
+    needs: [test-python]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Create Lambda package
+        run: |
+          chmod +x scripts/build-ai.sh
+          bash scripts/build-ai.sh
+
+      - name: Upload AI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-lambda
+          path: deploy/ai-lambda.zip
+          retention-days: 7
+
+  build-collaboration:
+    name: Build Collaboration Service
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, test-collaboration]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Collaboration
+        run: npm run build --workspace=services/collaboration
+
+      - name: Create Lambda package
+        run: |
+          chmod +x scripts/build-collaboration.sh
+          bash scripts/build-collaboration.sh
+
+      - name: Upload Collaboration artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: collaboration-lambda
+          path: deploy/collaboration-lambda.zip
+          retention-days: 7
+
   build-frontend:
     name: Build Frontend
     runs-on: ubuntu-latest
@@ -135,12 +248,21 @@ jobs:
         run: npm ci
 
       - name: Build Frontend
-        run: npm run build --workspace=frontend
+        run: |
+          chmod +x scripts/build-frontend.sh
+          bash scripts/build-frontend.sh
+
+      - name: Upload Frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist
+          retention-days: 7
 
   success:
     name: All CI Checks Passed
     runs-on: ubuntu-latest
-    needs: [lint, typecheck, test-node, test-python, build-api, build-frontend]
+    needs: [lint, typecheck, test-node, test-python, test-collaboration, security-scan, build-api, build-ai, build-collaboration, build-frontend]
     steps:
       - name: Success
         run: echo "All CI checks passed successfully!"

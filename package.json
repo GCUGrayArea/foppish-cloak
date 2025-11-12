@@ -19,7 +19,21 @@
     "clean": "npm run clean --workspaces --if-present && rm -rf node_modules",
     "api:dev": "npm run dev --workspace=services/api",
     "frontend:dev": "npm run dev --workspace=frontend",
-    "collaboration:dev": "npm run dev --workspace=services/collaboration"
+    "collaboration:dev": "npm run dev --workspace=services/collaboration",
+    "build:api": "bash scripts/build-api.sh",
+    "build:ai": "bash scripts/build-ai.sh",
+    "build:collaboration": "bash scripts/build-collaboration.sh",
+    "build:frontend": "bash scripts/build-frontend.sh",
+    "build:all": "npm run build:api && npm run build:ai && npm run build:collaboration && npm run build:frontend",
+    "deploy:lambda": "bash scripts/deploy-lambda.sh",
+    "deploy:frontend": "bash scripts/deploy-frontend.sh",
+    "deploy:dev": "npm run build:all && bash scripts/run-migrations.sh dev && npm run deploy:lambda api dev deploy/api-lambda.zip && npm run deploy:lambda ai dev deploy/ai-lambda.zip && npm run deploy:lambda collaboration dev deploy/collaboration-lambda.zip && npm run deploy:frontend dev",
+    "deploy:prod": "npm run build:all && bash scripts/run-migrations.sh prod && npm run deploy:lambda api prod deploy/api-lambda.zip && npm run deploy:lambda ai prod deploy/ai-lambda.zip && npm run deploy:lambda collaboration prod deploy/collaboration-lambda.zip && npm run deploy:frontend prod",
+    "migrate": "bash scripts/run-migrations.sh",
+    "smoke-test": "bash scripts/smoke-test.sh",
+    "rollback": "bash scripts/rollback.sh",
+    "infrastructure:deploy": "bash scripts/deploy-infrastructure.sh",
+    "infrastructure:destroy": "bash scripts/destroy-infrastructure.sh"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.21.0",

@@ -1,0 +1,100 @@
+name: Deploy to Dev
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ENVIRONMENT: dev
+
+jobs:
+  deploy:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    environment:
+      name: dev
+      url: https://demand-letters-dev.example.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download CI artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: deploy/
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify AWS credentials
+        run: aws sts get-caller-identity
+
+      - name: Send Slack notification (deployment started)
+        if: always()
+        run: |
+          chmod +x .github/scripts/notify-slack.sh
+          .github/scripts/notify-slack.sh started dev "Deployment to dev environment started"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        continue-on-error: true
+
+      - name: Run database migrations
+        run: |
+          chmod +x scripts/run-migrations.sh
+          bash scripts/run-migrations.sh dev
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_DEV }}
+
+      - name: Deploy API Lambda
+        run: |
+          chmod +x scripts/deploy-lambda.sh
+          bash scripts/deploy-lambda.sh api dev deploy/api-lambda/api-lambda.zip
+
+      - name: Deploy AI Lambda
+        run: |
+          chmod +x scripts/deploy-lambda.sh
+          bash scripts/deploy-lambda.sh ai dev deploy/ai-lambda/ai-lambda.zip
+
+      - name: Deploy Collaboration Lambda
+        run: |
+          chmod +x scripts/deploy-lambda.sh
+          bash scripts/deploy-lambda.sh collaboration dev deploy/collaboration-lambda/collaboration-lambda.zip
+
+      - name: Deploy Frontend
+        run: |
+          chmod +x scripts/deploy-frontend.sh
+          bash scripts/deploy-frontend.sh dev
+        env:
+          WAIT_FOR_INVALIDATION: "false"
+
+      - name: Run smoke tests
+        run: |
+          chmod +x scripts/smoke-test.sh
+          bash scripts/smoke-test.sh dev
+        env:
+          API_BASE_URL_DEV: ${{ secrets.API_BASE_URL_DEV }}
+          FRONTEND_URL_DEV: ${{ secrets.FRONTEND_URL_DEV }}
+
+      - name: Send Slack notification (success)
+        if: success()
+        run: |
+          chmod +x .github/scripts/notify-slack.sh
+          .github/scripts/notify-slack.sh success dev "Deployment to dev completed successfully"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        continue-on-error: true
+
+      - name: Send Slack notification (failure)
+        if: failure()
+        run: |
+          chmod +x .github/scripts/notify-slack.sh
+          .github/scripts/notify-slack.sh failure dev "Deployment to dev failed"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        continue-on-error: true

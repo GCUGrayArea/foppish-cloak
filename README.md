@@ -357,6 +357,250 @@ The Bedrock integration includes:
 
 See `services/ai-processor/src/bedrock/` for implementation details.
 
+## Deployment
+
+### CI/CD Pipeline
+
+The project uses GitHub Actions for continuous integration and deployment:
+
+- **CI Pipeline** (`.github/workflows/ci.yml`): Runs on every PR and push to main
+  - Linting and formatting checks
+  - TypeScript type checking
+  - Unit and integration tests (Node.js and Python)
+  - Security scanning (npm audit)
+  - Build verification for all services
+  - Artifact generation for deployment
+
+- **Dev Deployment** (`.github/workflows/deploy-dev.yml`): Auto-deploys to dev on main branch push
+  - Runs database migrations
+  - Deploys Lambda functions (API, AI, Collaboration)
+  - Deploys frontend to S3 + CloudFront
+  - Runs smoke tests
+  - Sends Slack notifications
+
+- **Prod Deployment** (`.github/workflows/deploy-prod.yml`): Manual deployment with approval
+  - Requires manual trigger via workflow_dispatch
+  - Requires approval from designated approvers
+  - Full build and test cycle before deployment
+  - Comprehensive smoke tests
+  - Deployment tagging and tracking
+
+- **Rollback** (`.github/workflows/rollback.yml`): Emergency rollback capability
+  - Roll back individual services or all services
+  - Automatic smoke tests after rollback
+  - CloudWatch annotations for tracking
+
+### Deployment Scripts
+
+All deployment scripts are located in the `scripts/` directory:
+
+#### Build Scripts
+```bash
+# Build individual services
+npm run build:api              # Build API Lambda package
+npm run build:ai               # Build AI processor Lambda package
+npm run build:collaboration    # Build collaboration Lambda package
+npm run build:frontend         # Build frontend for S3
+
+# Build all services
+npm run build:all
+```
+
+#### Deployment Scripts
+```bash
+# Deploy to dev environment
+npm run deploy:dev
+
+# Deploy to prod environment
+npm run deploy:prod
+
+# Deploy individual Lambda functions
+bash scripts/deploy-lambda.sh <service> <environment> <zip-file>
+# Example: bash scripts/deploy-lambda.sh api dev deploy/api-lambda.zip
+
+# Deploy frontend
+bash scripts/deploy-frontend.sh <environment>
+# Example: bash scripts/deploy-frontend.sh dev
+```
+
+#### Operations Scripts
+```bash
+# Run database migrations
+npm run migrate <environment>
+# Example: npm run migrate dev
+
+# Run smoke tests
+npm run smoke-test <environment>
+# Example: npm run smoke-test dev
+
+# Rollback deployment
+npm run rollback <service> <environment> [version]
+# Example: npm run rollback api dev
+# Example: npm run rollback all prod 5
+```
+
+#### Infrastructure Management
+```bash
+# Deploy infrastructure with Terraform
+npm run infrastructure:deploy
+
+# Destroy infrastructure (WARNING: destructive)
+npm run infrastructure:destroy
+```
+
+### Manual Deployment
+
+For manual deployment without CI/CD:
+
+1. **Build all services:**
+   ```bash
+   npm run build:all
+   ```
+
+2. **Run migrations:**
+   ```bash
+   export DATABASE_URL="postgresql://user:pass@host:5432/db"
+   bash scripts/run-migrations.sh dev
+   ```
+
+3. **Deploy Lambda functions:**
+   ```bash
+   bash scripts/deploy-lambda.sh api dev deploy/api-lambda.zip
+   bash scripts/deploy-lambda.sh ai dev deploy/ai-lambda.zip
+   bash scripts/deploy-lambda.sh collaboration dev deploy/collaboration-lambda.zip
+   ```
+
+4. **Deploy frontend:**
+   ```bash
+   bash scripts/deploy-frontend.sh dev
+   ```
+
+5. **Run smoke tests:**
+   ```bash
+   export API_BASE_URL_DEV="https://api.example.com"
+   export FRONTEND_URL_DEV="https://app.example.com"
+   bash scripts/smoke-test.sh dev
+   ```
+
+### Environment Configuration
+
+#### GitHub Secrets
+
+Configure the following secrets in your GitHub repository:
+
+**Development Environment:**
+- `AWS_ACCESS_KEY_ID_DEV`: AWS access key for dev environment
+- `AWS_SECRET_ACCESS_KEY_DEV`: AWS secret key for dev environment
+- `DATABASE_URL_DEV`: PostgreSQL connection string for dev
+- `API_BASE_URL_DEV`: Base URL for dev API
+- `FRONTEND_URL_DEV`: Base URL for dev frontend
+
+**Production Environment:**
+- `AWS_ACCESS_KEY_ID_PROD`: AWS access key for production
+- `AWS_SECRET_ACCESS_KEY_PROD`: AWS secret key for production
+- `DATABASE_URL_PROD`: PostgreSQL connection string for production
+- `API_BASE_URL_PROD`: Base URL for production API
+- `FRONTEND_URL_PROD`: Base URL for production frontend
+- `VITE_API_BASE_URL_PROD`: API URL for frontend build
+
+**Optional:**
+- `SLACK_WEBHOOK_URL`: Slack webhook for deployment notifications
+
+#### Local Environment Variables
+
+For local deployment, create a `.env` file (never commit this):
+
+```bash
+# AWS Configuration
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_key
+AWS_SECRET_ACCESS_KEY=your_secret
+
+# Database
+DATABASE_URL=postgresql://user:pass@host:5432/db
+
+# API URLs
+API_BASE_URL_DEV=https://api-dev.example.com
+FRONTEND_URL_DEV=https://app-dev.example.com
+API_BASE_URL_PROD=https://api.example.com
+FRONTEND_URL_PROD=https://app.example.com
+```
+
+### Deployment Workflow
+
+#### Development Deployment (Automatic)
+1. Create PR and wait for CI checks to pass
+2. Merge PR to `main` branch
+3. GitHub Actions automatically deploys to dev environment
+4. Monitor deployment in GitHub Actions
+5. Verify deployment with smoke tests
+
+#### Production Deployment (Manual)
+1. Ensure all changes are tested in dev environment
+2. Go to GitHub Actions → "Deploy to Production"
+3. Click "Run workflow"
+4. Enter the git ref to deploy (branch, tag, or commit SHA)
+5. Click "Run workflow" button
+6. Wait for approval from designated approvers
+7. Monitor deployment progress
+8. Verify deployment with comprehensive smoke tests
+
+#### Rollback Procedure
+If deployment fails or issues are detected:
+
+1. **Via GitHub Actions:**
+   - Go to GitHub Actions → "Rollback Deployment"
+   - Select environment (dev/prod)
+   - Select service (all, api, ai, collaboration)
+   - Optionally specify version number
+   - Click "Run workflow"
+
+2. **Manual Rollback:**
+   ```bash
+   # Rollback all services to previous version
+   bash scripts/rollback.sh all prod
+
+   # Rollback specific service to specific version
+   bash scripts/rollback.sh api prod 5
+
+   # Run smoke tests after rollback
+   bash scripts/smoke-test.sh prod
+   ```
+
+### Monitoring Deployments
+
+- **GitHub Actions**: View workflow runs and logs
+- **CloudWatch**: Deployment annotations and metrics
+- **Sentry**: Error tracking and release tagging
+- **Slack**: Deployment notifications (if configured)
+
+### Troubleshooting
+
+**Deployment fails during migration:**
+- Check CloudWatch logs for database errors
+- Verify DATABASE_URL is correct
+- Check if migrations are compatible with current schema
+- Rollback if necessary: `bash scripts/rollback.sh all <env>`
+
+**Lambda deployment fails:**
+- Check package size (must be <50MB zipped)
+- Verify AWS credentials have correct permissions
+- Check CloudWatch logs for function errors
+- Verify function configuration in Terraform
+
+**Frontend deployment fails:**
+- Check S3 bucket permissions
+- Verify CloudFront distribution exists
+- Check frontend build output in `frontend/dist`
+- Verify VITE_API_BASE_URL is set correctly
+
+**Smoke tests fail:**
+- Check service health endpoints
+- Verify API and frontend URLs are correct
+- Check CloudWatch logs for errors
+- Verify database connectivity
+- Check Lambda function versions
+
 ## Contributing
 
 ### Code Standards

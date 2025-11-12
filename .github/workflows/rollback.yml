@@ -1,0 +1,117 @@
+name: Rollback Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to rollback'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+      service:
+        description: 'Service to rollback'
+        required: true
+        type: choice
+        options:
+          - all
+          - api
+          - ai
+          - collaboration
+      version:
+        description: 'Target version (optional, defaults to previous)'
+        required: false
+        type: string
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  rollback:
+    name: Rollback ${{ inputs.service }} in ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (dev)
+        if: inputs.environment == 'dev'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Configure AWS credentials (prod)
+        if: inputs.environment == 'prod'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify AWS credentials
+        run: aws sts get-caller-identity
+
+      - name: Send Slack notification (rollback started)
+        run: |
+          chmod +x .github/scripts/notify-slack.sh
+          .github/scripts/notify-slack.sh started ${{ inputs.environment }} "Rollback initiated for ${{ inputs.service }}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        continue-on-error: true
+
+      - name: Execute rollback
+        run: |
+          chmod +x scripts/rollback.sh
+          if [ -n "${{ inputs.version }}" ]; then
+            bash scripts/rollback.sh ${{ inputs.service }} ${{ inputs.environment }} ${{ inputs.version }}
+          else
+            bash scripts/rollback.sh ${{ inputs.service }} ${{ inputs.environment }}
+          fi
+
+      - name: Run smoke tests after rollback
+        run: |
+          chmod +x scripts/smoke-test.sh
+          bash scripts/smoke-test.sh ${{ inputs.environment }}
+        env:
+          API_BASE_URL_DEV: ${{ secrets.API_BASE_URL_DEV }}
+          FRONTEND_URL_DEV: ${{ secrets.FRONTEND_URL_DEV }}
+          API_BASE_URL_PROD: ${{ secrets.API_BASE_URL_PROD }}
+          FRONTEND_URL_PROD: ${{ secrets.FRONTEND_URL_PROD }}
+
+      - name: Create rollback annotation in CloudWatch
+        run: |
+          ROLLBACK_TAG="rollback-$(date -u +%Y%m%d-%H%M%S)-${{ inputs.service }}"
+          aws cloudwatch put-metric-data \
+            --namespace "DemandLetters/Deployments" \
+            --metric-name "Rollback" \
+            --value 1 \
+            --dimensions Environment=${{ inputs.environment }},Service=${{ inputs.service }}
+
+      - name: Send Slack notification (rollback success)
+        if: success()
+        run: |
+          chmod +x .github/scripts/notify-slack.sh
+          .github/scripts/notify-slack.sh success ${{ inputs.environment }} "Rollback completed successfully for ${{ inputs.service }}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        continue-on-error: true
+
+      - name: Send Slack notification (rollback failure)
+        if: failure()
+        run: |
+          chmod +x .github/scripts/notify-slack.sh
+          .github/scripts/notify-slack.sh failure ${{ inputs.environment }} "Rollback FAILED for ${{ inputs.service }}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        continue-on-error: true
+
+      - name: Display rollback summary
+        if: always()
+        run: |
+          echo "::notice::Rollback ${{ job.status }} for ${{ inputs.service }} in ${{ inputs.environment }}"
+          echo "::notice::Check CloudWatch logs for detailed information"
