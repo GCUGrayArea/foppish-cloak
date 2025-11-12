@@ -2,16 +2,16 @@
 
 This file tracks which agent identities are currently in use. Agents must claim an identity before starting work and release it when done.
 
-**Last Updated:** 2025-11-12 15:45
+**Last Updated:** 2025-11-12 16:30
 
 ## Available Identities
 
 | Identity | Status | Last Commit | Current PR |
 |----------|--------|-------------|------------|
 | White    | In Use | 2025-11-12 15:50 | Coordination/Planning |
-| Orange   | In Use | 2025-11-12 15:55 | PR-019 |
-| Blonde   | Available | 2025-11-12 16:15 | PR-023 (Complete) |
-| Pink     | Available | - | - |
+| Orange   | In Use | 2025-11-12 16:30 | PR-019 (Yjs Collaboration) |
+| Blonde   | In Use | 2025-11-12 16:30 | PR-018 (Demand Letter Workspace UI) |
+| Pink     | In Use | 2025-11-12 16:30 | PR-022 (Frontend E2E Tests) |
 | Blue     | Available | - | - |
 | Brown    | Available | - | - |
 

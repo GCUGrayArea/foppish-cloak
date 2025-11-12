@@ -3592,7 +3592,9 @@ This is a cleanup PR to fix test quality issues found during QC. Does not change
 ---
 
 ### PR-018: Demand Letter Workspace UI
-**Status:** New
+**Status:** In Progress
+**Assigned to:** Agent Blonde
+**Started:** 2025-11-12
 **Dependencies:** PR-012, PR-014, PR-015, PR-016
 **Priority:** High
 
@@ -3632,7 +3634,9 @@ This is the primary user interface. UX should be intuitive and responsive.
 ## Block 8: Real-Time Collaboration (P1 Feature)
 
 ### PR-019: Yjs Collaboration Backend
-**Status:** Blocked-Ready → Ready to claim and implement
+**Status:** In Progress
+**Assigned to:** Agent Orange
+**Started:** 2025-11-12
 **Dependencies:** PR-001✅, PR-002✅, PR-012✅
 **Priority:** Medium (P1 - Should-have)
 
@@ -3780,7 +3784,9 @@ QC agent may expand this PR if gaps are found. Tests should use real AWS service
 ---
 
 ### PR-022: Frontend E2E Tests (Playwright)
-**Status:** New
+**Status:** In Progress
+**Assigned to:** Agent Pink
+**Started:** 2025-11-12
 **Dependencies:** PR-015, PR-016, PR-017, PR-018
 **Priority:** High
 
