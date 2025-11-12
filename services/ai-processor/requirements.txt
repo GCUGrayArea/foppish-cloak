@@ -8,7 +8,7 @@ psycopg2-binary>=2.9.9
 SQLAlchemy>=2.0.25
 
 # Document processing
-PyPDF2>=3.0.1
+pypdf>=3.0.0
 
 # AWS and LLM
 anthropic>=0.18.1

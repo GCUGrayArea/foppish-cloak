@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import BinaryIO
 
-import PyPDF2
+import pypdf
 
 from .bedrock.client import BedrockClient
 from .bedrock.tools import pydantic_to_tool_schema, extract_tool_result
@@ -84,7 +84,7 @@ class DocumentAnalyzer:
         Returns:
             Extracted text
         """
-        reader = PyPDF2.PdfReader(pdf_file)
+        reader = pypdf.PdfReader(pdf_file)
         text_parts = []
 
         for page_num, page in enumerate(reader.pages):
