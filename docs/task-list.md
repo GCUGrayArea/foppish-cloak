@@ -3101,9 +3101,10 @@ Avoid Tailwind CSS per project preferences. Consider CSS modules or styled-compo
 ---
 
 ### PR-015: Authentication UI (Login, Register)
-**Status:** New
+**Status:** Planning
 **Dependencies:** PR-001, PR-004, PR-014
 **Priority:** High
+**Assigned to:** Agent Orange
 
 **Description:**
 Build login, registration, and password reset UI components with form validation and error handling.
@@ -3172,9 +3173,10 @@ Use react-dropzone or similar for file upload UX.
 ---
 
 ### PR-017: Template Management UI
-**Status:** New
+**Status:** Planning
 **Dependencies:** PR-007, PR-014, PR-015
 **Priority:** High
+**Agent:** Blonde
 
 **Description:**
 Build interface for viewing, creating, and editing demand letter templates. Support template variables and preview.
