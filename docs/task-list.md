@@ -2992,23 +2992,28 @@ CloudWatch alarms:
 ## Block 5: API Integration Layer (Depends on: Blocks 3, 4)
 
 ### PR-012: Demand Letter Workflow API (Node.js)
-**Status:** Planning
+**Status:** In Progress
 **Agent:** White
 **Planning Started:** 2025-11-12
+**Implementation Started:** 2025-11-12
 **Dependencies:** PR-001, PR-002, PR-004, PR-006, PR-007, PR-011
 **Priority:** High
 
 **Description:**
 Build Node.js API endpoints orchestrating the complete demand letter workflow: upload documents → analyze → generate draft → refine → export.
 
-**Files (ESTIMATED - will be refined during Planning):**
-- services/api/src/services/DemandLetterService.ts (create)
-- services/api/src/services/AIServiceClient.ts (create) - calls Python Lambda
-- services/api/src/routes/demand-letters.ts (create)
-- services/api/src/types/demand-letter.ts (create)
-- services/api/src/utils/workflowState.ts (create) - state machine
-- tests/demand-letters/DemandLetterService.test.ts (create)
-- tests/integration/demand-letter-workflow.test.ts (create)
+**Files (VERIFIED during Planning):**
+- services/api/src/services/DemandLetterService.ts (create) - Main workflow orchestration service
+- services/api/src/services/AIServiceClient.ts (create) - Client for invoking Python AI Lambda functions
+- services/api/src/routes/demand-letters.ts (create) - Express router for demand letter endpoints
+- services/api/src/types/demand-letter.ts (create) - TypeScript types for demand letter workflow
+- services/api/src/types/ai-service.ts (create) - Types for AI service requests/responses
+- services/api/src/utils/workflowState.ts (create) - Workflow state machine and transitions
+- services/api/src/utils/lambdaClient.ts (create) - Generic AWS Lambda invocation utility
+- tests/unit/services/DemandLetterService.test.ts (create) - Unit tests for DemandLetterService
+- tests/unit/services/AIServiceClient.test.ts (create) - Unit tests for AIServiceClient
+- tests/unit/utils/workflowState.test.ts (create) - Unit tests for workflow state machine
+- tests/integration/demand-letter-workflow.test.ts (create) - End-to-end workflow integration tests
 
 **Acceptance Criteria:**
 - [ ] POST /demand-letters - create new demand letter project
