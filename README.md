@@ -35,9 +35,11 @@ The Demand Letter Generator is a microservices-based application that helps law 
 
 ### Backend - AI Processor (Python)
 - **Runtime**: Python 3.11+
-- **AI Provider**: AWS Bedrock (Claude)
-- **Validation**: Pydantic
-- **Testing**: pytest
+- **AI Provider**: AWS Bedrock (Claude 3.5 Sonnet)
+- **AWS SDK**: boto3 with bedrock-runtime client
+- **Validation**: Pydantic + pydantic-settings
+- **Testing**: pytest with mock and integration tests
+- **Features**: Tool calling, structured outputs, retry logic, cost tracking
 
 ### Infrastructure
 - **Cloud**: AWS (Lambda, API Gateway, S3, RDS PostgreSQL)
@@ -124,6 +126,9 @@ venv\Scripts\activate
 source venv/bin/activate
 
 pip install -r requirements.txt
+
+# Verify installation
+python -c "import boto3; import pydantic; print('Dependencies installed successfully')"
 ```
 
 ### 3. Set Up Local Database
@@ -154,11 +159,14 @@ cp .env.example .env
 
 Required environment variables:
 - `DATABASE_URL`: PostgreSQL connection string
-- `JWT_SECRET`: Secret key for JWT tokens
-- `AWS_REGION`: AWS region for Bedrock and services
-- `BEDROCK_MODEL_ID`: Claude model identifier
+- `JWT_SECRET`: Secret key for JWT tokens (API service)
+- `AWS_REGION`: AWS region (default: us-east-1)
+- `BEDROCK_MODEL_ID`: Claude model identifier (default: claude-3-5-sonnet-20241022-v2:0)
+- `BEDROCK_MAX_TOKENS`: Maximum tokens per response (default: 4096)
+- `BEDROCK_TEMPERATURE_EXTRACTION`: Temperature for extraction (default: 0.0)
+- `BEDROCK_TEMPERATURE_GENERATION`: Temperature for generation (default: 0.7)
 
-See `.env.example` for complete list.
+See `.env.example` files in each service directory for complete configuration.
 
 ### 5. Run Database Migrations
 
@@ -285,9 +293,69 @@ Key AWS services:
 - **API Gateway**: HTTP/WebSocket API endpoints
 - **RDS PostgreSQL**: Relational data storage
 - **S3**: Document storage
-- **Bedrock**: Claude AI model access
-- **CloudWatch**: Logging and monitoring
+- **Bedrock**: Claude AI model access via converse API
+- **CloudWatch**: Logging and monitoring (structured JSON logs)
 - **Secrets Manager**: Secure credential storage
+
+### AWS Bedrock Setup
+
+The AI processor service uses AWS Bedrock to access Claude 3.5 Sonnet. Before running the service:
+
+1. **Enable Bedrock in your AWS account:**
+   - Go to AWS Console → Bedrock
+   - Request access to Claude models (if not already enabled)
+   - Note: Availability varies by region
+
+2. **Configure AWS credentials:**
+   ```bash
+   # Option 1: AWS CLI (recommended for local development)
+   aws configure
+
+   # Option 2: Environment variables
+   export AWS_ACCESS_KEY_ID=your_key
+   export AWS_SECRET_ACCESS_KEY=your_secret
+   export AWS_REGION=us-east-1
+
+   # Option 3: IAM role (for Lambda deployment)
+   # Attach appropriate IAM policy to Lambda execution role
+   ```
+
+3. **Required IAM permissions:**
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Effect": "Allow",
+         "Action": [
+           "bedrock:InvokeModel",
+           "bedrock:InvokeModelWithResponseStream"
+         ],
+         "Resource": "arn:aws:bedrock:*::foundation-model/anthropic.claude-*"
+       }
+     ]
+   }
+   ```
+
+4. **Test Bedrock access:**
+   ```bash
+   cd services/ai-processor
+   python -c "from src.bedrock import BedrockClient; client = BedrockClient(); print('Bedrock client initialized successfully')"
+   ```
+
+### Bedrock Features
+
+The Bedrock integration includes:
+
+- **Structured Outputs**: Tool calling for deterministic data extraction
+- **Automatic Retry**: Exponential backoff for rate limits and server errors
+- **Cost Tracking**: Token usage logging for all API calls
+- **Error Handling**: Custom exceptions for different error types
+- **Multi-Tenant Context**: Firm and user tracking in all logs
+- **Correlation IDs**: Request tracing across services
+- **Temperature Control**: Separate settings for extraction (0.0) vs generation (0.7)
+
+See `services/ai-processor/src/bedrock/` for implementation details.
 
 ## Contributing
 

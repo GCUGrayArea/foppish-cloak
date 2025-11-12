@@ -1,0 +1,82 @@
+{
+  "simple_text_response": {
+    "ResponseMetadata": {
+      "RequestId": "test-request-id",
+      "HTTPStatusCode": 200
+    },
+    "output": {
+      "message": {
+        "role": "assistant",
+        "content": [
+          {
+            "text": "This is a test response from Claude."
+          }
+        ]
+      }
+    },
+    "usage": {
+      "inputTokens": 50,
+      "outputTokens": 25,
+      "totalTokens": 75
+    },
+    "stopReason": "end_turn"
+  },
+  "tool_use_response": {
+    "ResponseMetadata": {
+      "RequestId": "test-request-id-2",
+      "HTTPStatusCode": 200
+    },
+    "output": {
+      "message": {
+        "role": "assistant",
+        "content": [
+          {
+            "toolUse": {
+              "toolUseId": "test-tool-use-id",
+              "name": "extract_data",
+              "input": {
+                "facts": [
+                  {
+                    "fact_type": "party",
+                    "content": "John Doe",
+                    "confidence": 0.95
+                  },
+                  {
+                    "fact_type": "date",
+                    "content": "2024-01-15",
+                    "confidence": 0.90
+                  }
+                ],
+                "summary": "Test extraction summary"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "usage": {
+      "inputTokens": 120,
+      "outputTokens": 80,
+      "totalTokens": 200
+    },
+    "stopReason": "tool_use"
+  },
+  "throttling_error": {
+    "Error": {
+      "Code": "ThrottlingException",
+      "Message": "Rate limit exceeded"
+    },
+    "ResponseMetadata": {
+      "HTTPStatusCode": 429
+    }
+  },
+  "server_error": {
+    "Error": {
+      "Code": "InternalServerException",
+      "Message": "Internal server error"
+    },
+    "ResponseMetadata": {
+      "HTTPStatusCode": 500
+    }
+  }
+}
