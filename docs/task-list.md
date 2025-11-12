@@ -3288,6 +3288,41 @@ Build interface for viewing, creating, and editing demand letter templates. Supp
 **Notes:**
 Using native contentEditable for rich text editing instead of Lexical/TipTap to keep bundle size small and avoid additional dependencies. Template variables use {{variable_name}} syntax matching backend.
 
+---
+
+### PR-017a: Fix Template Management UI Test Failures
+**Status:** Complete
+**QC Status:** Approved ✓ (2025-11-12)
+**Agent:** QC Agent
+**Started:** 2025-11-12
+**Completed:** 2025-11-12
+**Dependencies:** PR-017
+**Priority:** High (Blocker - fixes test failures in PR-017)
+
+**Description:**
+Fix failing tests in TemplateEditor.test.tsx by properly mocking the useTemplate hook.
+
+**Files Modified:**
+- frontend/src/test/TemplateEditor.test.tsx (modify) - Add proper mock setup for useTemplate hooks
+
+**Issues Fixed:**
+1. TemplateEditor.test.tsx: 2 failing tests
+   - "renders for admin users"
+   - "does not render for non-admin users"
+   - Root cause: `useTemplate()` hook returns undefined (missing mock in test setup)
+   - Error: "Cannot destructure property 'data' of 'useTemplate(...)' as it is undefined."
+   - Solution: Mock all useTemplates hooks (useTemplate, useCreateTemplate, useUpdateTemplate, useRollbackTemplate) with proper return values
+
+**Acceptance Criteria:**
+- [x] All TemplateEditor tests passing (2/2)
+- [x] All other template tests still passing
+- [x] Frontend test suite: 30/30 tests passing ✓
+
+**Notes:**
+This is a cleanup PR to fix test quality issues found during QC. Does not change any application code, only test code.
+
+---
+
 ### PR-018: Demand Letter Workspace UI
 **Status:** New
 **Dependencies:** PR-012, PR-014, PR-015, PR-016
