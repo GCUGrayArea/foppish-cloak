@@ -2,13 +2,18 @@
  * Template Management Integration Tests
  *
  * Tests complete template CRUD workflows including versioning and multi-tenant isolation
+ *
+ * NOTE: This is a skeleton file. Variables are declared but not yet used.
+ * Remove @ts-expect-error directives when implementing actual tests.
  */
 
 import { TemplateService } from '../../services/api/src/services/TemplateService';
 import { getPool } from '../../services/api/src/db/connection';
+// @ts-expect-error - Skeleton file: types imported for future test implementation
 import { CreateTemplateRequest, UpdateTemplateRequest } from '../../services/api/src/types/template';
 
 describe('Template Management Integration Tests', () => {
+  // @ts-expect-error - Skeleton file: variables declared for future test implementation
   let templateService: TemplateService;
 
   beforeAll(async () => {

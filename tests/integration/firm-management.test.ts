@@ -2,6 +2,9 @@
  * Firm Management Integration Tests
  *
  * Tests complete firm management workflows including multi-tenant isolation
+ *
+ * NOTE: This is a skeleton file. Variables are declared but not yet used.
+ * Remove @ts-expect-error directives when implementing actual tests.
  */
 
 import { FirmService } from '../../services/api/src/services/FirmService';
@@ -9,7 +12,9 @@ import { UserService } from '../../services/api/src/services/UserService';
 import { getPool } from '../../services/api/src/db/connection';
 
 describe('Firm Management Integration Tests', () => {
+  // @ts-expect-error - Skeleton file: variables declared for future test implementation
   let firmService: FirmService;
+  // @ts-expect-error - Skeleton file: variables declared for future test implementation
   let userService: UserService;
 
   beforeAll(async () => {

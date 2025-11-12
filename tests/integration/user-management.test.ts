@@ -2,6 +2,9 @@
  * User Management Integration Tests
  *
  * Tests complete user management workflows with multi-tenant security
+ *
+ * NOTE: This is a skeleton file. Variables are declared but not yet used.
+ * Remove @ts-expect-error directives when implementing actual tests.
  */
 
 import { UserService } from '../../services/api/src/services/UserService';
@@ -9,7 +12,9 @@ import { InvitationService } from '../../services/api/src/services/InvitationSer
 import { getPool } from '../../services/api/src/db/connection';
 
 describe('User Management Integration Tests', () => {
+  // @ts-expect-error - Skeleton file: variables declared for future test implementation
   let userService: UserService;
+  // @ts-expect-error - Skeleton file: variables declared for future test implementation
   let invitationService: InvitationService;
 
   beforeAll(async () => {

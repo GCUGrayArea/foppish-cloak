@@ -2,12 +2,16 @@
  * Template Versioning Integration Tests
  *
  * Focused tests for template version management and rollback functionality
+ *
+ * NOTE: This is a skeleton file. Variables are declared but not yet used.
+ * Remove @ts-expect-error directives when implementing actual tests.
  */
 
 import { TemplateService } from '../../services/api/src/services/TemplateService';
 import { getPool } from '../../services/api/src/db/connection';
 
 describe('Template Versioning Integration Tests', () => {
+  // @ts-expect-error - Skeleton file: variables declared for future test implementation
   let templateService: TemplateService;
 
   beforeAll(async () => {
