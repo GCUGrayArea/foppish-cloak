@@ -4739,6 +4739,129 @@ VITE_APP_NAME=Demand Letter Generator
 
 ---
 
+## Block 12: Quality Improvements (QC-Generated)
+
+### PR-029: Test Quality Fixes
+**Status:** New
+**QC Status:** Created by QC Agent (2025-11-12)
+**Dependencies:** None (cleanup PR)
+**Priority:** Medium
+**Created by:** QC Agent
+**Created on:** 2025-11-12
+
+**Description:**
+Fix 6 test files with quality issues identified during QC review. All failures are in test code (mocks, types, assertions), not application code. This PR improves test reliability and removes TypeScript compilation errors from test suites.
+
+**Files:**
+- tests/templates/TemplateService.test.ts (modify) - Fix 4 mock setup issues
+- tests/unit/services/DemandLetterService.test.ts (modify) - Fix 5 mock setup issues
+- tests/collaboration/auth.test.ts (modify) - Fix error type checking order
+- services/collaboration/src/middleware/auth.ts (modify) - Fix JWT error handling order
+- tests/integration/demand-letter-workflow.test.ts (modify) - Remove unused variables
+- tests/api/errorHandler.test.ts (modify) - Fix mock type casting
+- tests/integration/document-export.test.ts (modify) - Fix import and unused variables
+
+**Test Failures to Fix:**
+
+1. **TemplateService.test.ts** (4 failures)
+   - Mock assertion too strict in duplicate template test
+   - 3 tests with TEMPLATE_NOT_FOUND - incomplete mock setup
+   - Fix: Add proper mock returns for all query scenarios
+
+2. **DemandLetterService.test.ts** (5 failures)
+   - enrichLetterDetails not mocked for all call sites
+   - associateDocuments fails on document lookup
+   - Fix: Complete mock setup for all service methods
+
+3. **auth.test.ts** (1 failure)
+   - TokenExpiredError caught by JsonWebTokenError check first
+   - Fix: Reorder instanceof checks (TokenExpiredError before JsonWebTokenError)
+
+4. **demand-letter-workflow.test.ts** (TS errors)
+   - Unused variables: firmId, userId
+   - Fix: Remove unused declarations or implement test
+
+5. **errorHandler.test.ts** (TS error)
+   - mockNext.mock.calls - type error
+   - Fix: Cast mockNext to jest.Mock type
+
+6. **document-export.test.ts** (TS errors)
+   - Wrong import: firmContextMiddleware
+   - Unused variable: res
+   - Fix: Correct import path, remove or use variable
+
+**Acceptance Criteria:**
+- [ ] All 6 test files compile without TypeScript errors
+- [ ] All test assertions pass
+- [ ] No new test failures introduced
+- [ ] npm test runs cleanly (no hanging processes)
+
+**Time Estimate:** 60-90 minutes
+
+**Notes:**
+- Priority: Medium - doesn't block deployment but improves test suite quality
+- All application code is functional - this is purely test quality improvement
+- Consider running with --detectOpenHandles to identify test cleanup leaks
+
+---
+
+### PR-030: Coding Standards Refactoring
+**Status:** New
+**QC Status:** Created by QC Agent (2025-11-12)
+**Dependencies:** None (cleanup PR)
+**Priority:** Low
+**Created by:** QC Agent
+**Created on:** 2025-11-12
+
+**Description:**
+Refactor 5 functions that exceed the 75-line coding standard. Extract helper methods to improve maintainability, readability, and testability. No functional changes - pure refactoring.
+
+**Files:**
+- services/api/src/services/TemplateService.ts (modify) - Refactor 2 functions
+- services/api/src/services/DemandLetterService.ts (modify) - Refactor 2 functions
+- services/api/src/routes/templates.ts (modify) - Refactor 1 route handler
+
+**Functions to Refactor:**
+
+1. **HIGH Priority:**
+   - `TemplateService.updateTemplate()` (104 lines, +29 over limit)
+     - Extract: transaction logic, metadata update, version creation helpers
+   - `DemandLetterService.refineDemandLetter()` (97 lines, +22 over limit)
+     - Extract: AI service call, revision creation, state update helpers
+
+2. **MEDIUM Priority:**
+   - `DemandLetterService.generateDemandLetter()` (83 lines, +8 over limit)
+     - Extract: template variable retrieval, content conversion helpers
+
+3. **LOW Priority:**
+   - `TemplateService.getTemplateById()` (77 lines, +2 over limit)
+     - Extract: enrichment logic into helper
+   - `routes/templates.ts` PUT handler (76 lines, +1 over limit)
+     - Extract: validation and error handling into middleware/helpers
+
+**Acceptance Criteria:**
+- [ ] All 5 functions under 75 lines
+- [ ] Extracted helpers are well-named and focused
+- [ ] All existing tests still pass
+- [ ] No functional changes (pure refactoring)
+- [ ] Code remains readable and maintainable
+
+**Time Estimate:** 120-180 minutes
+
+**Refactoring Strategy:**
+- Extract complex operations into private helper methods
+- Use descriptive names that explain what each helper does
+- Maintain original function signatures (no breaking changes)
+- Keep helpers close to where they're used (same class/file)
+- Add JSDoc comments to extracted helpers
+
+**Notes:**
+- Priority: Low - doesn't block functionality but improves maintainability
+- DemandLetterService.ts is at 718 lines (32 lines under 750 limit) - monitor file size
+- Consider splitting DemandLetterService into multiple service classes if it continues to grow
+
+---
+
 **Generated:** 2025-11-10
-**Last Updated:** 2025-11-11 (PR-014 planning added)
+**Last Updated:** 2025-11-12 (QC cleanup PRs added)
 **Ready for parallel agent execution**
