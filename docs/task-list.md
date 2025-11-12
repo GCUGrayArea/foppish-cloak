@@ -2320,8 +2320,9 @@ This is the core AI capability. Quality of extraction directly impacts letter qu
 ---
 
 ### PR-010: Demand Letter Generation (Python)
-**Status:** In Progress
+**Status:** Complete
 **Agent:** Orange
+**Completed on:** 2025-11-11
 **Planned by:** Agent Orange (2025-11-11)
 **Dependencies:** PR-001 (Complete), PR-002 (Complete), PR-007 (Approved ⚠️), PR-008 (Complete), PR-009 (Approved ⚠️)
 **Priority:** High
@@ -3045,8 +3046,9 @@ Use docx library for Word export. Consider using Lambda for PDF generation (head
 ## Block 6: Frontend Foundation (Depends on: Block 2)
 
 ### PR-014: React App Setup with Vite
-**Status:** In Progress
+**Status:** Complete
 **Agent:** White
+**Completed on:** 2025-11-11
 **Planned by:** Agent White (2025-11-11)
 **Dependencies:** PR-001 (Complete)
 **Priority:** High
