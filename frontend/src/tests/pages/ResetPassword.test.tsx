@@ -29,8 +29,10 @@ describe('ResetPassword Page', () => {
     );
 
     expect(screen.getByRole('heading', { name: /reset your password/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/new password/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/confirm new password/i)).toBeInTheDocument();
+
+    // Query password fields by their specific placeholders
+    expect(screen.getByPlaceholderText(/^enter your new password$/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/^re-enter your new password$/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /reset password/i })).toBeInTheDocument();
   });
 
@@ -41,8 +43,9 @@ describe('ResetPassword Page', () => {
       </BrowserRouter>
     );
 
-    // Password strength indicator should be present
-    const passwordInput = screen.getByLabelText(/new password/i);
+    // Password strength indicator should be present - get the first password field by exact placeholder
+    const passwordInput = screen.getByPlaceholderText(/^enter your new password$/i);
     expect(passwordInput).toBeInTheDocument();
+    expect(passwordInput).toHaveAttribute('name', 'password');
   });
 });

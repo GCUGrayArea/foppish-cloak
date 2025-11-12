@@ -69,9 +69,12 @@ describe('Login Page', () => {
     renderLogin();
 
     const emailInput = screen.getByLabelText(/email address/i);
+
+    // Type and blur to trigger validation
     await user.type(emailInput, 'invalid-email');
     await user.tab();
 
+    // Wait for validation error to appear
     await waitFor(() => {
       expect(screen.getByText(/invalid email format/i)).toBeInTheDocument();
     });
@@ -94,11 +97,17 @@ describe('Login Page', () => {
 
     expect(passwordInput.type).toBe('password');
 
+    // Click and wait for state update
     await user.click(toggleButton);
-    expect(passwordInput.type).toBe('text');
+    await waitFor(() => {
+      expect(passwordInput.type).toBe('text');
+    });
 
+    // Click again and wait for state update
     await user.click(toggleButton);
-    expect(passwordInput.type).toBe('password');
+    await waitFor(() => {
+      expect(passwordInput.type).toBe('password');
+    });
   });
 
   it('renders links to register and forgot password pages', () => {
