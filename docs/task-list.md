@@ -1515,7 +1515,9 @@ All endpoints verify:
 ## Block 3: Document Storage & Management (Depends on: Block 2)
 
 ### PR-006: Document Upload and Storage Service
-**Status:** New
+**Status:** Complete
+**Agent:** White
+**Completed on:** 2025-11-11
 **Dependencies:** PR-001, PR-002, PR-003, PR-004
 **Priority:** High
 
@@ -1534,17 +1536,17 @@ Implement secure document upload to S3 with virus scanning, file type validation
 - tests/integration/document-upload.test.ts (create)
 
 **Acceptance Criteria:**
-- [ ] POST /documents/upload - upload source documents to S3
-- [ ] GET /documents/:id - get document metadata
-- [ ] GET /documents/:id/download - generate signed S3 URL
-- [ ] DELETE /documents/:id - soft delete document
-- [ ] File type validation (PDF, DOCX, DOC, images)
-- [ ] File size limits (max 50MB per file)
-- [ ] Virus scanning integration (ClamAV or AWS GuardDuty)
-- [ ] S3 signed URLs with 1-hour expiration
-- [ ] Metadata extraction (file name, size, type, upload date)
-- [ ] Document associated with firm and user
-- [ ] Unit and integration tests
+- [x] POST /documents/upload - upload source documents to S3
+- [x] GET /documents/:id - get document metadata
+- [x] GET /documents/:id/download - generate signed S3 URL
+- [x] DELETE /documents/:id - soft delete document
+- [x] File type validation (PDF, DOCX, DOC, images)
+- [x] File size limits (max 50MB per file)
+- [x] Virus scanning integration (ClamAV or AWS GuardDuty)
+- [x] S3 signed URLs with 1-hour expiration
+- [x] Metadata extraction (file name, size, type, upload date)
+- [x] Document associated with firm and user
+- [x] Unit and integration tests
 
 **Notes:**
 Security-critical. All uploads must be scanned and validated before storage.
