@@ -3628,22 +3628,65 @@ This is the primary user interface. UX should be intuitive and responsive.
 ## Block 8: Real-Time Collaboration (P1 Feature)
 
 ### PR-019: Yjs Collaboration Backend
-**Status:** New
-**Dependencies:** PR-001, PR-002, PR-012
-**Priority:** Medium
+**Status:** Blocked-Ready → Ready to claim and implement
+**Dependencies:** PR-001✅, PR-002✅, PR-012✅
+**Priority:** Medium (P1 - Should-have)
+
+**Planning Status:** COMPLETE
+**Planned by:** Agent White (2025-11-12)
 
 **Description:**
 Implement WebSocket server for real-time collaboration using Yjs CRDT. Support concurrent editing of demand letters with conflict resolution.
 
-**Files (ESTIMATED - will be refined during Planning):**
-- services/collaboration/package.json (create) - new service
-- services/collaboration/src/server.ts (create) - WebSocket server
-- services/collaboration/src/yjs-handler.ts (create) - Yjs document sync
-- services/collaboration/src/persistence.ts (create) - save to PostgreSQL
-- services/collaboration/src/awareness.ts (create) - user presence
-- services/collaboration/src/middleware/auth.ts (create) - WebSocket auth
-- infrastructure/lambda-websocket.tf (modify) - WebSocket API Gateway
-- tests/collaboration/yjs-handler.test.ts (create)
+**Files (VERIFIED during Planning):**
+- services/collaboration/package.json (create) - new service with yjs, y-websocket, ws dependencies
+- services/collaboration/tsconfig.json (create) - TypeScript config extending base
+- services/collaboration/src/index.ts (create) - Lambda handler entry point
+- services/collaboration/src/server.ts (create) - y-websocket server setup
+- services/collaboration/src/handlers/connect.ts (create) - WebSocket $connect handler
+- services/collaboration/src/handlers/disconnect.ts (create) - WebSocket $disconnect handler
+- services/collaboration/src/handlers/message.ts (create) - WebSocket $default message handler
+- services/collaboration/src/yjs/documentManager.ts (create) - Yjs document lifecycle management
+- services/collaboration/src/yjs/persistence.ts (create) - PostgreSQL persistence adapter
+- services/collaboration/src/yjs/awareness.ts (create) - User presence/awareness state
+- services/collaboration/src/middleware/auth.ts (create) - WebSocket JWT auth
+- services/collaboration/src/db/client.ts (create) - PostgreSQL connection
+- services/collaboration/src/types/index.ts (create) - TypeScript types
+- services/collaboration/src/utils/connectionManager.ts (create) - DynamoDB connection tracking
+- infrastructure/lambda-websocket.tf (modify) - Replace placeholder Lambda with real service
+- tests/collaboration/documentManager.test.ts (create) - Yjs document tests
+- tests/collaboration/persistence.test.ts (create) - Persistence tests
+- tests/collaboration/awareness.test.ts (create) - Awareness tests
+- tests/collaboration/auth.test.ts (create) - WebSocket auth tests
+
+**Implementation Notes:**
+- **Architecture:** Lambda-based WebSocket handler using API Gateway WebSocket API (already provisioned in infrastructure)
+- **Yjs Integration:** Use y-websocket provider pattern with custom persistence layer
+- **Database Schema:** Store Yjs document state as binary (Uint8Array) in new `collaboration_documents` table with columns: letter_id (UUID), yjs_state (BYTEA), last_updated (TIMESTAMP)
+- **Connection Management:** Use existing DynamoDB table (websocket_connections) for tracking active connections
+- **Authentication:** Validate JWT token from query string parameter on $connect, extract firmId and userId
+- **Room Isolation:** One Yjs document per demand letter ID, scoped by firm_id for multi-tenancy
+- **Persistence Strategy:**
+  - Save Yjs state to PostgreSQL every 30 seconds or on disconnect
+  - Load from PostgreSQL on first connection to a room
+  - Use Y.encodeStateAsUpdate() and Y.applyUpdate() for serialization
+- **Awareness:** Track user presence with name, cursor position, selection range
+- **Performance:** Keep Yjs documents in Lambda memory for 15 minutes after last activity
+- **Libraries:**
+  - yjs: ^13.6.0 (CRDT library)
+  - y-websocket: ^1.5.0 (WebSocket provider)
+  - ws: ^8.14.0 (WebSocket server)
+  - lib0: ^0.2.0 (Yjs utilities)
+  - @aws-sdk/client-dynamodb: ^3.x (connection management)
+- **Testing:** Mock WebSocket connections, verify Yjs state synchronization, test persistence roundtrip
+- **Security:** Validate firm ownership of demand letter before allowing connection
+
+**Time Estimate:** 420 minutes (7 hours)
+- Service setup and Lambda integration: 90 minutes
+- Yjs document manager and persistence: 120 minutes
+- WebSocket handlers ($connect, $disconnect, $default): 90 minutes
+- Authentication and connection management: 60 minutes
+- Tests and debugging: 60 minutes
 
 **Acceptance Criteria:**
 - [ ] WebSocket server using y-websocket
@@ -3769,22 +3812,101 @@ E2E tests should run against a real backend (dev environment) for maximum confid
 ## Block 10: Performance & Monitoring
 
 ### PR-023: Logging and Monitoring Infrastructure
-**Status:** New
-**Dependencies:** PR-001, PR-003
+**Status:** Blocked-Ready → Ready to claim and implement
+**Dependencies:** PR-001✅, PR-003✅
 **Priority:** Medium
+
+**Planning Status:** COMPLETE
+**Planned by:** Agent White (2025-11-12)
 
 **Description:**
 Set up comprehensive logging with CloudWatch, error tracking with Sentry, and performance monitoring with X-Ray or Datadog.
 
-**Files (ESTIMATED - will be refined during Planning):**
-- services/api/src/lib/logger.ts (create) - Winston logger
-- services/api/src/middleware/requestLogger.ts (create)
-- services/api/src/middleware/errorHandler.ts (create) - Sentry integration
-- services/ai-processor/src/logging.py (create) - Python logging
+**Files (VERIFIED during Planning):**
+- services/api/src/lib/logger.ts (create) - Winston logger with CloudWatch transport
+- services/api/src/lib/metrics.ts (create) - Custom metrics helper
+- services/api/src/middleware/requestLogger.ts (create) - Request/response logging middleware
+- services/api/src/middleware/errorHandler.ts (create) - Global error handler with Sentry
+- services/api/src/config/sentry.ts (create) - Sentry configuration
+- services/api/src/config/cloudwatch.ts (create) - CloudWatch configuration
+- services/ai-processor/src/logging.py (create) - Python structured logging
+- services/ai-processor/src/metrics.py (create) - Bedrock cost tracking
 - infrastructure/monitoring.tf (create) - CloudWatch dashboards
-- infrastructure/alarms.tf (create) - CloudWatch alarms
-- services/api/src/config/sentry.ts (create)
-- frontend/src/lib/errorTracking.ts (create) - frontend Sentry
+- infrastructure/alarms.tf (create) - CloudWatch alarms and SNS topics
+- infrastructure/xray.tf (create) - AWS X-Ray configuration
+- frontend/src/lib/errorTracking.ts (create) - frontend Sentry setup
+- frontend/src/lib/analytics.ts (create) - Performance monitoring hooks
+- package.json (modify) - Add @sentry/node dependency to API service
+- services/api/package.json (modify) - Add winston-cloudwatch dependency
+- services/ai-processor/requirements.txt (modify) - Add sentry-sdk dependency
+- frontend/package.json (modify) - Add @sentry/react dependency
+- tests/api/logger.test.ts (create) - Logger tests
+- tests/api/errorHandler.test.ts (create) - Error handler tests
+
+**Implementation Notes:**
+- **Winston Configuration:**
+  - Console transport for local development (colorized, human-readable)
+  - CloudWatch transport for production (JSON structured logs)
+  - Log levels: error, warn, info, debug
+  - Include correlation IDs (generated in request logger middleware)
+  - Sanitize sensitive data (passwords, tokens) from logs
+- **Request Logging:**
+  - Log all HTTP requests with: method, path, status code, duration, user ID, firm ID
+  - Generate UUID correlation ID for request tracing
+  - Attach correlation ID to response headers (X-Correlation-ID)
+  - Log request/response bodies for non-GET requests (sanitized)
+- **Error Handling:**
+  - Catch all uncaught errors in middleware
+  - Send errors to Sentry with context (user, firm, request details)
+  - Return standardized error responses: {error: string, message: string, correlationId: string}
+  - Don't expose internal errors to clients in production
+- **CloudWatch Dashboards:**
+  - API metrics: Request count, error rate, P50/P95/P99 latency
+  - Lambda metrics: Invocation count, duration, errors, throttles
+  - Database metrics: Connection count, query duration
+  - Bedrock metrics: Token usage, cost estimation, request count
+- **CloudWatch Alarms:**
+  - High error rate: >5% errors in 5 minutes → SNS notification
+  - Slow response time: P95 >2 seconds for 5 minutes → SNS notification
+  - Lambda failures: >10 errors in 5 minutes → SNS notification
+  - Database connection issues: Connection pool exhaustion → SNS notification
+- **X-Ray Tracing:**
+  - Enable X-Ray for all Lambda functions
+  - Trace AWS SDK calls (S3, Bedrock, DynamoDB)
+  - Trace database queries
+  - Subsegments for business logic phases
+- **Sentry Configuration:**
+  - Separate Sentry projects for API, AI processor, frontend
+  - Environment tagging (dev, prod)
+  - User context (ID, email, firm) attached to all events
+  - Performance monitoring enabled (transaction sampling)
+  - Release tracking with git SHA
+- **Cost Tracking:**
+  - Log every Bedrock API call with input/output token counts
+  - Calculate cost per request (Claude Sonnet pricing: $0.003/1K input, $0.015/1K output)
+  - Aggregate costs by firm, user, and time period
+  - Store in CloudWatch metrics for cost dashboards
+- **Libraries:**
+  - winston: ^3.11.0 (already installed)
+  - winston-cloudwatch: ^6.0.0 (new)
+  - @sentry/node: ^7.x (API service)
+  - @sentry/react: ^7.x (frontend)
+  - sentry-sdk[flask]: ^1.x (Python)
+  - aws-xray-sdk: ^3.x (Node.js X-Ray)
+  - aws-xray-sdk-python: ^2.x (Python X-Ray)
+- **Environment Variables:**
+  - SENTRY_DSN (API, frontend, AI processor)
+  - LOG_LEVEL (default: info)
+  - CLOUDWATCH_LOG_GROUP
+  - ENABLE_XRAY (default: true in prod, false in dev)
+
+**Time Estimate:** 300 minutes (5 hours)
+- Winston logger and CloudWatch setup: 60 minutes
+- Request logging and error handling middleware: 60 minutes
+- Sentry integration (all services): 60 minutes
+- CloudWatch dashboards and alarms: 60 minutes
+- X-Ray tracing setup: 30 minutes
+- Tests and documentation: 30 minutes
 
 **Acceptance Criteria:**
 - [ ] Structured logging to CloudWatch (JSON format)
@@ -3803,20 +3925,110 @@ Essential for production operations. Can be developed in parallel with features.
 ---
 
 ### PR-024: API Rate Limiting and Security Headers
-**Status:** New
-**Dependencies:** PR-001, PR-004
+**Status:** Blocked-Ready → Ready to claim and implement
+**Dependencies:** PR-001✅, PR-004✅
 **Priority:** Medium
+
+**Planning Status:** COMPLETE
+**Planned by:** Agent White (2025-11-12)
 
 **Description:**
 Implement rate limiting, CORS configuration, security headers, and API abuse prevention.
 
-**Files (ESTIMATED - will be refined during Planning):**
-- services/api/src/middleware/rateLimit.ts (create)
-- services/api/src/middleware/security.ts (create) - helmet, CORS
-- services/api/src/config/cors.ts (create)
-- services/api/src/utils/ipWhitelist.ts (create)
-- tests/middleware/rateLimit.test.ts (create)
-- tests/middleware/security.test.ts (create)
+**Files (VERIFIED during Planning):**
+- services/api/src/middleware/rateLimit.ts (create) - Express rate limiter with Redis
+- services/api/src/middleware/security.ts (modify) - Enhanced helmet configuration
+- services/api/src/middleware/apiKey.ts (create) - API key validation
+- services/api/src/config/cors.ts (create) - CORS configuration with whitelisting
+- services/api/src/config/rateLimit.ts (create) - Rate limit rules
+- services/api/src/config/redis.ts (create) - Redis client for rate limiting
+- services/api/src/utils/ipWhitelist.ts (create) - IP whitelist management
+- services/api/src/index.ts (modify) - Apply security middleware
+- infrastructure/elasticache.tf (create) - Redis cluster for rate limiting
+- infrastructure/api-gateway.tf (modify) - API Gateway throttling settings
+- package.json (modify) - Add express-rate-limit, rate-limit-redis dependencies
+- services/api/package.json (modify) - Add redis, ioredis dependencies
+- .env.example (modify) - Add Redis and rate limit configuration
+- tests/middleware/rateLimit.test.ts (create) - Rate limit tests with mocked Redis
+- tests/middleware/security.test.ts (create) - Security header tests
+- tests/middleware/apiKey.test.ts (create) - API key validation tests
+
+**Implementation Notes:**
+- **Rate Limiting Strategy:**
+  - Two-tier approach: API Gateway throttling + application-level rate limiting
+  - API Gateway: 1000 req/sec burst, 500 req/sec steady-state (protects against DDoS)
+  - Application level: More granular per-IP and per-user limits
+  - Use Redis for distributed rate limiting (works across Lambda instances)
+- **Rate Limit Rules:**
+  - Anonymous (by IP): 100 requests per 15 minutes
+  - Authenticated (by user ID): 500 requests per 15 minutes
+  - Special endpoints (AI generation): 10 requests per hour per user
+  - Firm admin endpoints: 1000 requests per 15 minutes
+- **Rate Limit Implementation:**
+  - Use express-rate-limit middleware
+  - Store counters in Redis with TTL
+  - Return 429 Too Many Requests with Retry-After header
+  - Include X-RateLimit-* headers in all responses: Limit, Remaining, Reset
+  - Whitelist health check endpoint from rate limiting
+- **CORS Configuration:**
+  - Whitelist frontend domain(s): process.env.FRONTEND_URL
+  - Allow credentials (for cookie-based auth)
+  - Allowed methods: GET, POST, PUT, DELETE, PATCH
+  - Allowed headers: Authorization, Content-Type, X-Correlation-ID
+  - Expose headers: X-Correlation-ID, X-RateLimit-*
+  - Max age: 86400 (24 hours)
+  - Different CORS rules for dev (localhost:*) and prod (specific domain)
+- **Security Headers (Helmet):**
+  - Content-Security-Policy: Restrict script sources, disable unsafe-inline/eval
+  - Strict-Transport-Security: max-age=31536000; includeSubDomains
+  - X-Frame-Options: DENY
+  - X-Content-Type-Options: nosniff
+  - Referrer-Policy: strict-origin-when-cross-origin
+  - Permissions-Policy: camera=(), microphone=(), geolocation=()
+- **API Key Support:**
+  - Optional X-API-Key header for programmatic access
+  - API keys stored in database (firms table: api_key_hash, api_key_enabled)
+  - bcrypt hash API keys (never store plain text)
+  - API key bypasses user authentication but still requires firm context
+  - API keys subject to rate limiting (500 req/15min by default)
+  - Endpoint for firm admins to generate/revoke API keys
+- **IP Whitelist:**
+  - Optional feature for enterprise clients
+  - Store whitelisted IP ranges in database (firm_ip_whitelist table)
+  - Middleware checks client IP against whitelist if firm has whitelist enabled
+  - Support CIDR notation (e.g., 203.0.113.0/24)
+  - Return 403 Forbidden if IP not whitelisted
+- **Redis Configuration:**
+  - Use ElastiCache Redis cluster (provisioned in infrastructure/elasticache.tf)
+  - Connection pooling with ioredis
+  - Fallback: If Redis unavailable, allow requests but log warning (graceful degradation)
+  - Redis key pattern: ratelimit:{ip|userId}:{endpoint}
+- **API Gateway Throttling:**
+  - Configured in infrastructure/api-gateway.tf
+  - Burst limit: 1000 requests
+  - Rate limit: 500 requests per second
+  - Per-method throttling for expensive endpoints (AI generation: 10 req/sec)
+- **Libraries:**
+  - express-rate-limit: ^7.0.0 (rate limiting middleware)
+  - rate-limit-redis: ^4.0.0 (Redis store for rate limiter)
+  - ioredis: ^5.0.0 (Redis client)
+  - helmet: ^7.1.0 (already installed, enhance configuration)
+  - cors: ^2.8.5 (already installed, add configuration)
+  - ipaddr.js: ^2.0.0 (CIDR notation parsing)
+- **Environment Variables:**
+  - REDIS_URL (ElastiCache endpoint)
+  - REDIS_PASSWORD (if auth enabled)
+  - FRONTEND_URL (for CORS whitelist)
+  - RATE_LIMIT_ENABLED (default: true)
+  - RATE_LIMIT_WINDOW_MS (default: 900000 = 15 minutes)
+  - RATE_LIMIT_MAX_REQUESTS (default: 100 for anonymous, 500 for authenticated)
+
+**Time Estimate:** 240 minutes (4 hours)
+- Rate limiting middleware and Redis setup: 90 minutes
+- Enhanced security headers and CORS configuration: 30 minutes
+- API key validation system: 60 minutes
+- IP whitelist implementation: 30 minutes
+- Tests and documentation: 30 minutes
 
 **Acceptance Criteria:**
 - [ ] Rate limiting by IP (100 req/15min for anonymous)
@@ -3836,22 +4048,147 @@ Consider using API Gateway throttling as first line of defense.
 ## Block 11: Documentation & Deployment
 
 ### PR-025: Deployment Pipeline and CI/CD
-**Status:** New
-**Dependencies:** PR-003, PR-011, PR-014
+**Status:** Blocked-Ready → Ready to claim and implement
+**Dependencies:** PR-003✅, PR-011✅, PR-014✅
 **Priority:** High
+
+**Planning Status:** COMPLETE
+**Planned by:** Agent White (2025-11-12)
 
 **Description:**
 Create complete CI/CD pipeline for automated testing, building, and deployment to AWS using GitHub Actions.
 
-**Files (ESTIMATED - will be refined during Planning):**
-- .github/workflows/ci.yml (modify) - full CI pipeline
-- .github/workflows/deploy-dev.yml (create)
-- .github/workflows/deploy-prod.yml (create)
-- scripts/build-api.sh (create)
-- scripts/build-ai.sh (create)
-- scripts/build-frontend.sh (create)
-- scripts/deploy.sh (create)
-- scripts/smoke-test.sh (create)
+**Files (VERIFIED during Planning):**
+- .github/workflows/ci.yml (modify) - Enhanced CI with parallel jobs
+- .github/workflows/deploy-dev.yml (create) - Auto-deploy to dev on main merge
+- .github/workflows/deploy-prod.yml (create) - Manual production deployment
+- .github/workflows/rollback.yml (create) - Emergency rollback workflow
+- scripts/build-api.sh (create) - Build API Lambda package
+- scripts/build-ai.sh (create) - Build AI processor Lambda package
+- scripts/build-collaboration.sh (create) - Build collaboration Lambda package
+- scripts/build-frontend.sh (create) - Build and upload frontend to S3
+- scripts/deploy-lambda.sh (create) - Deploy Lambda functions with versioning
+- scripts/deploy-frontend.sh (create) - Deploy frontend to S3 with CloudFront invalidation
+- scripts/run-migrations.sh (create) - Run database migrations safely
+- scripts/smoke-test.sh (create) - Post-deployment smoke tests
+- scripts/rollback.sh (create) - Rollback to previous Lambda version
+- scripts/common.sh (create) - Shared deployment utilities
+- .github/scripts/notify-slack.sh (create) - Slack deployment notifications (optional)
+- package.json (modify) - Add deployment scripts
+- README.md (modify) - Add deployment documentation
+
+**Implementation Notes:**
+- **CI Pipeline Enhancement:**
+  - Already has lint, typecheck, test-node, test-python, build-api, build-frontend
+  - Add: test-collaboration, build-collaboration, security-scan
+  - Run tests in parallel for speed
+  - Cache dependencies (npm, pip) for faster builds
+  - Upload build artifacts for deployment workflows
+  - Fail fast: Stop on first critical error
+- **Dev Deployment Workflow:**
+  - Trigger: Push to main branch (auto-deploy)
+  - Steps:
+    1. Checkout code and download CI artifacts
+    2. Configure AWS credentials (OIDC or long-lived)
+    3. Run database migrations (with backup)
+    4. Deploy Lambda functions (API, AI, Collaboration)
+    5. Deploy frontend to S3
+    6. Invalidate CloudFront cache
+    7. Run smoke tests
+    8. Send Slack notification (success/failure)
+  - Environment: dev
+  - Approval: Not required (auto-deploy)
+- **Prod Deployment Workflow:**
+  - Trigger: Manual workflow_dispatch with tag/commit selection
+  - Require approval from designated approvers
+  - Steps: Same as dev but with additional safety checks
+  - Environment: prod
+  - Deployment strategy: Blue/green (Lambda aliases) or canary (gradual rollout)
+  - Approval: Required before deployment starts
+  - Smoke tests more comprehensive than dev
+- **Lambda Deployment:**
+  - Package code with dependencies as ZIP
+  - Upload to S3 deployment bucket
+  - Update Lambda function code from S3
+  - Publish new version
+  - Update alias (e.g., "live") to point to new version
+  - Keep last 5 versions for rollback
+  - Use environment-specific function names: {service}-{env}
+- **Frontend Deployment:**
+  - Build with Vite (production mode)
+  - Upload to S3 bucket (with versioning)
+  - Set cache headers: index.html (no-cache), assets (1 year cache)
+  - Invalidate CloudFront distribution (/* path)
+  - Wait for invalidation to complete
+- **Database Migrations:**
+  - Run migrations before deploying code
+  - Use node-pg-migrate or similar
+  - Create automatic backup before migration
+  - Test migrations in dev environment first
+  - Rollback capability if migration fails
+  - Locking mechanism to prevent concurrent migrations
+- **Smoke Tests:**
+  - Health check endpoints (API, frontend)
+  - Authentication flow (login test user)
+  - Database connectivity
+  - S3 access (upload test file)
+  - Bedrock access (simple generation test)
+  - Expected duration: <2 minutes
+  - Fail deployment if smoke tests fail
+- **Rollback Mechanism:**
+  - Manual workflow to rollback to previous version
+  - For Lambda: Update alias to point to previous version
+  - For frontend: Restore previous S3 version
+  - For database: Manual rollback (requires careful planning)
+  - Send notification after rollback
+- **Secrets Management:**
+  - GitHub Secrets for sensitive values
+  - AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY (or use OIDC)
+  - DATABASE_URL (dev and prod)
+  - JWT_SECRET (dev and prod)
+  - SENTRY_DSN (dev and prod)
+  - SLACK_WEBHOOK_URL (for notifications)
+  - Never commit secrets to repository
+- **Environment Variables:**
+  - Store in GitHub Environments (dev, prod)
+  - Pass to build scripts via environment
+  - Inject into Lambda function configuration
+  - Frontend: Build-time env vars (VITE_API_URL, etc.)
+- **Build Optimization:**
+  - TypeScript compilation with --sourceMap for debugging
+  - Minification for production builds
+  - Tree-shaking to reduce bundle size
+  - Exclude dev dependencies from Lambda packages
+  - Use Lambda layers for shared dependencies (node_modules)
+- **Monitoring Integration:**
+  - Tag deployments in Sentry (release tracking)
+  - Create CloudWatch annotation for deployments
+  - Log deployment events to CloudWatch
+  - Track deployment metrics (frequency, success rate, duration)
+- **Branch Protection:**
+  - Require PR reviews before merging to main
+  - Require CI checks to pass
+  - Prevent direct pushes to main
+  - Require linear history (rebase/squash)
+- **Infrastructure Deployment:**
+  - Terraform changes deployed manually (not via CI/CD)
+  - Use scripts/deploy-infrastructure.sh
+  - Plan → Review → Apply workflow
+  - Separate state files for dev and prod
+- **Dependencies:**
+  - GitHub Actions runners (ubuntu-latest)
+  - AWS CLI v2
+  - Terraform CLI (for infrastructure changes)
+  - jq (JSON processing in scripts)
+  - curl (smoke tests)
+
+**Time Estimate:** 360 minutes (6 hours)
+- CI pipeline enhancements: 60 minutes
+- Dev deployment workflow: 90 minutes
+- Prod deployment workflow with approvals: 60 minutes
+- Build scripts (API, AI, Collaboration, Frontend): 90 minutes
+- Smoke tests and rollback mechanism: 30 minutes
+- Documentation and testing: 30 minutes
 
 **Acceptance Criteria:**
 - [ ] CI pipeline runs on every PR (lint, test, build)
