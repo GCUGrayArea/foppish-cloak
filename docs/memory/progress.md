@@ -1,6 +1,6 @@
 # Progress
 
-**Last Updated:** 2025-11-10 (Initial creation during planning phase)
+**Last Updated:** 2025-11-13 (AWS Deployment Phase 1 & 2)
 
 This file tracks what actually works, what's left to build, current status of major features, and known issues.
 
@@ -15,8 +15,24 @@ This file tracks what actually works, what's left to build, current status of ma
 - ✅ .gitignore configured for full tech stack
 - ✅ Tech stack decisions made
 
-**Implementation:**
-- ❌ Nothing implemented yet - ready to start Block 1
+**AWS Infrastructure (Phase 1 - COMPLETE):**
+- ✅ 101 AWS resources deployed to us-east-1
+- ✅ RDS PostgreSQL 17 instance running
+- ✅ Lambda functions created (API, AI, WebSocket)
+- ✅ API Gateway REST endpoint responding
+- ✅ API Gateway WebSocket endpoint created
+- ✅ ECR repository with Docker image (AI Lambda)
+- ✅ S3 buckets for documents and Lambda deployments
+- ✅ DynamoDB table for WebSocket connections
+- ✅ Secrets Manager configured
+- ✅ Security groups and VPC networking
+- ✅ AI Lambda bug fixed (circular import resolved)
+
+**What's Partially Working:**
+- ⚠️ API Lambda responding with placeholder code
+- ⚠️ AI Lambda health check passing, but needs testing with real workloads
+- ⚠️ Database exists but schema not initialized (migrations not run)
+- ⚠️ WebSocket API exists but routes not configured
 
 ---
 
@@ -202,19 +218,50 @@ This file tracks what actually works, what's left to build, current status of ma
 ### Environments
 
 **Development:**
-- Status: Not deployed
-- Infrastructure: Not created (PR-003)
-- URL: TBD
+- Status: Infrastructure deployed (Phase 1 complete)
+- Region: us-east-1
+- Infrastructure: 101 resources deployed via Terraform
+- API Endpoint: https://0t0mc3c8p6.execute-api.us-east-1.amazonaws.com/dev/
+- WebSocket Endpoint: wss://x3dmeqo1te.execute-api.us-east-1.amazonaws.com/dev
+- Database: demand-letters-dev-postgres.crws0amqe1e3.us-east-1.rds.amazonaws.com
+- Status: Placeholder Lambda code deployed, schema not initialized
 
 **Production:**
 - Status: Not deployed
-- Infrastructure: Not created (PR-003)
+- Infrastructure: Not created
 - URL: TBD
 
 ### CI/CD Pipeline
 - Status: Not created (PR-001 basic pipeline, PR-025 full pipeline)
 - Automated Tests: Not configured
 - Deployment Automation: Not configured
+- **Recommendation:** Set up GitHub Actions for Linux-based Lambda builds
+
+### Deployment Recommendations for Future Agents
+
+**For Database Migrations:**
+1. ✅ **Recommended:** Package migrations with API Lambda, run from inside VPC
+2. Use AWS RDS Query Editor to execute SQL manually
+3. Create bastion host (EC2 in public subnet) for direct database access
+4. Use AWS Systems Manager Session Manager
+
+**For Lambda Deployments:**
+1. ✅ **Recommended:** Use GitHub Actions CI/CD with Linux runners
+   - Avoids Windows native module build issues
+   - Automated builds on every PR/merge
+   - Consistent build environment
+2. Build on Linux machine or WSL2 with proper Node.js environment
+3. Install Visual Studio Build Tools on Windows (20-30 min setup)
+4. Use Docker for builds (requires proper volume permissions)
+
+**For AI Lambda (Python Docker):**
+1. Build with: `docker buildx build --platform linux/arm64 --provenance=false --sbom=false`
+2. Push to ECR, update Lambda function with new image URI
+3. Always test locally with `docker run` before deploying
+
+**Critical AWS CLI Note:**
+- All AWS CLI commands must use `--region us-east-1` or set `export AWS_DEFAULT_REGION=us-east-1`
+- Terraform uses us-east-1, AWS CLI may default to us-east-2
 
 ---
 

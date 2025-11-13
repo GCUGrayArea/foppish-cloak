@@ -333,9 +333,55 @@ VITE_SENTRY_DSN=<from Sentry>
 
 ## Known Technical Challenges
 
-### To Be Discovered During Implementation
+### Discovered During AWS Deployment (Phase 1 & 2)
 
-**Expected Challenges:**
+**1. Windows Build Environment Issues** ⚠️ CRITICAL
+- **Problem:** Native Node.js modules (bcrypt, @sentry/profiling-node, puppeteer) fail to build on Windows without Visual Studio C++ Build Tools
+- **Impact:** Cannot build Lambda deployment packages locally on Windows
+- **Solutions:**
+  - ✅ **Use GitHub Actions/CI** (Recommended): Build in Linux containers automatically
+  - Use Docker with proper volume permissions for builds
+  - Install Visual Studio Build Tools (20-30 min setup time)
+  - Use WSL2 with proper Node.js environment
+- **Status:** Use CI/CD for production deployments; manual deployment requires Linux environment
+
+**2. RDS Network Isolation** ✅ EXPECTED BEHAVIOR
+- **Problem:** RDS in private subnets cannot be accessed from local machine even with `PubliclyAccessible=true`
+- **Root Cause:** Correct security architecture - private subnets lack internet gateway routing
+- **Solutions:**
+  - ✅ **Run migrations from Lambda** (Recommended): Package migrations with API Lambda, run from inside VPC
+  - Use AWS RDS Query Editor to execute SQL manually
+  - Create bastion host (EC2 in public subnet)
+  - Use AWS Systems Manager Session Manager
+- **Status:** Use Lambda-based migrations or manual SQL execution for schema initialization
+
+**3. AI Lambda Circular Import** ✅ FIXED
+- **Problem:** Lambda crashed with exit code 1 due to module shadowing
+- **Root Cause:** Custom `logging.py` files shadowed Python's builtin `logging` module
+- **Solution:** Renamed to `structured_logging.py` and `bedrock_logging.py`
+- **Prevention:** Avoid module names that match Python standard library
+- **Status:** Fixed in commit 81be339
+
+**4. WebSocket Routes Not Created** ⚠️ KNOWN ISSUE
+- **Problem:** WebSocket API exists but has no routes ($connect, $disconnect, $default)
+- **Root Cause:** Collaboration service not built, so Terraform skipped route creation
+- **Solution:** Build collaboration service and reapply Terraform
+- **Status:** Non-blocking for core functionality; needed for real-time collaboration
+
+**5. Docker Image Media Type Error** ✅ FIXED
+- **Problem:** Lambda rejected Docker image with "unsupported media type" error
+- **Root Cause:** Docker BuildKit attestation/SBOM manifests incompatible with Lambda
+- **Solution:** Build with `--provenance=false --sbom=false` flags
+- **Status:** Fixed; 315MB arm64 image deployed successfully
+
+**6. Region Mismatch (us-east-1 vs us-east-2)** ✅ DOCUMENTED
+- **Problem:** Terraform used us-east-1, AWS CLI defaulted to us-east-2, causing "ghost resources"
+- **Decision:** Stayed in us-east-1 to avoid 30+ min redeployment
+- **Impact:** Must use `--region us-east-1` in all AWS CLI commands or `export AWS_DEFAULT_REGION=us-east-1`
+- **Status:** All infrastructure in us-east-1; documented in deployment notes
+
+**Expected Challenges (Not Yet Encountered):**
+
 1. **Lambda Cold Starts:** Python Lambda with large dependencies may have slow cold starts
    - Mitigation: Use Lambda layers, container images, or provisioned concurrency
 
@@ -353,8 +399,6 @@ VITE_SENTRY_DSN=<from Sentry>
 
 6. **Multi-Tenant Data Isolation:** Ensuring no cross-firm data leaks
    - Mitigation: Comprehensive testing, middleware enforcement, database constraints
-
-**This section will be updated as challenges are discovered and solved.**
 
 ---
 
