@@ -14,7 +14,7 @@ import time
 from datetime import datetime
 from typing import Dict, Optional, Any
 from contextlib import contextmanager
-from .logging import logger
+from .structured_logging import logger
 
 
 class MetricsCollector:

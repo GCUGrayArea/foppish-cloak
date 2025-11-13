@@ -419,7 +419,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         "Lambda invocation started",
         extra={
             "correlation_id": correlation_id,
-            "request_id": context.request_id if context else "unknown",
+            "request_id": context.aws_request_id if context else "unknown",
             "path": event.get("path"),
             "http_method": event.get("httpMethod"),
         },

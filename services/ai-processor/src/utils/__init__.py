@@ -1,6 +1,6 @@
 """Utility modules for AI processor service."""
 
-from .logging import (
+from .bedrock_logging import (
     generate_correlation_id,
     log_bedrock_error,
     log_bedrock_request,
