@@ -1,7 +1,7 @@
 # ECR Repository for AI Processor Lambda Container Images
 
 resource "aws_ecr_repository" "ai_processor" {
-  name                 = "${local.name_prefix}-ai-processor"
+  name                 = "${local.name_prefix}-ai-proc-v2"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
