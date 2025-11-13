@@ -178,7 +178,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_high_cpu" {
   treat_missing_data  = "notBreaching"
 
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.main.id
+    DBInstanceIdentifier = aws_db_instance.postgres.id
   }
 
   tags = local.common_tags
@@ -199,7 +199,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_high_connections" {
   treat_missing_data  = "notBreaching"
 
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.main.id
+    DBInstanceIdentifier = aws_db_instance.postgres.id
   }
 
   tags = local.common_tags
@@ -220,7 +220,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_low_storage" {
   treat_missing_data  = "notBreaching"
 
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.main.id
+    DBInstanceIdentifier = aws_db_instance.postgres.id
   }
 
   tags = local.common_tags

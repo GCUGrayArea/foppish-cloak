@@ -23,7 +23,7 @@ resource "aws_lambda_function" "ai_processor" {
 
   # VPC configuration for RDS access
   vpc_config {
-    subnet_ids         = aws_subnet.private[*].id
+    subnet_ids         = data.aws_subnets.default.ids
     security_group_ids = [aws_security_group.lambda.id]
   }
 
@@ -98,63 +98,8 @@ resource "aws_lambda_alias" "ai_live" {
   }
 }
 
-# CloudWatch Alarms for AI Lambda
-resource "aws_cloudwatch_metric_alarm" "ai_lambda_errors" {
-  alarm_name          = "${local.name_prefix}-ai-lambda-errors"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "2"
-  metric_name         = "Errors"
-  namespace           = "AWS/Lambda"
-  period              = "300"
-  statistic           = "Sum"
-  threshold           = "5"
-  alarm_description   = "AI Lambda function has too many errors"
-  alarm_actions       = [] # Add SNS topic ARN for notifications
-
-  dimensions = {
-    FunctionName = aws_lambda_function.ai_processor.function_name
-  }
-
-  tags = local.common_tags
-}
-
-resource "aws_cloudwatch_metric_alarm" "ai_lambda_throttles" {
-  alarm_name          = "${local.name_prefix}-ai-lambda-throttles"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "1"
-  metric_name         = "Throttles"
-  namespace           = "AWS/Lambda"
-  period              = "300"
-  statistic           = "Sum"
-  threshold           = "3"
-  alarm_description   = "AI Lambda function is being throttled"
-  alarm_actions       = [] # Add SNS topic ARN for notifications
-
-  dimensions = {
-    FunctionName = aws_lambda_function.ai_processor.function_name
-  }
-
-  tags = local.common_tags
-}
-
-resource "aws_cloudwatch_metric_alarm" "ai_lambda_duration" {
-  alarm_name          = "${local.name_prefix}-ai-lambda-duration"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "2"
-  metric_name         = "Duration"
-  namespace           = "AWS/Lambda"
-  period              = "300"
-  statistic           = "Average"
-  threshold           = "270000" # 270 seconds (out of 300 second timeout)
-  alarm_description   = "AI Lambda function duration is too high"
-  alarm_actions       = [] # Add SNS topic ARN for notifications
-
-  dimensions = {
-    FunctionName = aws_lambda_function.ai_processor.function_name
-  }
-
-  tags = local.common_tags
-}
+# Note: CloudWatch alarms for AI Lambda (errors, throttles, duration) are defined in alarms.tf
+# to avoid duplication and ensure proper integration with SNS topics
 
 # CloudWatch Metric Filter for Bedrock Token Usage (for cost tracking)
 resource "aws_cloudwatch_log_metric_filter" "bedrock_tokens" {

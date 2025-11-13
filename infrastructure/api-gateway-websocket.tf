@@ -58,7 +58,7 @@ data "archive_file" "websocket_placeholder" {
         return {
           statusCode: 200,
           body: JSON.stringify({
-            message: `WebSocket ${routeKey} - placeholder`,
+            message: `WebSocket $${routeKey} - placeholder`,
             routeKey
           })
         };

@@ -32,7 +32,7 @@ resource "aws_lambda_function" "websocket_collaboration" {
     variables = {
       ENVIRONMENT            = var.environment
       CONNECTIONS_TABLE_NAME = aws_dynamodb_table.websocket_connections.name
-      DATABASE_URL           = "postgresql://${aws_db_instance.postgres.username}:${random_password.db_password.result}@${aws_db_instance.postgres.endpoint}/${aws_db_instance.postgres.db_name}"
+      DATABASE_URL           = "postgresql://${aws_db_instance.postgres.username}:${random_password.db_master_password.result}@${aws_db_instance.postgres.endpoint}/${aws_db_instance.postgres.db_name}"
       JWT_SECRET             = random_password.jwt_secret.result
       AWS_REGION_CUSTOM      = var.aws_region
       NODE_ENV               = var.environment
@@ -40,7 +40,7 @@ resource "aws_lambda_function" "websocket_collaboration" {
   }
 
   vpc_config {
-    subnet_ids         = aws_subnet.private[*].id
+    subnet_ids         = data.aws_subnets.default.ids
     security_group_ids = [aws_security_group.lambda.id]
   }
 

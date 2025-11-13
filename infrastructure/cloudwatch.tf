@@ -103,7 +103,7 @@ resource "aws_cloudwatch_composite_alarm" "system_health" {
   actions_enabled     = true
   alarm_actions       = [] # Add SNS topic ARN for notifications
 
-  alarm_rule = "ALARM(${aws_cloudwatch_metric_alarm.api_lambda_errors.alarm_name}) OR ALARM(${aws_cloudwatch_metric_alarm.ai_lambda_errors.alarm_name}) OR ALARM(${aws_cloudwatch_metric_alarm.rds_cpu.alarm_name})"
+  alarm_rule = "ALARM(${aws_cloudwatch_metric_alarm.api_lambda_high_errors.alarm_name}) OR ALARM(${aws_cloudwatch_metric_alarm.ai_lambda_high_errors.alarm_name}) OR ALARM(${aws_cloudwatch_metric_alarm.rds_high_cpu.alarm_name})"
 
   tags = local.common_tags
 }

@@ -9,10 +9,10 @@ resource "random_password" "db_master_password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-# DB Subnet Group spanning private subnets
+# DB Subnet Group spanning Default VPC subnets
 resource "aws_db_subnet_group" "main" {
   name       = "${local.name_prefix}-db-subnet-group"
-  subnet_ids = aws_subnet.private[*].id
+  subnet_ids = data.aws_subnets.default.ids
 
   tags = merge(
     local.common_tags,
@@ -131,60 +131,5 @@ resource "aws_secretsmanager_secret_version" "db_credentials" {
   })
 }
 
-# CloudWatch Alarms for RDS
-resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
-  alarm_name          = "${local.name_prefix}-rds-high-cpu"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "2"
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/RDS"
-  period              = "300"
-  statistic           = "Average"
-  threshold           = "80"
-  alarm_description   = "RDS CPU utilization is too high"
-  alarm_actions       = [] # Add SNS topic ARN for notifications
-
-  dimensions = {
-    DBInstanceIdentifier = aws_db_instance.postgres.id
-  }
-
-  tags = local.common_tags
-}
-
-resource "aws_cloudwatch_metric_alarm" "rds_storage" {
-  alarm_name          = "${local.name_prefix}-rds-low-storage"
-  comparison_operator = "LessThanThreshold"
-  evaluation_periods  = "1"
-  metric_name         = "FreeStorageSpace"
-  namespace           = "AWS/RDS"
-  period              = "300"
-  statistic           = "Average"
-  threshold           = "5000000000" # 5GB in bytes
-  alarm_description   = "RDS free storage space is too low"
-  alarm_actions       = [] # Add SNS topic ARN for notifications
-
-  dimensions = {
-    DBInstanceIdentifier = aws_db_instance.postgres.id
-  }
-
-  tags = local.common_tags
-}
-
-resource "aws_cloudwatch_metric_alarm" "rds_connections" {
-  alarm_name          = "${local.name_prefix}-rds-high-connections"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "1"
-  metric_name         = "DatabaseConnections"
-  namespace           = "AWS/RDS"
-  period              = "300"
-  statistic           = "Average"
-  threshold           = "80"
-  alarm_description   = "RDS has too many database connections"
-  alarm_actions       = [] # Add SNS topic ARN for notifications
-
-  dimensions = {
-    DBInstanceIdentifier = aws_db_instance.postgres.id
-  }
-
-  tags = local.common_tags
-}
+# Note: CloudWatch alarms for RDS are defined in alarms.tf
+# to avoid duplication and ensure proper integration with SNS topics

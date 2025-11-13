@@ -43,7 +43,7 @@ resource "aws_lambda_function" "api" {
 
   # VPC configuration for RDS access
   vpc_config {
-    subnet_ids         = aws_subnet.private[*].id
+    subnet_ids         = data.aws_subnets.default.ids
     security_group_ids = [aws_security_group.lambda.id]
   }
 
@@ -139,60 +139,5 @@ resource "aws_lambda_permission" "api_gateway" {
   source_arn    = "${aws_api_gateway_rest_api.main.execution_arn}/*"
 }
 
-# CloudWatch Alarms for API Lambda
-resource "aws_cloudwatch_metric_alarm" "api_lambda_errors" {
-  alarm_name          = "${local.name_prefix}-api-lambda-errors"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "2"
-  metric_name         = "Errors"
-  namespace           = "AWS/Lambda"
-  period              = "300"
-  statistic           = "Sum"
-  threshold           = "5"
-  alarm_description   = "API Lambda function has too many errors"
-  alarm_actions       = [] # Add SNS topic ARN for notifications
-
-  dimensions = {
-    FunctionName = aws_lambda_function.api.function_name
-  }
-
-  tags = local.common_tags
-}
-
-resource "aws_cloudwatch_metric_alarm" "api_lambda_throttles" {
-  alarm_name          = "${local.name_prefix}-api-lambda-throttles"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "1"
-  metric_name         = "Throttles"
-  namespace           = "AWS/Lambda"
-  period              = "300"
-  statistic           = "Sum"
-  threshold           = "10"
-  alarm_description   = "API Lambda function is being throttled"
-  alarm_actions       = [] # Add SNS topic ARN for notifications
-
-  dimensions = {
-    FunctionName = aws_lambda_function.api.function_name
-  }
-
-  tags = local.common_tags
-}
-
-resource "aws_cloudwatch_metric_alarm" "api_lambda_duration" {
-  alarm_name          = "${local.name_prefix}-api-lambda-duration"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "2"
-  metric_name         = "Duration"
-  namespace           = "AWS/Lambda"
-  period              = "300"
-  statistic           = "Average"
-  threshold           = "25000" # 25 seconds (out of 30 second timeout)
-  alarm_description   = "API Lambda function duration is too high"
-  alarm_actions       = [] # Add SNS topic ARN for notifications
-
-  dimensions = {
-    FunctionName = aws_lambda_function.api.function_name
-  }
-
-  tags = local.common_tags
-}
+# Note: CloudWatch alarms for API Lambda are defined in alarms.tf
+# to avoid duplication and ensure proper integration with SNS topics

@@ -3,7 +3,7 @@
 
 # X-Ray Sampling Rule - controls which requests are traced
 resource "aws_xray_sampling_rule" "main" {
-  rule_name      = "${local.name_prefix}-sampling-rule"
+  rule_name      = "${var.project_name}-${var.environment}-main"
   priority       = 1000
   version        = 1
   reservoir_size = 1 # Always trace at least 1 request per second
@@ -22,7 +22,7 @@ resource "aws_xray_sampling_rule" "main" {
 
 # Higher sampling rate for error traces
 resource "aws_xray_sampling_rule" "errors" {
-  rule_name      = "${local.name_prefix}-errors-sampling"
+  rule_name      = "${var.project_name}-${var.environment}-errors"
   priority       = 100 # Higher priority (lower number)
   version        = 1
   reservoir_size = 5
@@ -170,12 +170,12 @@ resource "aws_iam_policy" "xray" {
 
 # Attach X-Ray policy to Lambda execution roles
 resource "aws_iam_role_policy_attachment" "api_lambda_xray" {
-  role       = aws_iam_role.lambda_api_exec.name
+  role       = aws_iam_role.lambda_api.name
   policy_arn = aws_iam_policy.xray.arn
 }
 
 resource "aws_iam_role_policy_attachment" "ai_lambda_xray" {
-  role       = aws_iam_role.lambda_ai_exec.name
+  role       = aws_iam_role.lambda_ai.name
   policy_arn = aws_iam_policy.xray.arn
 }
 
