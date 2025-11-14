@@ -5,7 +5,6 @@
 import request from 'supertest';
 import express from 'express';
 import demandLettersRouter from '../../services/api/src/routes/demand-letters';
-import { firmContextMiddleware } from '../../services/api/src/middleware/firmContext';
 import { DemandLetterModel } from '../../services/api/src/db/models/DemandLetter';
 import { FirmModel } from '../../services/api/src/db/models/Firm';
 import { UserModel } from '../../services/api/src/db/models/User';

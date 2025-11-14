@@ -21,6 +21,10 @@ describe('DemandLetterService', () => {
     service = new DemandLetterService();
 
     mockDemandLetterModel = DemandLetterModel as jest.Mocked<typeof DemandLetterModel>;
+
+    // Mock pool.query for enrichLetterDetails
+    const mockPool = require('../../../services/api/src/db/connection').pool;
+    mockPool.query = jest.fn().mockResolvedValue({ rows: [] });
   });
 
   describe('createDemandLetter', () => {
@@ -37,6 +41,7 @@ describe('DemandLetterService', () => {
       };
 
       mockDemandLetterModel.create.mockResolvedValue(mockLetter);
+      mockDemandLetterModel.findById.mockResolvedValue(mockLetter);
 
       const result = await service.createDemandLetter(
         {
@@ -69,6 +74,19 @@ describe('DemandLetterService', () => {
       };
 
       mockDemandLetterModel.create.mockResolvedValue(mockLetter);
+      mockDemandLetterModel.findById.mockResolvedValue(mockLetter);
+
+      // Mock DocumentService.getDocumentById for associateDocuments
+      const { DocumentService } = require('../../../services/api/src/services/DocumentService');
+      DocumentService.prototype.getDocumentById = jest.fn().mockResolvedValue({
+        id: 'doc-1',
+        filename: 'test.pdf',
+        fileType: 'application/pdf',
+      });
+
+      // Mock pool.query for document association
+      const mockPool = require('../../../services/api/src/db/connection').pool;
+      mockPool.query.mockResolvedValue({ rows: [] });
 
       await service.createDemandLetter(
         {
@@ -79,7 +97,7 @@ describe('DemandLetterService', () => {
         'user-123'
       );
 
-      // Would verify document association calls
+      expect(DocumentService.prototype.getDocumentById).toHaveBeenCalled();
     });
   });
 

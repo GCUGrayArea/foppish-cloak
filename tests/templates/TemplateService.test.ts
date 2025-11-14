@@ -108,8 +108,7 @@ describe('TemplateService', () => {
       ).rejects.toThrow('TEMPLATE_NAME_EXISTS');
 
       expect(client.query).toHaveBeenCalledWith(
-        expect.stringContaining('ROLLBACK'),
-        undefined
+        expect.stringContaining('ROLLBACK')
       );
     });
 
@@ -220,7 +219,26 @@ describe('TemplateService', () => {
       mockPool.connect.mockResolvedValue(client);
 
       // Mock getTemplateById
-      mockPool.query.mockResolvedValue({ rows: [] });
+      mockPool.query.mockResolvedValueOnce({
+        rows: [{
+          id: 'template-123',
+          firm_id: 'firm-123',
+          name: 'Template',
+          description: null,
+          is_default: false,
+          created_at: new Date(),
+          updated_at: new Date(),
+          creator_id: 'user-123',
+          creator_name: 'Test User',
+          version_id: 'version-123',
+          version_number: 3,
+          content: 'Updated content with {{new_variable}}',
+          variables: ['new_variable'],
+          version_created_at: new Date(),
+          version_creator_id: 'user-123',
+          version_creator_name: 'Test User'
+        }]
+      }).mockResolvedValueOnce({ rows: [] }); // version history
 
       const data: UpdateTemplateRequest = {
         content: 'Updated content with {{new_variable}}'
@@ -251,7 +269,26 @@ describe('TemplateService', () => {
       mockPool.connect.mockResolvedValue(client);
 
       // Mock getTemplateById
-      mockPool.query.mockResolvedValue({ rows: [] });
+      mockPool.query.mockResolvedValueOnce({
+        rows: [{
+          id: 'template-123',
+          firm_id: 'firm-123',
+          name: 'Updated Name',
+          description: 'Updated description',
+          is_default: false,
+          created_at: new Date(),
+          updated_at: new Date(),
+          creator_id: 'user-123',
+          creator_name: 'Test User',
+          version_id: 'version-123',
+          version_number: 1,
+          content: 'Content',
+          variables: [],
+          version_created_at: new Date(),
+          version_creator_id: 'user-123',
+          version_creator_name: 'Test User'
+        }]
+      }).mockResolvedValueOnce({ rows: [] }); // version history
 
       const data: UpdateTemplateRequest = {
         name: 'Updated Name',
@@ -323,7 +360,26 @@ describe('TemplateService', () => {
       mockPool.connect.mockResolvedValue(client);
 
       // Mock getTemplateById
-      mockPool.query.mockResolvedValue({ rows: [] });
+      mockPool.query.mockResolvedValueOnce({
+        rows: [{
+          id: 'template-123',
+          firm_id: 'firm-123',
+          name: 'Template',
+          description: null,
+          is_default: false,
+          created_at: new Date(),
+          updated_at: new Date(),
+          creator_id: 'user-123',
+          creator_name: 'Test User',
+          version_id: 'version-456',
+          version_number: 2,
+          content: 'Content',
+          variables: [],
+          version_created_at: new Date(),
+          version_creator_id: 'user-123',
+          version_creator_name: 'Test User'
+        }]
+      }).mockResolvedValueOnce({ rows: [] }); // version history
 
       await expect(
         service.rollbackToVersion('template-123', 'firm-123', 'version-456')

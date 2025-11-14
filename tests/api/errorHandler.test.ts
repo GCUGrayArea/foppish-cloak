@@ -305,7 +305,7 @@ describe('Error Handler Middleware', () => {
       notFoundHandler(mockReq as Request, mockRes as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalled();
-      const error = mockNext.mock.calls[0][0];
+      const error = (mockNext as jest.Mock).mock.calls[0][0];
       expect(error).toBeInstanceOf(NotFoundError);
       expect(error.message).toBe('Endpoint not found');
     });

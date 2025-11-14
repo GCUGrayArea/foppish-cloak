@@ -17,9 +17,6 @@ import { pool } from '../../services/api/src/db/connection';
 describe.skip('Demand Letter Workflow Integration', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let authToken: string = '';
-  let firmId: string = '';
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let userId: string = '';
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let documentId: string = '';
   let letterId: string = '';
