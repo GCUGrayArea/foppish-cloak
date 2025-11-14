@@ -26,6 +26,66 @@ const router = Router();
 const templateService = new TemplateService();
 
 /**
+ * Validate template update request
+ *
+ * @param req - Request object
+ * @param res - Response object
+ * @returns Validated data or null if validation failed (response already sent)
+ */
+function validateTemplateUpdate(
+  req: AuthenticatedRequest,
+  res: Response
+): { user: any; data: any } | null {
+  const user = req.user;
+
+  if (!user) {
+    res.status(401).json({
+      error: 'Not authenticated',
+      code: 'NOT_AUTHENTICATED'
+    });
+    return null;
+  }
+
+  // Verify admin role
+  if (user.role !== 'admin') {
+    res.status(403).json({
+      error: 'Admin access required',
+      code: 'INSUFFICIENT_PERMISSIONS'
+    });
+    return null;
+  }
+
+  // Validate request body
+  const validation = updateTemplateSchema.safeParse(req.body);
+  if (!validation.success) {
+    res.status(400).json({
+      error: 'Invalid request data',
+      code: 'INVALID_INPUT',
+      details: validation.error.errors
+    });
+    return null;
+  }
+
+  const data = validation.data;
+
+  // Validate content if provided
+  if (data.content) {
+    const contentValidation = validateTemplateContent(data.content);
+    if (!contentValidation.valid) {
+      res.status(400).json({
+        error: 'Invalid template content',
+        code: 'INVALID_TEMPLATE_CONTENT',
+        details: contentValidation.errors
+      });
+      return null;
+    }
+  }
+
+  return { user, data };
+}
+
+
+/**
  * Rollback request schema
  */
 const rollbackSchema = z.object({

@@ -153,31 +153,16 @@ export class DemandLetterService {
     );
 
     try {
-      // Get template variables if template specified
-      const templateVariables = await this.getTemplateVariables(
-        request.templateId,
+      // Generate letter using AI service
+      const generatedLetter = await this.performLetterGeneration(
+        request,
+        letter,
+        userId,
         firmId
       );
 
-      // Generate letter using AI service
-      const generationResult = await this.aiService.generateLetter({
-        caseId: request.letterId,
-        extractedData: letter.extractedData,
-        templateVariables,
-        tone: request.tone || 'formal',
-        customInstructions: request.customInstructions,
-        firmId,
-        userId,
-      });
-
-      if (!generationResult.success || !generationResult.letter) {
-        throw new Error(
-          generationResult.errorMessage || 'Letter generation failed'
-        );
-      }
-
       // Convert sections to content
-      const content = this.sectionsToContent(generationResult.letter.sections);
+      const content = this.sectionsToContent(generatedLetter.letter.sections);
 
       // Create initial revision
       await this.createRevision(
@@ -189,15 +174,12 @@ export class DemandLetterService {
       );
 
       // Update letter with generated content
-      await DemandLetterModel.update(request.letterId, firmId, {
-        current_content: content,
-        status: 'draft',
-        generation_metadata: {
-          model: generationResult.modelId,
-          generatedAt: generationResult.generationTimestamp,
-          tokenUsage: generationResult.tokenUsage,
-        },
-      });
+      await this.updateLetterWithGeneratedContent(
+        request.letterId,
+        firmId,
+        content,
+        generatedLetter
+      );
 
       // Transition to generated state
       await this.updateLetterStatus(
@@ -216,6 +198,72 @@ export class DemandLetterService {
         `Letter generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
+  }
+
+  /**
+   * Perform letter generation using AI service
+   *
+   * @param request - Generation request
+   * @param letter - Current letter details
+   * @param userId - User ID
+   * @param firmId - Firm ID
+   * @returns Generation result
+   */
+  private async performLetterGeneration(
+    request: GenerateDemandLetterRequest,
+    letter: DemandLetterDetails,
+    userId: string,
+    firmId: string
+  ): Promise<any> {
+    // Get template variables if template specified
+    const templateVariables = await this.getTemplateVariables(
+      request.templateId,
+      firmId
+    );
+
+    // Generate letter using AI service
+    const generationResult = await this.aiService.generateLetter({
+      caseId: request.letterId,
+      extractedData: letter.extractedData,
+      templateVariables,
+      tone: request.tone || 'formal',
+      customInstructions: request.customInstructions,
+      firmId,
+      userId,
+    });
+
+    if (!generationResult.success || !generationResult.letter) {
+      throw new Error(
+        generationResult.errorMessage || 'Letter generation failed'
+      );
+    }
+
+    return generationResult;
+  }
+
+  /**
+   * Update letter with generated content and metadata
+   *
+   * @param letterId - Letter ID
+   * @param firmId - Firm ID
+   * @param content - Generated content
+   * @param generationResult - Generation result with metadata
+   */
+  private async updateLetterWithGeneratedContent(
+    letterId: string,
+    firmId: string,
+    content: string,
+    generationResult: any
+  ): Promise<void> {
+    await DemandLetterModel.update(letterId, firmId, {
+      current_content: content,
+      status: 'draft',
+      generation_metadata: {
+        model: generationResult.modelId,
+        generatedAt: generationResult.generationTimestamp,
+        tokenUsage: generationResult.tokenUsage,
+      },
+    });
   }
 
   /**
@@ -240,65 +288,31 @@ export class DemandLetterService {
     );
 
     try {
-      // Parse current content into sections
-      const currentLetter = this.contentToSections(
-        letter.currentContent || '',
-        letter.generationMetadata
-      );
-
-      // Get conversation history if exists
-      const conversationHistory = await this.getConversationHistory(
-        request.letterId
-      );
-
-      // Refine letter using AI service
-      const refinementResult = await this.aiService.refineLetter({
-        letterId: request.letterId,
-        currentLetter,
-        feedback: {
-          instruction: request.feedback,
-          sections: request.sections,
-        },
-        conversationHistory,
-        firmId,
+      // Refine the letter using AI service
+      const refinedContent = await this.performLetterRefinement(
+        request,
+        letter,
         userId,
-      });
-
-      if (!refinementResult.success || !refinementResult.refinedLetter) {
-        throw new Error(
-          refinementResult.errorMessage || 'Letter refinement failed'
-        );
-      }
-
-      // Convert sections to content
-      const refinedContent = this.sectionsToContent(
-        refinementResult.refinedLetter.sections
+        firmId
       );
 
       // Create refinement revision
       await this.createRevision(
         request.letterId,
-        refinedContent,
+        refinedContent.content,
         'ai_refinement',
         userId,
-        refinementResult.changesSummary || 'AI refinement'
+        refinedContent.summary
       );
 
-      // Update letter
-      const currentMeta = letter.generationMetadata || {};
-      await DemandLetterModel.update(request.letterId, firmId, {
-        current_content: refinedContent,
-        status: 'draft',
-        generation_metadata: {
-          ...currentMeta,
-          lastRefinedAt: refinementResult.refinementTimestamp,
-          refinementCount: (currentMeta.refinementCount || 0) + 1,
-          totalTokens:
-            (currentMeta.totalTokens || 0) +
-            refinementResult.tokenUsage.inputTokens +
-            refinementResult.tokenUsage.outputTokens,
-        },
-      });
+      // Update letter with refined content and metadata
+      await this.updateLetterWithRefinedContent(
+        request.letterId,
+        firmId,
+        refinedContent.content,
+        letter.generationMetadata,
+        refinedContent.tokenUsage
+      );
 
       // Transition back to generated state
       await this.updateLetterStatus(
@@ -317,6 +331,95 @@ export class DemandLetterService {
         `Letter refinement failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
+  }
+
+  /**
+   * Perform letter refinement using AI service
+   *
+   * @param request - Refinement request
+   * @param letter - Current letter details
+   * @param userId - User ID
+   * @param firmId - Firm ID
+   * @returns Refined content, summary, and token usage
+   */
+  private async performLetterRefinement(
+    request: RefineDemandLetterRequest,
+    letter: DemandLetterDetails,
+    userId: string,
+    firmId: string
+  ): Promise<{ content: string; summary: string; tokenUsage: any }> {
+    // Parse current content into sections
+    const currentLetter = this.contentToSections(
+      letter.currentContent || '',
+      letter.generationMetadata
+    );
+
+    // Get conversation history if exists
+    const conversationHistory = await this.getConversationHistory(
+      request.letterId
+    );
+
+    // Refine letter using AI service
+    const refinementResult = await this.aiService.refineLetter({
+      letterId: request.letterId,
+      currentLetter,
+      feedback: {
+        instruction: request.feedback,
+        sections: request.sections,
+      },
+      conversationHistory,
+      firmId,
+      userId,
+    });
+
+    if (!refinementResult.success || !refinementResult.refinedLetter) {
+      throw new Error(
+        refinementResult.errorMessage || 'Letter refinement failed'
+      );
+    }
+
+    // Convert sections to content
+    const refinedContent = this.sectionsToContent(
+      refinementResult.refinedLetter.sections
+    );
+
+    return {
+      content: refinedContent,
+      summary: refinementResult.changesSummary || 'AI refinement',
+      tokenUsage: refinementResult.tokenUsage
+    };
+  }
+
+  /**
+   * Update letter with refined content and metadata
+   *
+   * @param letterId - Letter ID
+   * @param firmId - Firm ID
+   * @param content - Refined content
+   * @param currentMetadata - Current generation metadata
+   * @param tokenUsage - Token usage from refinement
+   */
+  private async updateLetterWithRefinedContent(
+    letterId: string,
+    firmId: string,
+    content: string,
+    currentMetadata: Record<string, any> | undefined,
+    tokenUsage: any
+  ): Promise<void> {
+    const metadata = currentMetadata || {};
+    await DemandLetterModel.update(letterId, firmId, {
+      current_content: content,
+      status: 'draft',
+      generation_metadata: {
+        ...metadata,
+        lastRefinedAt: new Date().toISOString(),
+        refinementCount: (metadata.refinementCount || 0) + 1,
+        totalTokens:
+          (metadata.totalTokens || 0) +
+          tokenUsage.inputTokens +
+          tokenUsage.outputTokens,
+      },
+    });
   }
 
   /**

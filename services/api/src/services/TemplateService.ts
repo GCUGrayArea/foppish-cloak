@@ -150,6 +150,20 @@ export class TemplateService {
     const row = templateResult.rows[0];
 
     // Get version history
+    const versionHistory = await this.getVersionHistory(templateId);
+
+    return this.enrichTemplateDetails(row, versionHistory);
+  }
+
+  /**
+   * Get version history for a template
+   *
+   * @param templateId - Template UUID
+   * @returns Array of version history items
+   */
+  private async getVersionHistory(
+    templateId: string
+  ): Promise<VersionHistoryItem[]> {
     const historyQuery = `
       SELECT
         tv.id, tv.version_number, tv.created_at,
@@ -161,13 +175,25 @@ export class TemplateService {
     `;
 
     const historyResult = await this.pool.query(historyQuery, [templateId]);
-    const versionHistory: VersionHistoryItem[] = historyResult.rows.map(v => ({
+    return historyResult.rows.map(v => ({
       id: v.id,
       versionNumber: v.version_number,
       createdBy: v.creator_name,
       createdAt: v.created_at.toISOString()
     }));
+  }
 
+  /**
+   * Enrich template row data into full response object
+   *
+   * @param row - Database row data
+   * @param versionHistory - Version history items
+   * @returns Enriched template details
+   */
+  private enrichTemplateDetails(
+    row: any,
+    versionHistory: VersionHistoryItem[]
+  ): TemplateDetailResponse {
     return {
       id: row.id,
       firmId: row.firm_id,
@@ -297,86 +323,30 @@ export class TemplateService {
       await client.query('BEGIN');
 
       // Verify template exists and belongs to firm
-      const existingTemplate = await client.query(
-        'SELECT id, name FROM templates WHERE id = $1 AND firm_id = $2',
-        [templateId, firmId]
+      const existingTemplate = await this.verifyTemplateExists(
+        client,
+        templateId,
+        firmId
       );
 
-      if (existingTemplate.rows.length === 0) {
-        throw new Error('TEMPLATE_NOT_FOUND');
-      }
-
       // Check for name conflict if name is being changed
-      if (data.name && data.name !== existingTemplate.rows[0].name) {
-        const duplicateCheck = await client.query(
-          'SELECT id FROM templates WHERE firm_id = $1 AND name = $2 AND id != $3',
-          [firmId, data.name, templateId]
-        );
-
-        if (duplicateCheck.rows.length > 0) {
-          throw new Error('TEMPLATE_NAME_EXISTS');
-        }
+      if (data.name && data.name !== existingTemplate.name) {
+        await this.checkNameConflict(client, firmId, data.name, templateId);
       }
 
       // Handle content update (creates new version)
       if (data.content) {
-        const sanitizedContent = sanitizeTemplateContent(data.content);
-        const variables = extractVariables(sanitizedContent);
-
-        // Get current max version number
-        const maxVersionResult = await client.query(
-          'SELECT COALESCE(MAX(version_number), 0) as max_version FROM template_versions WHERE template_id = $1',
-          [templateId]
-        );
-
-        const nextVersion = maxVersionResult.rows[0].max_version + 1;
-
-        // Create new version
-        const versionResult = await client.query(
-          `INSERT INTO template_versions
-           (template_id, version_number, content, variables, created_by)
-           VALUES ($1, $2, $3, $4, $5)
-           RETURNING id`,
-          [templateId, nextVersion, sanitizedContent, JSON.stringify(variables), userId]
-        );
-
-        const newVersionId = versionResult.rows[0].id;
-
-        // Update template's current version
-        await client.query(
-          'UPDATE templates SET current_version_id = $1, updated_at = NOW() WHERE id = $2',
-          [newVersionId, templateId]
+        await this.createNewTemplateVersion(
+          client,
+          templateId,
+          data.content,
+          userId
         );
       }
 
       // Handle metadata updates (name, description)
-      const metadataUpdates: string[] = [];
-      const metadataValues: any[] = [];
-      let paramCount = 1;
-
-      if (data.name) {
-        metadataUpdates.push(`name = $${paramCount}`);
-        metadataValues.push(data.name);
-        paramCount++;
-      }
-
-      if (data.description !== undefined) {
-        metadataUpdates.push(`description = $${paramCount}`);
-        metadataValues.push(data.description || null);
-        paramCount++;
-      }
-
-      if (metadataUpdates.length > 0) {
-        metadataUpdates.push('updated_at = NOW()');
-        metadataValues.push(templateId);
-
-        const updateQuery = `
-          UPDATE templates
-          SET ${metadataUpdates.join(', ')}
-          WHERE id = $${paramCount}
-        `;
-
-        await client.query(updateQuery, metadataValues);
+      if (data.name || data.description !== undefined) {
+        await this.updateTemplateMetadata(client, templateId, data);
       }
 
       await client.query('COMMIT');
@@ -387,6 +357,144 @@ export class TemplateService {
       throw error;
     } finally {
       client.release();
+    }
+  }
+
+  /**
+   * Verify template exists and belongs to firm
+   *
+   * @param client - Database client
+   * @param templateId - Template UUID
+   * @param firmId - Firm UUID
+   * @returns Template record
+   * @throws Error if template not found
+   */
+  private async verifyTemplateExists(
+    client: any,
+    templateId: string,
+    firmId: string
+  ): Promise<{ id: string; name: string }> {
+    const result = await client.query(
+      'SELECT id, name FROM templates WHERE id = $1 AND firm_id = $2',
+      [templateId, firmId]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('TEMPLATE_NOT_FOUND');
+    }
+
+    return result.rows[0];
+  }
+
+  /**
+   * Check for template name conflict
+   *
+   * @param client - Database client
+   * @param firmId - Firm UUID
+   * @param name - Template name to check
+   * @param excludeId - Template ID to exclude from check
+   * @throws Error if name already exists
+   */
+  private async checkNameConflict(
+    client: any,
+    firmId: string,
+    name: string,
+    excludeId?: string
+  ): Promise<void> {
+    const query = excludeId
+      ? 'SELECT id FROM templates WHERE firm_id = $1 AND name = $2 AND id != $3'
+      : 'SELECT id FROM templates WHERE firm_id = $1 AND name = $2';
+
+    const params = excludeId ? [firmId, name, excludeId] : [firmId, name];
+    const result = await client.query(query, params);
+
+    if (result.rows.length > 0) {
+      throw new Error('TEMPLATE_NAME_EXISTS');
+    }
+  }
+
+  /**
+   * Create new template version with content
+   *
+   * @param client - Database client
+   * @param templateId - Template UUID
+   * @param content - Template content
+   * @param userId - User creating the version
+   */
+  private async createNewTemplateVersion(
+    client: any,
+    templateId: string,
+    content: string,
+    userId: string
+  ): Promise<void> {
+    const sanitizedContent = sanitizeTemplateContent(content);
+    const variables = extractVariables(sanitizedContent);
+
+    // Get current max version number
+    const maxVersionResult = await client.query(
+      'SELECT COALESCE(MAX(version_number), 0) as max_version FROM template_versions WHERE template_id = $1',
+      [templateId]
+    );
+
+    const nextVersion = maxVersionResult.rows[0].max_version + 1;
+
+    // Create new version
+    const versionResult = await client.query(
+      `INSERT INTO template_versions
+       (template_id, version_number, content, variables, created_by)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id`,
+      [templateId, nextVersion, sanitizedContent, JSON.stringify(variables), userId]
+    );
+
+    const newVersionId = versionResult.rows[0].id;
+
+    // Update template's current version
+    await client.query(
+      'UPDATE templates SET current_version_id = $1, updated_at = NOW() WHERE id = $2',
+      [newVersionId, templateId]
+    );
+  }
+
+  /**
+   * Update template metadata fields
+   *
+   * @param client - Database client
+   * @param templateId - Template UUID
+   * @param data - Update data containing name and/or description
+   */
+  private async updateTemplateMetadata(
+    client: any,
+    templateId: string,
+    data: { name?: string; description?: string }
+  ): Promise<void> {
+    const updates: string[] = [];
+    const values: any[] = [];
+    let paramCount = 1;
+
+    if (data.name) {
+      updates.push(`name = $${paramCount}`);
+      values.push(data.name);
+      paramCount++;
+    }
+
+    if (data.description !== undefined) {
+      updates.push(`description = $${paramCount}`);
+      values.push(data.description || null);
+      paramCount++;
+    }
+
+    if (updates.length > 0) {
+      updates.push('updated_at = NOW()');
+      values.push(templateId);
+
+      const query = `
+        UPDATE templates
+        SET ${updates.join(', ')}
+        WHERE id = $${paramCount}
+      `;
+
+      await client.query(query, values);
     }
   }
 
