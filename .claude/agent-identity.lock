@@ -2,7 +2,7 @@
 
 This file tracks which agent identities are currently in use. Agents must claim an identity before starting work and release it when done.
 
-**Last Updated:** 2025-11-14 (White released after PR-030)
+**Last Updated:** 2025-11-14 (White released after PR-030 commit)
 
 ## Available Identities
 
