@@ -1,5 +1,4 @@
 import express, { Application } from 'express';
-import helmet from 'helmet';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
@@ -10,17 +9,30 @@ import templateRoutes from './routes/templates';
 import demandLetterRoutes from './routes/demand-letters';
 import { authenticate } from './middleware/auth';
 import { enforceFirmContext } from './middleware/firmContext';
+import { securityHeaders, permissionsPolicy } from './middleware/security';
+import { corsConfig } from './config/cors';
+import { rateLimiter } from './middleware/rateLimit';
+import { validateApiKey } from './middleware/apiKey';
 
 dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(helmet());
-app.use(cors());
+// Security Middleware (applied first)
+app.use(securityHeaders);
+app.use(permissionsPolicy);
+app.use(cors(corsConfig));
+
+// Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Rate limiting middleware (applied globally)
+app.use(rateLimiter);
+
+// API Key validation (optional, before JWT auth)
+app.use(validateApiKey);
 
 // Health check endpoint
 app.get('/health', (_req, res) => {
