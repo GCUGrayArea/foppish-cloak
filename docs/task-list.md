@@ -4742,7 +4742,7 @@ VITE_APP_NAME=Demand Letter Generator
 ## Block 12: Quality Improvements (QC-Generated)
 
 ### PR-029: Test Quality Fixes
-**Status:** New
+**Status:** In Progress
 **QC Status:** Created by QC Agent (2025-11-12)
 **Dependencies:** None (cleanup PR)
 **Priority:** Medium
