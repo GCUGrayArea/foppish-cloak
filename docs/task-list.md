@@ -3752,12 +3752,12 @@ P1 (should-have) feature. Can be deferred if timeline is tight. Requires WebSock
 ---
 
 ### PR-020: Collaboration UI Integration
-**Status:** In Progress
+**Status:** Complete ✅
 **Dependencies:** PR-014✅, PR-018✅, PR-019✅
 **Priority:** Medium (P1 - Should-have)
 
-**Assigned to:** Agent Orange
-**Started:** 2025-11-14
+**Completed by:** Agent Orange
+**Completed on:** 2025-11-14
 
 **Planning Status:** COMPLETE
 **Planned by:** Agent White (2025-11-14)
@@ -4448,8 +4448,9 @@ Essential for user onboarding and reducing support burden. Legal professionals m
 ---
 
 ### PR-027: API Documentation (OpenAPI/Swagger)
-**Status:** In Progress
-**Agent:** Pink (2025-11-14)
+**Status:** Complete ✅
+**Completed by:** Agent Pink
+**Completed on:** 2025-11-14
 **Dependencies:** PR-004✅, PR-005✅, PR-006✅, PR-007✅, PR-012✅, PR-013✅
 **Priority:** Medium
 
