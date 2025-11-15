@@ -1,0 +1,187 @@
+{
+  "ai_log_group_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "/aws/lambda/demand-letters-dev-ai-processor"
+  },
+  "api_gateway_rest_api_endpoint": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://0t0mc3c8p6.execute-api.us-east-1.amazonaws.com/"
+  },
+  "api_gateway_rest_api_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "0t0mc3c8p6"
+  },
+  "api_gateway_websocket_api_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "x3dmeqo1te"
+  },
+  "api_gateway_websocket_endpoint": {
+    "sensitive": false,
+    "type": "string",
+    "value": "wss://x3dmeqo1te.execute-api.us-east-1.amazonaws.com/dev"
+  },
+  "api_log_group_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "/aws/lambda/demand-letters-dev-api"
+  },
+  "aws_account_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "971422717446"
+  },
+  "aws_region": {
+    "sensitive": false,
+    "type": "string",
+    "value": "us-east-1"
+  },
+  "cost_tracking_dashboard_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=demand-letters-dev-cost-tracking"
+  },
+  "critical_alarms_topic_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:sns:us-east-1:971422717446:demand-letters-dev-critical-alarms"
+  },
+  "detailed_monitoring_dashboard_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": null
+  },
+  "documents_bucket_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:s3:::demand-letters-dev-documents"
+  },
+  "documents_bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "demand-letters-dev-documents"
+  },
+  "ecr_ai_processor_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "971422717446.dkr.ecr.us-east-1.amazonaws.com/demand-letters-dev-ai-proc-v2"
+  },
+  "environment": {
+    "sensitive": false,
+    "type": "string",
+    "value": "dev"
+  },
+  "jwt_secret_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:secretsmanager:us-east-1:971422717446:secret:demand-letters-dev/jwt/secret-lmpG9u"
+  },
+  "lambda_ai_function_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:lambda:us-east-1:971422717446:function:demand-letters-dev-ai-processor"
+  },
+  "lambda_ai_function_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "demand-letters-dev-ai-processor"
+  },
+  "lambda_ai_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::971422717446:role/demand-letters-dev-lambda-ai-role"
+  },
+  "lambda_api_function_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:lambda:us-east-1:971422717446:function:demand-letters-dev-api"
+  },
+  "lambda_api_function_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "demand-letters-dev-api"
+  },
+  "lambda_api_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::971422717446:role/demand-letters-dev-lambda-api-role"
+  },
+  "lambda_deployments_bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "demand-letters-dev-lambda-deployments"
+  },
+  "private_subnet_ids": {
+    "sensitive": false,
+    "type": [
+      "list",
+      "string"
+    ],
+    "value": [
+      "subnet-0ec51c4b01051563c",
+      "subnet-0dcbb744fa27d655a",
+      "subnet-022c1189cdbc888b5",
+      "subnet-06bf4817afa42342a",
+      "subnet-00b7d6dbd598ca211",
+      "subnet-05537dea7b585b315"
+    ]
+  },
+  "public_subnet_ids": {
+    "sensitive": false,
+    "type": [
+      "list",
+      "string"
+    ],
+    "value": [
+      "subnet-0ec51c4b01051563c",
+      "subnet-0dcbb744fa27d655a",
+      "subnet-022c1189cdbc888b5",
+      "subnet-06bf4817afa42342a",
+      "subnet-00b7d6dbd598ca211",
+      "subnet-05537dea7b585b315"
+    ]
+  },
+  "rds_database_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "demand_letters_dev"
+  },
+  "rds_endpoint": {
+    "sensitive": true,
+    "type": "string",
+    "value": "demand-letters-dev-postgres.crws0amqe1e3.us-east-1.rds.amazonaws.com:5432"
+  },
+  "rds_secret_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:secretsmanager:us-east-1:971422717446:secret:demand-letters-dev/database/master-NylJjz"
+  },
+  "vpc_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-03cd6462b46350c8e"
+  },
+  "warning_alarms_topic_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:sns:us-east-1:971422717446:demand-letters-dev-warning-alarms"
+  },
+  "xray_ai_processor_group_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": null
+  },
+  "xray_api_service_group_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": null
+  },
+  "xray_console_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://us-east-1.console.aws.amazon.com/xray/home?region=us-east-1#/service-map"
+  }
+}
