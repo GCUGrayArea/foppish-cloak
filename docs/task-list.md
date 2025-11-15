@@ -3787,23 +3787,81 @@ Requires careful UX design to avoid overwhelming users with presence indicators.
 ## Block 9: Testing & Quality Assurance
 
 ### PR-021: Integration Test Suite
-**Status:** New
+**Status:** Planning
 **Dependencies:** PR-004, PR-006, PR-007, PR-012, PR-013
 **Priority:** High
+
+**Planning Status:** COMPLETE
+**Planned by:** Agent White (2025-11-14)
 
 **Description:**
 Create comprehensive end-to-end integration tests covering complete user workflows from registration to demand letter export.
 
-**Files (ESTIMATED - will be refined during Planning):**
-- tests/integration/auth-flow.test.ts (create)
-- tests/integration/document-workflow.test.ts (create)
-- tests/integration/template-workflow.test.ts (create)
-- tests/integration/letter-generation.test.ts (create)
-- tests/integration/export-workflow.test.ts (create)
-- tests/integration/setup.ts (create) - test database setup
-- tests/fixtures/users.json (create)
-- tests/fixtures/sample-documents/ (create directory)
-- tests/fixtures/sample-letters/ (create directory)
+**Files (VERIFIED during Planning):**
+- tests/integration/setup/testDatabase.ts (create) - Test database initialization and cleanup
+- tests/integration/setup/fixtures.ts (create) - Fixture data loading utilities
+- tests/integration/setup/testServer.ts (create) - Express app instance for testing
+- tests/integration/auth-flow.test.ts (create) - Full auth workflow tests
+- tests/integration/document-upload.test.ts (create) - Document storage workflow
+- tests/integration/template-crud.test.ts (create) - Template CRUD operations
+- tests/integration/letter-generation-complete.test.ts (create) - Complete letter workflow (unskip existing skeleton)
+- tests/integration/export-workflow.test.ts (create) - Export to Word/PDF tests
+- tests/integration/multi-tenant.test.ts (create) - Multi-firm isolation tests
+- tests/integration/error-scenarios.test.ts (create) - Error handling and edge cases
+- tests/fixtures/users.json (create) - Test user data
+- tests/fixtures/firms.json (create) - Test firm data
+- tests/fixtures/templates.json (create) - Test template data
+- tests/fixtures/documents/sample-contract.pdf (create) - Sample PDF for upload tests
+- tests/fixtures/documents/sample-invoice.pdf (create) - Sample invoice document
+- jest.integration.config.js (create) - Jest config specific to integration tests
+- package.json (modify) - Add integration test script
+- .env.test (create) - Test environment variables template
+
+**Implementation Notes:**
+
+**Test Database Strategy:**
+- Use a separate test database (demand_letters_test)
+- Run migrations before test suite
+- Each test file gets isolated transaction or DB snapshot
+- Cleanup after all tests complete
+
+**Fixture Management:**
+- Load fixtures from JSON files
+- Helper functions to create test data with proper relationships
+- Predictable IDs for assertions
+- Cleanup fixtures after each test
+
+**Authentication in Tests:**
+- Helper function createAuthenticatedUser() returns {user, token, firm}
+- All integration tests use real JWT tokens
+- Test both authenticated and unauthenticated scenarios
+
+**AWS Service Mocking:**
+- Mock S3 for document uploads (use in-memory storage)
+- Mock Bedrock AI calls (return predictable responses)
+- Mock Lambda invocations
+- Real PostgreSQL database (not mocked)
+
+**Test Isolation:**
+- Use beforeEach/afterEach for transaction rollback
+- Or use database snapshots between tests
+- Ensure tests can run in any order
+- Parallel execution safe
+
+**Coverage Goals:**
+- Test happy paths for all major workflows
+- Test error scenarios (invalid auth, missing data, etc.)
+- Test multi-tenant isolation (firm A can't access firm B data)
+- Test concurrent operations
+- Validate database constraints
+
+**Time Estimate:** 360 minutes (6 hours)
+- Test infrastructure setup: 90 minutes
+- Auth flow tests: 30 minutes
+- Document/template tests: 60 minutes
+- Letter generation workflow: 90 minutes
+- Export and error scenarios: 60 minutes
+- Debugging and fixes: 30 minutes
 
 **Acceptance Criteria:**
 - [ ] Full authentication flow (register → login → logout)
