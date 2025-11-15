@@ -17,6 +17,7 @@ import { z } from 'zod';
 import { DemandLetterService } from '../services/DemandLetterService';
 import { ExportService } from '../services/ExportService';
 import { AuthenticatedRequest } from '../middleware/firmContext';
+import type { CreateDemandLetterRequest, RefineDemandLetterRequest } from '../types/demand-letter';
 
 const router = Router();
 const demandLetterService = new DemandLetterService();
@@ -79,7 +80,7 @@ router.post('/', async (req: AuthenticatedRequest, res: Response) => {
 
     // Create demand letter
     const letter = await demandLetterService.createDemandLetter(
-      validation.data,
+      validation.data as CreateDemandLetterRequest,
       req.firmId,
       req.user.id
     );
@@ -328,7 +329,7 @@ router.post('/:id/refine', async (req: AuthenticatedRequest, res: Response) => {
       {
         letterId: id,
         ...validation.data,
-      },
+      } as RefineDemandLetterRequest,
       req.firmId,
       req.user.id
     );

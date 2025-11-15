@@ -14,6 +14,7 @@ import { Router, Response } from 'express';
 import { TemplateService } from '../services/TemplateService';
 import { AuthenticatedRequest } from '../middleware/firmContext';
 import { verifyTemplateOwnership } from '../middleware/templateOwnership';
+import type { CreateTemplateRequest } from '../types/template';
 import {
   createTemplateSchema,
   updateTemplateSchema,
@@ -235,7 +236,7 @@ router.post('/', async (req: AuthenticatedRequest, res: Response) => {
     const template = await templateService.createTemplate(
       user.firmId,
       user.id,
-      data
+      data as CreateTemplateRequest
     );
 
     return res.status(201).json(template);

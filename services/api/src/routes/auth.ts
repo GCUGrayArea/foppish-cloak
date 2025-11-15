@@ -34,7 +34,7 @@ router.post('/register', async (req: Request, res: Response) => {
       res.status(400).json({
         error: 'Invalid request data',
         code: 'VALIDATION_ERROR',
-        details: validation.errors
+        details: 'errors' in validation ? validation.errors : []
       });
       return;
     }
@@ -62,7 +62,7 @@ router.post('/login', async (req: Request, res: Response) => {
       res.status(400).json({
         error: 'Invalid request data',
         code: 'VALIDATION_ERROR',
-        details: validation.errors
+        details: 'errors' in validation ? validation.errors : []
       });
       return;
     }
@@ -90,7 +90,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
       res.status(400).json({
         error: 'Invalid request data',
         code: 'VALIDATION_ERROR',
-        details: validation.errors
+        details: 'errors' in validation ? validation.errors : []
       });
       return;
     }
@@ -118,7 +118,7 @@ router.post('/logout', authenticate, async (req: Request, res: Response) => {
       res.status(400).json({
         error: 'Invalid request data',
         code: 'VALIDATION_ERROR',
-        details: validation.errors
+        details: 'errors' in validation ? validation.errors : []
       });
       return;
     }
@@ -148,7 +148,7 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
       res.status(400).json({
         error: 'Invalid request data',
         code: 'VALIDATION_ERROR',
-        details: validation.errors
+        details: 'errors' in validation ? validation.errors : []
       });
       return;
     }
@@ -181,7 +181,7 @@ router.post('/reset-password', async (req: Request, res: Response) => {
       res.status(400).json({
         error: 'Invalid request data',
         code: 'VALIDATION_ERROR',
-        details: validation.errors
+        details: 'errors' in validation ? validation.errors : []
       });
       return;
     }

@@ -1,11 +1,11 @@
 import { CorsOptions } from 'cors';
 
 // Get allowed origins from environment
-function getAllowedOrigins(): string[] {
+function getAllowedOrigins(): (string | RegExp)[] {
   const frontendUrl = process.env.FRONTEND_URL;
   const nodeEnv = process.env.NODE_ENV;
 
-  const origins: string[] = [];
+  const origins: (string | RegExp)[] = [];
 
   // Add frontend URL if configured
   if (frontendUrl) {

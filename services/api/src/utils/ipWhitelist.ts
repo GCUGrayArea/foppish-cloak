@@ -54,10 +54,11 @@ export async function enforceIpWhitelist(
       req.ip;
 
     if (!clientIp) {
-      return res.status(403).json({
+      res.status(403).json({
         error: 'Forbidden',
         message: 'Unable to determine client IP address',
       });
+      return;
     }
 
     // Get whitelisted IP ranges for this firm

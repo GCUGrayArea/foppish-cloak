@@ -16,6 +16,7 @@ import { UserService } from '../services/UserService';
 import { InvitationService } from '../services/InvitationService';
 import { AuthenticatedRequest } from '../middleware/firmContext';
 import { sendInvitationEmail } from '../utils/email';
+import type { InviteUserRequest } from '../types/user';
 
 const router = Router();
 const firmService = new FirmService();
@@ -207,7 +208,7 @@ router.post('/:firmId/users/invite', async (req: AuthenticatedRequest, res: Resp
     // Create invitation
     const invitation = await invitationService.inviteUser(
       firmId,
-      inviteData,
+      inviteData as InviteUserRequest,
       user.id
     );
 

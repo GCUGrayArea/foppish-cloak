@@ -85,7 +85,10 @@ export function initSentry() {
 
       // Remove sensitive query parameters
       if (event.request?.query_string) {
-        event.request.query_string = event.request.query_string.replace(
+        const queryString = typeof event.request.query_string === 'string'
+          ? event.request.query_string
+          : new URLSearchParams(event.request.query_string as any).toString();
+        event.request.query_string = queryString.replace(
           /([?&])(token|password|secret|api_key)=[^&]*/gi,
           '$1$2=***REDACTED***'
         );
