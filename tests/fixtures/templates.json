@@ -1,0 +1,82 @@
+[
+  {
+    "id": "template-test-001",
+    "firm_id": "firm-test-001",
+    "name": "Standard Demand Letter",
+    "description": "General purpose demand letter template",
+    "category": "Demand Letter",
+    "content": "{{sender_firm_name}}\n{{sender_address}}\n{{sender_phone}}\n{{sender_email}}\n\n{{date}}\n\n{{recipient_name}}\n{{recipient_address}}\n\nRe: Demand for Payment - {{matter_description}}\n\nDear {{recipient_name}}:\n\nThis letter serves as formal notice that {{client_name}} demands immediate payment of {{amount_owed}} relating to {{matter_description}}.\n\nThe facts are as follows:\n{{fact_section}}\n\nBased on the foregoing, {{client_name}} is entitled to {{amount_owed}} plus interest and costs.\n\nIf payment in full is not received within {{response_deadline}} days of the date of this letter, we will proceed with legal action without further notice.\n\nPlease remit payment to:\n{{payment_instructions}}\n\nSincerely,\n\n{{attorney_name}}\n{{attorney_title}}\n{{sender_firm_name}}",
+    "variables": [
+      "sender_firm_name",
+      "sender_address",
+      "sender_phone",
+      "sender_email",
+      "date",
+      "recipient_name",
+      "recipient_address",
+      "matter_description",
+      "client_name",
+      "amount_owed",
+      "fact_section",
+      "response_deadline",
+      "payment_instructions",
+      "attorney_name",
+      "attorney_title"
+    ],
+    "is_active": true
+  },
+  {
+    "id": "template-test-002",
+    "firm_id": "firm-test-001",
+    "name": "Breach of Contract Demand",
+    "description": "Template for breach of contract demands",
+    "category": "Breach of Contract",
+    "content": "{{sender_firm_name}}\n{{sender_address}}\n\n{{date}}\n\n{{recipient_name}}\n{{recipient_company}}\n{{recipient_address}}\n\nRe: Breach of Contract - {{contract_description}}\n\nDear {{recipient_name}}:\n\nThis firm represents {{client_name}} with respect to your breach of the {{contract_description}} executed on {{contract_date}}.\n\n{{breach_description}}\n\nAs a result of your breach, {{client_name}} has suffered damages in the amount of {{damages_amount}}.\n\nDemand is hereby made for payment of {{damages_amount}} within {{response_deadline}} days.\n\nFailure to comply will result in litigation.\n\nSincerely,\n{{attorney_name}}",
+    "variables": [
+      "sender_firm_name",
+      "sender_address",
+      "date",
+      "recipient_name",
+      "recipient_company",
+      "recipient_address",
+      "contract_description",
+      "client_name",
+      "contract_date",
+      "breach_description",
+      "damages_amount",
+      "response_deadline",
+      "attorney_name"
+    ],
+    "is_active": true
+  },
+  {
+    "id": "template-test-003",
+    "firm_id": "firm-test-002",
+    "name": "Personal Injury Demand",
+    "description": "Template for personal injury settlement demands",
+    "category": "Personal Injury",
+    "content": "{{law_firm_name}}\n{{law_firm_address}}\n\n{{date}}\n\n{{insurance_company}}\nAttn: {{adjuster_name}}\n{{insurance_address}}\n\nRe: {{client_name}} v. {{defendant_name}}\nClaim No: {{claim_number}}\nDate of Loss: {{incident_date}}\n\nDear {{adjuster_name}}:\n\nThis office represents {{client_name}} who was injured on {{incident_date}} due to the negligence of your insured, {{defendant_name}}.\n\nIncident Details:\n{{incident_description}}\n\nInjuries:\n{{injury_description}}\n\nMedical Treatment:\n{{treatment_summary}}\n\nMedical Expenses: {{medical_expenses}}\nLost Wages: {{lost_wages}}\nPain and Suffering: {{pain_suffering}}\n\nTotal Demand: {{total_demand}}\n\nPlease respond within {{response_deadline}} days.\n\nSincerely,\n{{attorney_name}}",
+    "variables": [
+      "law_firm_name",
+      "law_firm_address",
+      "date",
+      "insurance_company",
+      "adjuster_name",
+      "insurance_address",
+      "client_name",
+      "defendant_name",
+      "claim_number",
+      "incident_date",
+      "incident_description",
+      "injury_description",
+      "treatment_summary",
+      "medical_expenses",
+      "lost_wages",
+      "pain_suffering",
+      "total_demand",
+      "response_deadline",
+      "attorney_name"
+    ],
+    "is_active": true
+  }
+]

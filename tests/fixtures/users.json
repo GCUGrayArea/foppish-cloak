@@ -1,0 +1,56 @@
+[
+  {
+    "id": "user-test-001",
+    "firm_id": "firm-test-001",
+    "email": "admin@smithlaw.test",
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "role": "admin",
+    "is_active": true
+  },
+  {
+    "id": "user-test-002",
+    "firm_id": "firm-test-001",
+    "email": "attorney1@smithlaw.test",
+    "first_name": "John",
+    "last_name": "Doe",
+    "role": "attorney",
+    "is_active": true
+  },
+  {
+    "id": "user-test-003",
+    "firm_id": "firm-test-001",
+    "email": "paralegal1@smithlaw.test",
+    "first_name": "Sarah",
+    "last_name": "Johnson",
+    "role": "paralegal",
+    "is_active": true
+  },
+  {
+    "id": "user-test-004",
+    "firm_id": "firm-test-002",
+    "email": "admin@johnsonlegal.test",
+    "first_name": "Michael",
+    "last_name": "Johnson",
+    "role": "admin",
+    "is_active": true
+  },
+  {
+    "id": "user-test-005",
+    "firm_id": "firm-test-002",
+    "email": "attorney2@johnsonlegal.test",
+    "first_name": "Emily",
+    "last_name": "Brown",
+    "role": "attorney",
+    "is_active": true
+  },
+  {
+    "id": "user-test-006",
+    "firm_id": "firm-test-003",
+    "email": "admin@davispartners.test",
+    "first_name": "Robert",
+    "last_name": "Davis",
+    "role": "admin",
+    "is_active": true
+  }
+]

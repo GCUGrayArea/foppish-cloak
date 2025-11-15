@@ -1,0 +1,23 @@
+[
+  {
+    "id": "firm-test-001",
+    "name": "Smith & Associates Law Firm",
+    "address": "100 Main Street, Suite 500, New York, NY 10001",
+    "phone": "(212) 555-0100",
+    "email": "contact@smithlaw.test"
+  },
+  {
+    "id": "firm-test-002",
+    "name": "Johnson Legal Group",
+    "address": "250 Park Avenue, Floor 12, New York, NY 10017",
+    "phone": "(212) 555-0200",
+    "email": "info@johnsonlegal.test"
+  },
+  {
+    "id": "firm-test-003",
+    "name": "Davis & Partners LLP",
+    "address": "75 Broadway, Suite 300, New York, NY 10004",
+    "phone": "(212) 555-0300",
+    "email": "hello@davispartners.test"
+  }
+]
