@@ -1,0 +1,111 @@
+components:
+  schemas:
+    DocumentUploadResponse:
+      type: object
+      required:
+        - message
+        - document
+      properties:
+        message:
+          type: string
+          description: Success message
+          example: Document uploaded successfully
+        document:
+          $ref: '#/components/schemas/DocumentResponse'
+
+    DocumentResponse:
+      type: object
+      required:
+        - id
+        - filename
+        - fileType
+        - fileSize
+        - s3Key
+        - firmId
+        - uploadedBy
+        - uploadedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Document ID
+          example: 8f7e6d5c-4b3a-2c1d-0e9f-8a7b6c5d4e3f
+        filename:
+          type: string
+          description: Original filename
+          example: medical_records.pdf
+        fileType:
+          type: string
+          description: MIME type
+          example: application/pdf
+        fileSize:
+          type: integer
+          description: File size in bytes
+          example: 2458624
+        s3Key:
+          type: string
+          description: S3 storage key
+          example: firms/123e4567/documents/8f7e6d5c-4b3a-2c1d-0e9f-8a7b6c5d4e3f.pdf
+        firmId:
+          type: string
+          format: uuid
+          description: Firm ID
+          example: 123e4567-e89b-12d3-a456-426614174000
+        uploadedBy:
+          type: string
+          format: uuid
+          description: User ID who uploaded the document
+          example: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+        uploadedAt:
+          type: string
+          format: date-time
+          description: Upload timestamp
+          example: 2024-01-20T09:15:00Z
+        metadata:
+          type: object
+          description: Additional document metadata
+          additionalProperties: true
+
+    DocumentListResponse:
+      type: object
+      required:
+        - documents
+        - total
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentResponse'
+        total:
+          type: integer
+          description: Total number of documents
+          example: 45
+        limit:
+          type: integer
+          description: Page size
+          example: 20
+        offset:
+          type: integer
+          description: Number of items skipped
+          example: 0
+
+    DocumentDownloadResponse:
+      type: object
+      required:
+        - downloadUrl
+        - expiresAt
+      properties:
+        downloadUrl:
+          type: string
+          format: uri
+          description: Pre-signed S3 URL (valid for 1 hour)
+          example: https://s3.amazonaws.com/bucket/key?signature=...
+        expiresAt:
+          type: string
+          format: date-time
+          description: URL expiration timestamp
+          example: 2024-01-20T10:15:00Z
+        filename:
+          type: string
+          description: Original filename
+          example: medical_records.pdf

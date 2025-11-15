@@ -1,0 +1,259 @@
+components:
+  schemas:
+    CreateTemplateRequest:
+      type: object
+      required:
+        - name
+        - content
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Template name
+          example: Personal Injury Demand Letter
+        description:
+          type: string
+          maxLength: 1000
+          description: Template description
+          example: Standard template for personal injury cases
+        content:
+          type: string
+          description: Template content with variables (e.g., {{clientName}}, {{incidentDate}})
+          example: |
+            Dear {{recipientName}},
+
+            Re: Demand for Settlement - {{clientName}} v. {{defendantName}}
+
+            This letter serves as a formal demand for settlement...
+        variables:
+          type: array
+          description: List of variables used in template
+          items:
+            type: object
+            required:
+              - name
+              - type
+            properties:
+              name:
+                type: string
+                description: Variable name
+                example: clientName
+              type:
+                type: string
+                enum: [text, number, date, boolean]
+                description: Variable data type
+                example: text
+              description:
+                type: string
+                description: Variable description
+                example: Client's full legal name
+              required:
+                type: boolean
+                description: Whether variable is required
+                example: true
+              defaultValue:
+                type: string
+                description: Default value if not provided
+        category:
+          type: string
+          description: Template category
+          example: personal-injury
+
+    UpdateTemplateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Template name
+          example: Personal Injury Demand Letter v2
+        description:
+          type: string
+          maxLength: 1000
+          description: Template description
+        content:
+          type: string
+          description: Template content with variables
+        variables:
+          type: array
+          description: List of variables used in template
+          items:
+            type: object
+            required:
+              - name
+              - type
+            properties:
+              name:
+                type: string
+              type:
+                type: string
+                enum: [text, number, date, boolean]
+              description:
+                type: string
+              required:
+                type: boolean
+              defaultValue:
+                type: string
+        category:
+          type: string
+          description: Template category
+
+    TemplateResponse:
+      type: object
+      required:
+        - id
+        - name
+        - content
+        - firmId
+        - version
+        - isActive
+        - createdBy
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Template ID
+          example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        name:
+          type: string
+          description: Template name
+          example: Personal Injury Demand Letter
+        description:
+          type: string
+          description: Template description
+          example: Standard template for personal injury cases
+        content:
+          type: string
+          description: Template content with variables
+        variables:
+          type: array
+          description: List of variables
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              type:
+                type: string
+              description:
+                type: string
+              required:
+                type: boolean
+              defaultValue:
+                type: string
+        category:
+          type: string
+          description: Template category
+          example: personal-injury
+        firmId:
+          type: string
+          format: uuid
+          description: Firm ID
+          example: 123e4567-e89b-12d3-a456-426614174000
+        version:
+          type: integer
+          description: Template version number
+          example: 3
+        isActive:
+          type: boolean
+          description: Whether template is currently active
+          example: true
+        createdBy:
+          type: string
+          format: uuid
+          description: User ID who created the template
+          example: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+          example: 2024-01-10T08:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: 2024-01-20T14:30:00Z
+
+    TemplateListResponse:
+      type: object
+      required:
+        - templates
+        - total
+      properties:
+        templates:
+          type: array
+          items:
+            $ref: '#/components/schemas/TemplateResponse'
+        total:
+          type: integer
+          description: Total number of templates
+          example: 12
+        limit:
+          type: integer
+          description: Page size
+          example: 20
+        offset:
+          type: integer
+          description: Number of items skipped
+          example: 0
+
+    TemplateVersionsResponse:
+      type: object
+      required:
+        - versions
+        - total
+      properties:
+        versions:
+          type: array
+          items:
+            type: object
+            required:
+              - versionId
+              - version
+              - createdAt
+              - createdBy
+            properties:
+              versionId:
+                type: string
+                format: uuid
+                description: Version record ID
+                example: f1e2d3c4-b5a6-7890-cdef-1234567890ab
+              version:
+                type: integer
+                description: Version number
+                example: 2
+              content:
+                type: string
+                description: Template content at this version
+              createdAt:
+                type: string
+                format: date-time
+                description: Version creation timestamp
+                example: 2024-01-15T10:00:00Z
+              createdBy:
+                type: string
+                format: uuid
+                description: User who created this version
+                example: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+              changeNotes:
+                type: string
+                description: Notes about changes in this version
+                example: Added incident details section
+        total:
+          type: integer
+          description: Total number of versions
+          example: 5
+
+    RollbackTemplateRequest:
+      type: object
+      required:
+        - versionId
+      properties:
+        versionId:
+          type: string
+          format: uuid
+          description: Version ID to rollback to
+          example: f1e2d3c4-b5a6-7890-cdef-1234567890ab

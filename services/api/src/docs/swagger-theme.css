@@ -1,0 +1,277 @@
+/**
+ * Custom Swagger UI Theme
+ *
+ * Applies branding and improved styling to Swagger UI
+ */
+
+/* Hide default Swagger top bar */
+.swagger-ui .topbar {
+  display: none;
+}
+
+/* Custom header */
+.swagger-ui .information-container {
+  margin: 30px 0;
+}
+
+.swagger-ui .info .title {
+  font-size: 36px;
+  color: #1f2937;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.swagger-ui .info .base-url {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Tag sections */
+.swagger-ui .opblock-tag {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+  padding: 15px 0;
+  margin-top: 30px;
+}
+
+/* Operation blocks */
+.swagger-ui .opblock {
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+  border: 1px solid #e5e7eb;
+}
+
+.swagger-ui .opblock .opblock-summary {
+  border-radius: 8px 8px 0 0;
+  padding: 12px 20px;
+}
+
+/* HTTP method colors */
+.swagger-ui .opblock.opblock-get {
+  border-color: #3b82f6;
+}
+
+.swagger-ui .opblock.opblock-get .opblock-summary {
+  background-color: #eff6ff;
+}
+
+.swagger-ui .opblock.opblock-post {
+  border-color: #10b981;
+}
+
+.swagger-ui .opblock.opblock-post .opblock-summary {
+  background-color: #ecfdf5;
+}
+
+.swagger-ui .opblock.opblock-put {
+  border-color: #f59e0b;
+}
+
+.swagger-ui .opblock.opblock-put .opblock-summary {
+  background-color: #fffbeb;
+}
+
+.swagger-ui .opblock.opblock-delete {
+  border-color: #ef4444;
+}
+
+.swagger-ui .opblock.opblock-delete .opblock-summary {
+  background-color: #fef2f2;
+}
+
+/* Response codes */
+.swagger-ui .responses-inner .responses-header {
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+}
+
+.swagger-ui .response-col_status {
+  font-weight: 600;
+}
+
+.swagger-ui .response .response-col_status {
+  color: #10b981;
+}
+
+/* Authorization button */
+.swagger-ui .btn.authorize {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 10px 20px;
+}
+
+.swagger-ui .btn.authorize:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.swagger-ui .btn.authorize svg {
+  fill: white;
+}
+
+/* Try it out button */
+.swagger-ui .try-out__btn {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.swagger-ui .try-out__btn:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+/* Execute button */
+.swagger-ui .execute-wrapper .btn {
+  background-color: #10b981;
+  border-color: #10b981;
+  color: white;
+  border-radius: 6px;
+  font-weight: 600;
+  padding: 10px 30px;
+}
+
+.swagger-ui .execute-wrapper .btn:hover {
+  background-color: #059669;
+  border-color: #059669;
+}
+
+/* Clear button */
+.swagger-ui .btn.btn-clear {
+  background-color: #6b7280;
+  border-color: #6b7280;
+  color: white;
+  border-radius: 6px;
+}
+
+.swagger-ui .btn.btn-clear:hover {
+  background-color: #4b5563;
+  border-color: #4b5563;
+}
+
+/* Inputs */
+.swagger-ui input[type=text],
+.swagger-ui input[type=email],
+.swagger-ui input[type=password],
+.swagger-ui select,
+.swagger-ui textarea {
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  padding: 8px 12px;
+}
+
+.swagger-ui input[type=text]:focus,
+.swagger-ui input[type=email]:focus,
+.swagger-ui input[type=password]:focus,
+.swagger-ui select:focus,
+.swagger-ui textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Code blocks */
+.swagger-ui .microlight {
+  background-color: #1f2937;
+  border-radius: 6px;
+  padding: 15px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Model section */
+.swagger-ui .model-box {
+  border-radius: 6px;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 15px;
+}
+
+.swagger-ui .model-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Scrollbar styling */
+.swagger-ui ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.swagger-ui ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+
+.swagger-ui ::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+.swagger-ui ::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Response samples */
+.swagger-ui .responses-wrapper .response .response-col_description__inner {
+  padding: 15px;
+}
+
+/* Lock icon for security */
+.swagger-ui .authorization__btn.locked svg {
+  fill: #10b981;
+}
+
+.swagger-ui .authorization__btn.unlocked svg {
+  fill: #9ca3af;
+}
+
+/* Deprecated operations */
+.swagger-ui .opblock.opblock-deprecated {
+  opacity: 0.6;
+  border-color: #9ca3af;
+}
+
+.swagger-ui .opblock.opblock-deprecated .opblock-summary {
+  background-color: #f3f4f6;
+}
+
+/* Filter input */
+.swagger-ui .filter-container input {
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+/* Loading spinner */
+.swagger-ui .loading-container {
+  padding: 40px;
+  text-align: center;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .swagger-ui .info .title {
+    font-size: 28px;
+  }
+
+  .swagger-ui .opblock-tag {
+    font-size: 16px;
+  }
+
+  .swagger-ui .opblock {
+    margin-bottom: 10px;
+  }
+}

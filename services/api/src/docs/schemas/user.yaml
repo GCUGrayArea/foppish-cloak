@@ -1,0 +1,88 @@
+components:
+  schemas:
+    UpdateUserRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: User first name
+          example: John
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: User last name
+          example: Doe
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: john.doe@lawfirm.com
+
+    UpdateUserRoleRequest:
+      type: object
+      required:
+        - role
+      properties:
+        role:
+          type: string
+          enum: [admin, attorney, paralegal]
+          description: New user role
+          example: attorney
+
+    UserResponse:
+      type: object
+      required:
+        - id
+        - email
+        - firstName
+        - lastName
+        - role
+        - firmId
+        - isActive
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: User ID
+          example: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+        email:
+          type: string
+          format: email
+          description: User email
+          example: john.doe@lawfirm.com
+        firstName:
+          type: string
+          description: First name
+          example: John
+        lastName:
+          type: string
+          description: Last name
+          example: Doe
+        role:
+          type: string
+          enum: [admin, attorney, paralegal]
+          description: User role
+          example: attorney
+        firmId:
+          type: string
+          format: uuid
+          description: Firm ID
+          example: 123e4567-e89b-12d3-a456-426614174000
+        isActive:
+          type: boolean
+          description: Whether user account is active
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+          example: 2024-01-15T10:30:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: 2024-01-15T10:30:00Z

@@ -1,0 +1,177 @@
+components:
+  schemas:
+    UpdateFirmRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Firm name
+          example: Doe & Associates LLP
+        settings:
+          type: object
+          description: Firm-specific settings
+          additionalProperties: true
+          example:
+            defaultLetterTone: formal
+            requireApproval: true
+
+    FirmResponse:
+      type: object
+      required:
+        - id
+        - name
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Firm ID
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          description: Firm name
+          example: Doe & Associates LLP
+        settings:
+          type: object
+          description: Firm-specific settings
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Firm creation timestamp
+          example: 2024-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: 2024-01-15T10:30:00Z
+
+    InviteUserRequest:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: jane.smith@lawfirm.com
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: User first name
+          example: Jane
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: User last name
+          example: Smith
+        role:
+          type: string
+          enum: [admin, attorney, paralegal]
+          description: User role in the firm
+          example: paralegal
+
+    InvitationResponse:
+      type: object
+      required:
+        - invitation
+        - message
+      properties:
+        invitation:
+          type: object
+          required:
+            - id
+            - email
+            - role
+            - status
+            - createdAt
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: Invitation ID
+              example: 9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d
+            email:
+              type: string
+              format: email
+              description: Invited user email
+              example: jane.smith@lawfirm.com
+            firstName:
+              type: string
+              description: First name
+              example: Jane
+            lastName:
+              type: string
+              description: Last name
+              example: Smith
+            role:
+              type: string
+              enum: [admin, attorney, paralegal]
+              description: Assigned role
+              example: paralegal
+            status:
+              type: string
+              enum: [pending, accepted, expired]
+              description: Invitation status
+              example: pending
+            createdAt:
+              type: string
+              format: date-time
+              description: Invitation creation timestamp
+              example: 2024-01-20T14:30:00Z
+            expiresAt:
+              type: string
+              format: date-time
+              description: Invitation expiry timestamp
+              example: 2024-01-27T14:30:00Z
+        message:
+          type: string
+          description: Status message
+          example: Invitation email sent
+
+    UserListResponse:
+      type: object
+      required:
+        - users
+        - total
+      properties:
+        users:
+          type: array
+          items:
+            $ref: './auth.yaml#/components/schemas/UserProfile'
+        total:
+          type: integer
+          description: Total number of users
+          example: 15
+        limit:
+          type: integer
+          description: Page size
+          example: 20
+        offset:
+          type: integer
+          description: Number of items skipped
+          example: 0
+
+    RemoveUserResponse:
+      type: object
+      required:
+        - message
+        - userId
+      properties:
+        message:
+          type: string
+          description: Success message
+          example: User removed successfully
+        userId:
+          type: string
+          format: uuid
+          description: ID of removed user
+          example: 7c9e6679-7425-40de-944b-e07fc1f90ae7

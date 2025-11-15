@@ -1,0 +1,1522 @@
+openapi: 3.0.3
+info:
+  title: Demand Letter Generator API
+  version: 1.0.0
+  description: |
+    RESTful API for the Demand Letter Generator application. This API enables law firms to:
+    - Manage users and authentication
+    - Upload and manage source documents
+    - Create and manage demand letter templates
+    - Generate AI-powered demand letters using AWS Bedrock (Claude)
+    - Export demand letters to Word/PDF formats
+
+    ## Authentication
+
+    All endpoints except `/auth/*` require authentication using a JWT Bearer token.
+    Obtain a token by calling `/auth/login` or `/auth/register`.
+
+    Include the token in the `Authorization` header:
+    ```
+    Authorization: Bearer <your-access-token>
+    ```
+
+    ## Multi-Tenancy
+
+    This application is multi-tenant. All data is scoped to firms, and users can only access data
+    from their own firm. The `firmId` is extracted from the JWT token and enforced by the API.
+
+    ## Rate Limiting
+
+    All endpoints are rate-limited to prevent abuse. Default limits:
+    - Authentication endpoints: 5 requests per minute
+    - Other endpoints: 100 requests per minute
+
+    ## Error Handling
+
+    All error responses follow a consistent format:
+    ```json
+    {
+      "error": "Human-readable error message",
+      "code": "MACHINE_READABLE_ERROR_CODE",
+      "details": []  // Optional, for validation errors
+    }
+    ```
+
+  contact:
+    name: API Support
+    email: support@demandlettergenerator.com
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://api.demandlettergenerator.com/v1
+    description: Production server
+  - url: https://dev-api.demandlettergenerator.com/v1
+    description: Development server
+  - url: http://localhost:3000
+    description: Local development
+
+tags:
+  - name: Authentication
+    description: User registration, login, and token management
+  - name: Firms
+    description: Firm management and settings
+  - name: Users
+    description: User profile and role management
+  - name: Documents
+    description: Source document upload and management
+  - name: Templates
+    description: Demand letter template management
+  - name: Demand Letters
+    description: Demand letter creation, generation, and workflow
+
+paths:
+  # ========================================
+  # Authentication Endpoints
+  # ========================================
+
+  /auth/register:
+    post:
+      tags: [Authentication]
+      summary: Register new user and firm
+      description: |
+        Create a new user account and firm. This is the initial registration endpoint
+        that creates both the firm and the first admin user in a single operation.
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/auth.yaml#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User and firm created successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/auth.yaml#/components/schemas/RegisterResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: User with this email already exists in this firm
+                code: USER_ALREADY_EXISTS
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Login user
+      description: |
+        Authenticate user with email, password, and firm ID. Returns access token (1 hour expiry)
+        and refresh token (30 day expiry).
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/auth.yaml#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/auth.yaml#/components/schemas/LoginResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          description: Invalid credentials or user inactive
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/Error'
+              examples:
+                invalidCredentials:
+                  value:
+                    error: Invalid email or password
+                    code: INVALID_CREDENTIALS
+                userInactive:
+                  value:
+                    error: User account is inactive
+                    code: USER_INACTIVE
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /auth/refresh:
+    post:
+      tags: [Authentication]
+      summary: Refresh access token
+      description: |
+        Use a refresh token to obtain a new access token. The refresh token remains valid
+        until it expires or is explicitly revoked via logout.
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/auth.yaml#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/auth.yaml#/components/schemas/AuthTokens'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: Invalid or expired token
+                code: INVALID_TOKEN
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /auth/logout:
+    post:
+      tags: [Authentication]
+      summary: Logout user
+      description: |
+        Invalidate the refresh token to log out the user. The access token will continue
+        to be valid until it expires (max 1 hour).
+      operationId: logout
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/auth.yaml#/components/schemas/LogoutRequest'
+      responses:
+        '200':
+          description: Logged out successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/SuccessMessage'
+              example:
+                message: Logged out successfully
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /auth/forgot-password:
+    post:
+      tags: [Authentication]
+      summary: Initiate password reset
+      description: |
+        Request a password reset email. For security, this endpoint always returns success
+        even if the email doesn't exist, to prevent user enumeration.
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/auth.yaml#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: Reset email sent (or email doesn't exist)
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/SuccessMessage'
+              example:
+                message: If a user with this email exists, a password reset link has been sent
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /auth/reset-password:
+    post:
+      tags: [Authentication]
+      summary: Reset password with token
+      description: |
+        Complete the password reset flow using the token from the reset email.
+        Tokens expire after 1 hour.
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/auth.yaml#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/SuccessMessage'
+              example:
+                message: Password reset successful
+        '400':
+          description: Invalid request or expired token
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/Error'
+              examples:
+                validation:
+                  value:
+                    error: Invalid request data
+                    code: VALIDATION_ERROR
+                expiredToken:
+                  value:
+                    error: Invalid or expired reset token
+                    code: INVALID_RESET_TOKEN
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  # ========================================
+  # Firm Endpoints
+  # ========================================
+
+  /firms/{id}:
+    get:
+      tags: [Firms]
+      summary: Get firm details
+      description: Get details of a firm (admin only). Users can only access their own firm.
+      operationId: getFirm
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Firm ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Firm details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/firm.yaml#/components/schemas/FirmResponse'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+    put:
+      tags: [Firms]
+      summary: Update firm settings
+      description: Update firm name or settings (admin only)
+      operationId: updateFirm
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Firm ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/firm.yaml#/components/schemas/UpdateFirmRequest'
+      responses:
+        '200':
+          description: Firm updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/firm.yaml#/components/schemas/FirmResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /firms/{firmId}/users:
+    get:
+      tags: [Firms]
+      summary: List firm users
+      description: List all users in the firm with optional filtering
+      operationId: listFirmUsers
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: firmId
+          in: path
+          required: true
+          description: Firm ID
+          schema:
+            type: string
+            format: uuid
+        - name: role
+          in: query
+          description: Filter by role
+          schema:
+            type: string
+            enum: [admin, attorney, paralegal]
+        - name: isActive
+          in: query
+          description: Filter by active status
+          schema:
+            type: boolean
+        - $ref: './src/docs/schemas/common.yaml#/components/parameters/LimitQueryParam'
+        - $ref: './src/docs/schemas/common.yaml#/components/parameters/OffsetQueryParam'
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/firm.yaml#/components/schemas/UserListResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /firms/{firmId}/users/invite:
+    post:
+      tags: [Firms]
+      summary: Invite user to firm
+      description: Send an invitation email to add a new user to the firm (admin only)
+      operationId: inviteUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: firmId
+          in: path
+          required: true
+          description: Firm ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/firm.yaml#/components/schemas/InviteUserRequest'
+      responses:
+        '201':
+          description: Invitation sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/firm.yaml#/components/schemas/InvitationResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '409':
+          description: User already exists or invitation already pending
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/Error'
+              examples:
+                userExists:
+                  value:
+                    error: User already exists in firm
+                    code: USER_ALREADY_EXISTS
+                invitationPending:
+                  value:
+                    error: Invitation already pending for this email
+                    code: INVITATION_ALREADY_PENDING
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /firms/{firmId}/users/{userId}:
+    delete:
+      tags: [Firms]
+      summary: Remove user from firm
+      description: Remove a user from the firm (admin only). Cannot remove yourself.
+      operationId: removeUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: firmId
+          in: path
+          required: true
+          description: Firm ID
+          schema:
+            type: string
+            format: uuid
+        - name: userId
+          in: path
+          required: true
+          description: User ID to remove
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/firm.yaml#/components/schemas/RemoveUserResponse'
+        '400':
+          description: Cannot modify self
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: Cannot delete yourself
+                code: CANNOT_MODIFY_SELF
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  # ========================================
+  # User Endpoints
+  # ========================================
+
+  /users/me:
+    get:
+      tags: [Users]
+      summary: Get current user profile
+      description: Get the profile of the currently authenticated user
+      operationId: getCurrentUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/user.yaml#/components/schemas/UserResponse'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /users/{id}:
+    put:
+      tags: [Users]
+      summary: Update user profile
+      description: |
+        Update user profile. Users can update their own profile. Admins can update any
+        user in their firm.
+      operationId: updateUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/user.yaml#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/user.yaml#/components/schemas/UserResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '409':
+          description: Email conflict
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: Email already in use
+                code: EMAIL_CONFLICT
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /users/{id}/role:
+    put:
+      tags: [Users]
+      summary: Change user role
+      description: Change user role (admin only). Cannot change your own role.
+      operationId: updateUserRole
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/user.yaml#/components/schemas/UpdateUserRoleRequest'
+      responses:
+        '200':
+          description: User role updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/user.yaml#/components/schemas/UserResponse'
+        '400':
+          description: Cannot modify self or validation error
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/Error'
+              examples:
+                cannotModifySelf:
+                  value:
+                    error: Cannot change your own role
+                    code: CANNOT_MODIFY_SELF
+                validation:
+                  value:
+                    error: Invalid request data
+                    code: VALIDATION_ERROR
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  # ========================================
+  # Document Endpoints
+  # ========================================
+
+  /documents/upload:
+    post:
+      tags: [Documents]
+      summary: Upload source document
+      description: |
+        Upload a source document (PDF, Word, etc.) for analysis and use in demand letters.
+        Maximum file size: 50MB.
+      operationId: uploadDocument
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Document file to upload (PDF, DOCX, TXT)
+      responses:
+        '201':
+          description: Document uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/document.yaml#/components/schemas/DocumentUploadResponse'
+        '400':
+          description: No file provided or invalid file type
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: No file provided
+                message: Please upload a file
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: File too large
+                message: Maximum file size is 50MB
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /documents:
+    get:
+      tags: [Documents]
+      summary: List documents
+      description: List all documents for the authenticated user's firm
+      operationId: listDocuments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: uploadedBy
+          in: query
+          description: Filter by uploader user ID
+          schema:
+            type: string
+            format: uuid
+        - name: fileType
+          in: query
+          description: Filter by file type (MIME type)
+          schema:
+            type: string
+        - $ref: './src/docs/schemas/common.yaml#/components/parameters/LimitQueryParam'
+        - $ref: './src/docs/schemas/common.yaml#/components/parameters/OffsetQueryParam'
+      responses:
+        '200':
+          description: Documents retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/document.yaml#/components/schemas/DocumentListResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /documents/{id}:
+    get:
+      tags: [Documents]
+      summary: Get document metadata
+      description: Get metadata for a specific document
+      operationId: getDocument
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Document metadata retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/document.yaml#/components/schemas/DocumentResponse'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+    delete:
+      tags: [Documents]
+      summary: Delete document
+      description: Delete a document (marks as deleted, actual file removed later)
+      operationId: deleteDocument
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Document deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/SuccessMessage'
+              example:
+                message: Document deleted successfully
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /documents/{id}/download:
+    get:
+      tags: [Documents]
+      summary: Get document download URL
+      description: Get a pre-signed URL to download the document (valid for 1 hour)
+      operationId: getDocumentDownloadUrl
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Download URL generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/document.yaml#/components/schemas/DocumentDownloadResponse'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  # ========================================
+  # Template Endpoints
+  # ========================================
+
+  /templates:
+    get:
+      tags: [Templates]
+      summary: List templates
+      description: List all demand letter templates for the authenticated user's firm
+      operationId: listTemplates
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          description: Filter by template category
+          schema:
+            type: string
+        - name: isActive
+          in: query
+          description: Filter by active status
+          schema:
+            type: boolean
+        - $ref: './src/docs/schemas/common.yaml#/components/parameters/LimitQueryParam'
+        - $ref: './src/docs/schemas/common.yaml#/components/parameters/OffsetQueryParam'
+      responses:
+        '200':
+          description: Templates retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/template.yaml#/components/schemas/TemplateListResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+    post:
+      tags: [Templates]
+      summary: Create template
+      description: Create a new demand letter template (admin only)
+      operationId: createTemplate
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/template.yaml#/components/schemas/CreateTemplateRequest'
+      responses:
+        '201':
+          description: Template created successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/template.yaml#/components/schemas/TemplateResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /templates/{id}:
+    get:
+      tags: [Templates]
+      summary: Get template details
+      description: Get details of a specific template
+      operationId: getTemplate
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Template ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Template retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/template.yaml#/components/schemas/TemplateResponse'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+    put:
+      tags: [Templates]
+      summary: Update template
+      description: Update an existing template (admin only). Creates a new version.
+      operationId: updateTemplate
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Template ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/template.yaml#/components/schemas/UpdateTemplateRequest'
+      responses:
+        '200':
+          description: Template updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/template.yaml#/components/schemas/TemplateResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+    delete:
+      tags: [Templates]
+      summary: Delete template
+      description: Delete a template (admin only). Marks template as inactive.
+      operationId: deleteTemplate
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Template ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Template deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/SuccessMessage'
+              example:
+                message: Template deleted successfully
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /templates/{id}/versions:
+    get:
+      tags: [Templates]
+      summary: Get template version history
+      description: Get all versions of a template
+      operationId: getTemplateVersions
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Template ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Template versions retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/template.yaml#/components/schemas/TemplateVersionsResponse'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /templates/{id}/rollback:
+    post:
+      tags: [Templates]
+      summary: Rollback template to previous version
+      description: Rollback template to a previous version (admin only)
+      operationId: rollbackTemplate
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Template ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/template.yaml#/components/schemas/RollbackTemplateRequest'
+      responses:
+        '200':
+          description: Template rolled back successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/template.yaml#/components/schemas/TemplateResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  # ========================================
+  # Demand Letter Endpoints
+  # ========================================
+
+  /demand-letters:
+    get:
+      tags: [Demand Letters]
+      summary: List demand letters
+      description: List all demand letters for the authenticated user's firm
+      operationId: listDemandLetters
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [draft, analyzing, generating, refining, complete, archived]
+        - name: createdBy
+          in: query
+          description: Filter by creator user ID
+          schema:
+            type: string
+            format: uuid
+        - name: templateId
+          in: query
+          description: Filter by template ID
+          schema:
+            type: string
+            format: uuid
+        - $ref: './src/docs/schemas/common.yaml#/components/parameters/LimitQueryParam'
+        - $ref: './src/docs/schemas/common.yaml#/components/parameters/OffsetQueryParam'
+      responses:
+        '200':
+          description: Demand letters retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/demand-letter.yaml#/components/schemas/DemandLetterListResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+    post:
+      tags: [Demand Letters]
+      summary: Create demand letter
+      description: Create a new demand letter. Initial status is 'draft'.
+      operationId: createDemandLetter
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/demand-letter.yaml#/components/schemas/CreateDemandLetterRequest'
+      responses:
+        '201':
+          description: Demand letter created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Demand letter created successfully
+                  letter:
+                    $ref: './src/docs/schemas/demand-letter.yaml#/components/schemas/DemandLetterResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /demand-letters/{id}:
+    get:
+      tags: [Demand Letters]
+      summary: Get demand letter details
+      description: Get details of a specific demand letter
+      operationId: getDemandLetter
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Demand letter ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Demand letter retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/demand-letter.yaml#/components/schemas/DemandLetterResponse'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+    put:
+      tags: [Demand Letters]
+      summary: Update demand letter
+      description: Update demand letter metadata (title, associated documents)
+      operationId: updateDemandLetter
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Demand letter ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Updated title
+                documentIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '200':
+          description: Demand letter updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/demand-letter.yaml#/components/schemas/DemandLetterResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+    delete:
+      tags: [Demand Letters]
+      summary: Delete demand letter
+      description: Delete a demand letter (soft delete - marks as archived)
+      operationId: deleteDemandLetter
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Demand letter ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Demand letter deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/common.yaml#/components/schemas/SuccessMessage'
+              example:
+                message: Demand letter deleted successfully
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /demand-letters/{id}/analyze:
+    post:
+      tags: [Demand Letters]
+      summary: Analyze documents
+      description: |
+        Trigger AI analysis of associated documents to extract structured data.
+        This is an asynchronous operation. Use GET /demand-letters/{id}/status to check progress.
+      operationId: analyzeDemandLetter
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Demand letter ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/demand-letter.yaml#/components/schemas/AnalyzeDemandLetterRequest'
+      responses:
+        '202':
+          description: Analysis started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Document analysis started
+                  status:
+                    type: string
+                    example: analyzing
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /demand-letters/{id}/generate:
+    post:
+      tags: [Demand Letters]
+      summary: Generate letter draft
+      description: |
+        Generate initial demand letter draft using AI and selected template.
+        This is an asynchronous operation. Use GET /demand-letters/{id}/status to check progress.
+      operationId: generateDemandLetter
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Demand letter ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/demand-letter.yaml#/components/schemas/GenerateDemandLetterRequest'
+      responses:
+        '202':
+          description: Generation started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Letter generation started
+                  status:
+                    type: string
+                    example: generating
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /demand-letters/{id}/refine:
+    post:
+      tags: [Demand Letters]
+      summary: Refine letter with feedback
+      description: |
+        Refine the demand letter based on user feedback using AI.
+        This is an asynchronous operation. Use GET /demand-letters/{id}/status to check progress.
+      operationId: refineDemandLetter
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Demand letter ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/demand-letter.yaml#/components/schemas/RefineDemandLetterRequest'
+      responses:
+        '202':
+          description: Refinement started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Letter refinement started
+                  status:
+                    type: string
+                    example: refining
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /demand-letters/{id}/status:
+    get:
+      tags: [Demand Letters]
+      summary: Get workflow status
+      description: Get current status of the demand letter workflow (analyzing, generating, refining)
+      operationId: getDemandLetterStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Demand letter ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/demand-letter.yaml#/components/schemas/DemandLetterStatusResponse'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /demand-letters/{id}/history:
+    get:
+      tags: [Demand Letters]
+      summary: Get revision history
+      description: Get all revisions of the demand letter
+      operationId: getDemandLetterHistory
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Demand letter ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Revision history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/demand-letter.yaml#/components/schemas/DemandLetterRevisionHistoryResponse'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+  /demand-letters/{id}/export:
+    post:
+      tags: [Demand Letters]
+      summary: Export demand letter
+      description: Export demand letter to Word (.docx) or PDF format
+      operationId: exportDemandLetter
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Demand letter ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './src/docs/schemas/demand-letter.yaml#/components/schemas/ExportDemandLetterRequest'
+      responses:
+        '200':
+          description: Export completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: './src/docs/schemas/demand-letter.yaml#/components/schemas/ExportDemandLetterResponse'
+        '400':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: './src/docs/schemas/common.yaml#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      $ref: './src/docs/schemas/common.yaml#/components/securitySchemes/BearerAuth'
