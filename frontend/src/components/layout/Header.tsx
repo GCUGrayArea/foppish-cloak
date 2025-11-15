@@ -2,9 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../ui/Button';
+import { HelpButton } from '../help/HelpButton';
 import styles from './Header.module.css';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  onHelpClick?: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onHelpClick }) => {
   const { user, logout } = useAuth();
 
   const handleLogout = async () => {
@@ -29,6 +34,11 @@ export const Header: React.FC = () => {
             </span>
             <span className={styles.userRole}>{user?.role}</span>
           </div>
+          {onHelpClick && (
+            <div data-tour="help">
+              <HelpButton onClick={onHelpClick} />
+            </div>
+          )}
           <Button
             variant="ghost"
             size="sm"
