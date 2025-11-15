@@ -51,6 +51,7 @@
   background: #fef3c7;
   border-radius: 4px;
 }
+.typingIndicatorContainer {  padding: 8px 16px;  border-bottom: 1px solid #e5e7eb;  background: #ffffff;}
 
 .editorContainer {
   position: relative;

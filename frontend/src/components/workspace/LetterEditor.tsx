@@ -1,17 +1,25 @@
 /**
  * LetterEditor Component
  *
- * Rich text editor for demand letter content with real-time updates
+ * Rich text editor for demand letter content with optional real-time collaboration
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '../ui/Button';
+import { CollaborativeEditor } from '../editor/CollaborativeEditor';
+import { PresenceList } from '../editor/PresenceList';
+import { TypingIndicator } from '../editor/TypingIndicator';
+import { OfflineIndicator } from '../editor/OfflineIndicator';
+import { useCollaboration } from '../../hooks/useCollaboration';
+import { useAuth } from '../../hooks/useAuth';
 import styles from './LetterEditor.module.css';
 
 export interface LetterEditorProps {
+  letterId: string;
   content: string;
   isGenerating?: boolean;
   isRefining?: boolean;
+  enableCollaboration?: boolean;
   onContentChange?: (content: string) => void;
   onSave?: () => void;
   onGenerate?: () => void;
@@ -19,16 +27,29 @@ export interface LetterEditorProps {
 }
 
 export const LetterEditor: React.FC<LetterEditorProps> = ({
+  letterId,
   content,
   isGenerating = false,
   isRefining = false,
+  enableCollaboration = true,
   onContentChange,
   onSave,
   onGenerate,
   onExport,
 }) => {
+  const { user } = useAuth();
   const [localContent, setLocalContent] = useState(content);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Collaboration hook (only if enabled and user is authenticated)
+  const collaboration = enableCollaboration && user
+    ? useCollaboration({
+        letterId,
+        userId: user.id,
+        userName: `${user.firstName} ${user.lastName}`,
+        autoConnect: true,
+      })
+    : null;
 
   useEffect(() => {
     setLocalContent(content);
@@ -48,6 +69,17 @@ export const LetterEditor: React.FC<LetterEditorProps> = ({
     [onContentChange]
   );
 
+  const handleContentChange = useCallback(
+    (newContent: string) => {
+      setLocalContent(newContent);
+
+      if (onContentChange) {
+        onContentChange(newContent);
+      }
+    },
+    [onContentChange]
+  );
+
   const handleSave = useCallback(() => {
     if (onSave) {
       onSave();
@@ -55,8 +87,13 @@ export const LetterEditor: React.FC<LetterEditorProps> = ({
     }
   }, [onSave]);
 
-  const wordCount = localContent.trim().split(/\s+/).filter(Boolean).length;
+  const handleReconnect = useCallback(() => {
+    if (collaboration) {
+      collaboration.connect();
+    }
+  }, [collaboration]);
 
+  const wordCount = localContent.trim().split(/\s+/).filter(Boolean).length;
   const isProcessing = isGenerating || isRefining;
 
   return (
@@ -67,12 +104,29 @@ export const LetterEditor: React.FC<LetterEditorProps> = ({
           {wordCount > 0 && (
             <span className={styles.wordCount}>{wordCount} words</span>
           )}
-          {hasUnsavedChanges && (
+          {!enableCollaboration && hasUnsavedChanges && (
             <span className={styles.unsavedIndicator}>Unsaved changes</span>
           )}
         </div>
         <div className={styles.headerRight}>
-          {onSave && (
+          {/* Collaboration indicators */}
+          {enableCollaboration && collaboration && (
+            <>
+              <OfflineIndicator
+                status={collaboration.status}
+                error={collaboration.error}
+                onReconnect={handleReconnect}
+              />
+              <PresenceList
+                users={collaboration.activeUsers}
+                currentUserId={user?.id || ''}
+                currentUserName={user ? `${user.firstName} ${user.lastName}` : 'You'}
+              />
+            </>
+          )}
+
+          {/* Action buttons */}
+          {onSave && !enableCollaboration && (
             <Button
               variant="outline"
               size="sm"
@@ -98,6 +152,18 @@ export const LetterEditor: React.FC<LetterEditorProps> = ({
           )}
         </div>
       </div>
+
+      {/* Typing indicators */}
+      {enableCollaboration && collaboration && collaboration.activeUsers.length > 0 && (
+        <div className={styles.typingIndicatorContainer}>
+          <TypingIndicator
+            users={collaboration.activeUsers}
+            currentUserId={user?.id || ''}
+          />
+        </div>
+      )}
+
+      {/* Editor container */}
       <div className={styles.editorContainer}>
         {isProcessing && (
           <div className={styles.processingOverlay}>
@@ -109,13 +175,27 @@ export const LetterEditor: React.FC<LetterEditorProps> = ({
             </p>
           </div>
         )}
-        <textarea
-          className={styles.editor}
-          value={localContent}
-          onChange={handleChange}
-          placeholder="Your demand letter will appear here. Click 'Generate' to create an initial draft based on the analyzed documents."
-          disabled={isProcessing}
-        />
+
+        {/* Collaborative editor or standard textarea */}
+        {enableCollaboration && user ? (
+          <CollaborativeEditor
+            letterId={letterId}
+            userId={user.id}
+            userName={`${user.firstName} ${user.lastName}`}
+            initialContent={content}
+            placeholder="Your demand letter will appear here. Click 'Generate' to create an initial draft based on the analyzed documents."
+            disabled={isProcessing}
+            onContentChange={handleContentChange}
+          />
+        ) : (
+          <textarea
+            className={styles.editor}
+            value={localContent}
+            onChange={handleChange}
+            placeholder="Your demand letter will appear here. Click 'Generate' to create an initial draft based on the analyzed documents."
+            disabled={isProcessing}
+          />
+        )}
       </div>
     </div>
   );

@@ -1,0 +1,84 @@
+/**
+ * OfflineIndicator Styles
+ */
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  transition: all 0.3s;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon {
+  font-size: 14px;
+}
+
+.text {
+  font-weight: 500;
+}
+
+/* Status-specific styles */
+.disconnected {
+  background-color: #ffebee;
+  border: 1px solid #ef5350;
+  color: #c62828;
+}
+
+.connecting {
+  background-color: #fff3e0;
+  border: 1px solid #ffa726;
+  color: #e65100;
+}
+
+.connected {
+  background-color: #e8f5e9;
+  border: 1px solid #66bb6a;
+  color: #2e7d32;
+}
+
+.syncing {
+  background-color: #e3f2fd;
+  border: 1px solid #42a5f5;
+  color: #1565c0;
+}
+
+.syncing .icon {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.synced {
+  background-color: #e8f5e9;
+  border: 1px solid #4CAF50;
+  color: #2e7d32;
+}
+
+.errorMessage {
+  font-size: 11px;
+  color: #c62828;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reconnectButton {
+  margin-left: 8px;
+}

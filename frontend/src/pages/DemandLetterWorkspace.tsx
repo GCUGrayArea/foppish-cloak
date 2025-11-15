@@ -145,6 +145,7 @@ export const DemandLetterWorkspace: React.FC = () => {
 
         <div className={styles.centerColumn}>
           <LetterEditor
+            letterId={id}
             content={letter.currentContent || ''}
             isGenerating={isGenerating}
             isRefining={isRefining}
