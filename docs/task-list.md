@@ -4445,7 +4445,8 @@ Essential for user onboarding and reducing support burden. Legal professionals m
 ---
 
 ### PR-027: API Documentation (OpenAPI/Swagger)
-**Status:** Blocked-Ready
+**Status:** In Progress
+**Agent:** Pink (2025-11-14)
 **Dependencies:** PR-004✅, PR-005✅, PR-006✅, PR-007✅, PR-012✅, PR-013✅
 **Priority:** Medium
 
