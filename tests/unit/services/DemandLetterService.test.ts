@@ -76,19 +76,25 @@ describe('DemandLetterService', () => {
       mockDemandLetterModel.create.mockResolvedValue(mockLetter);
       mockDemandLetterModel.findById.mockResolvedValue(mockLetter);
 
-      // Mock DocumentService.getDocumentById for associateDocuments
-      const { DocumentService } = require('../../../services/api/src/services/DocumentService');
-      DocumentService.prototype.getDocumentById = jest.fn().mockResolvedValue({
+      // Mock DocumentService
+      const DocumentService = require('../../../services/api/src/services/DocumentService').DocumentService;
+      const mockGetDocumentById = jest.fn().mockResolvedValue({
         id: 'doc-1',
         filename: 'test.pdf',
         fileType: 'application/pdf',
       });
+      DocumentService.mockImplementation(() => ({
+        getDocumentById: mockGetDocumentById,
+      }));
 
       // Mock pool.query for document association
       const mockPool = require('../../../services/api/src/db/connection').pool;
       mockPool.query.mockResolvedValue({ rows: [] });
 
-      await service.createDemandLetter(
+      // Create new service instance with mocked DocumentService
+      const testService = new DemandLetterService();
+
+      await testService.createDemandLetter(
         {
           title: 'Test Letter',
           documentIds: ['doc-1', 'doc-2'],
@@ -97,7 +103,7 @@ describe('DemandLetterService', () => {
         'user-123'
       );
 
-      expect(DocumentService.prototype.getDocumentById).toHaveBeenCalled();
+      expect(mockGetDocumentById).toHaveBeenCalled();
     });
   });
 
@@ -191,6 +197,10 @@ describe('DemandLetterService', () => {
       };
 
       mockDemandLetterModel.findById.mockResolvedValue(mockLetter);
+
+      // Mock pool.query for document count
+      const mockPool = require('../../../services/api/src/db/connection').pool;
+      mockPool.query.mockResolvedValue({ rows: [{ count: '2' }] });
 
       const status = await service.getWorkflowStatus('letter-123', 'firm-123');
 
