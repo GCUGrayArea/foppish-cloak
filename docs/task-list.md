@@ -3752,35 +3752,70 @@ P1 (should-have) feature. Can be deferred if timeline is tight. Requires WebSock
 ---
 
 ### PR-020: Collaboration UI Integration
-**Status:** New
-**Dependencies:** PR-014, PR-018, PR-019
-**Priority:** Medium
+**Status:** Blocked-Ready
+**Dependencies:** PR-014✅, PR-018✅, PR-019✅
+**Priority:** Medium (P1 - Should-have)
+
+**Planning Status:** COMPLETE
+**Planned by:** Agent White (2025-11-14)
 
 **Description:**
-Integrate Yjs into React editor for real-time collaborative editing. Show user cursors, selections, and presence indicators.
+Integrate Yjs into React editor for real-time collaborative editing. Show user cursors, selections, and presence indicators. Connect frontend to existing collaboration WebSocket backend.
 
-**Files (ESTIMATED - will be refined during Planning):**
-- frontend/src/lib/collaboration/yjs-provider.ts (create)
-- frontend/src/lib/collaboration/awareness-hooks.ts (create)
-- frontend/src/components/editor/CollaborativeEditor.tsx (create)
-- frontend/src/components/editor/UserCursor.tsx (create)
-- frontend/src/components/editor/PresenceList.tsx (create)
-- frontend/src/hooks/useCollaboration.ts (create)
-- frontend/src/tests/CollaborativeEditor.test.tsx (create)
+**Files (VERIFIED during Planning - 12 files):**
+- frontend/src/lib/collaboration/yjs-provider.ts (create) - Yjs WebSocket provider setup
+- frontend/src/lib/collaboration/awareness-hooks.ts (create) - React hooks for awareness
+- frontend/src/hooks/useCollaboration.ts (create) - Main collaboration hook
+- frontend/src/components/editor/CollaborativeEditor.tsx (create) - Yjs-enabled editor component
+- frontend/src/components/editor/UserCursor.tsx (create) - Remote cursor indicator
+- frontend/src/components/editor/PresenceList.tsx (create) - Active users list
+- frontend/src/components/editor/TypingIndicator.tsx (create) - "User is typing..." indicator
+- frontend/src/components/editor/OfflineIndicator.tsx (create) - Connection status indicator
+- frontend/src/components/editor/ConflictDialog.tsx (create) - Conflict resolution UI (optional)
+- frontend/src/types/collaboration.ts (create) - TypeScript types
+- frontend/package.json (modify) - Add yjs, y-websocket, y-protocols dependencies
+- frontend/src/components/workspace/LetterEditor.tsx (modify) - Integrate CollaborativeEditor
+- frontend/src/tests/components/editor/CollaborativeEditor.test.tsx (create) - Component tests with mocked WebSocket
+
+**Technology Decisions:**
+- **Yjs:** ^13.6.10 (CRDT library - match backend version)
+- **y-websocket:** ^1.5.0 (WebSocket provider - match backend)
+- **y-protocols:** ^1.0.6 (Awareness protocol utilities)
+- **Editor Integration:** Textarea-based synchronization (can enhance with rich text later)
+- **Connection Management:** Auto-reconnect with exponential backoff
+- **Offline Queue:** Store changes in IndexedDB when disconnected
+
+**Implementation Strategy:**
+1. **Phase 1: Basic Sync** - Install Yjs, create WebSocket provider, sync textarea content
+2. **Phase 2: Awareness** - Implement presence hooks, PresenceList component
+3. **Phase 3: Cursors and Typing** - Track cursor positions, render remote cursors, typing indicators
+4. **Phase 4: Offline Support** - Handle connection loss, queue changes, sync on reconnect
+5. **Phase 5: Optional Features** - Conflict resolution dialog, document locking UI
 
 **Acceptance Criteria:**
-- [ ] Real-time text editing synchronized across users
-- [ ] User cursors and selections visible
-- [ ] User presence list showing active collaborators
-- [ ] User names/avatars in presence indicators
+- [ ] Real-time text editing synchronized across users (<100ms latency)
+- [ ] User cursors and selections visible with color coding
+- [ ] User presence list showing active collaborators with names
+- [ ] Typing indicators ("User X is typing...")
 - [ ] Offline support (queue changes, sync when reconnected)
-- [ ] Conflict-free editing experience
-- [ ] Performance: <100ms sync latency
-- [ ] Graceful handling of connection loss
+- [ ] Connection status indicator (connected/disconnected/syncing)
+- [ ] Conflict-free editing experience (Yjs handles automatically)
+- [ ] Graceful handling of connection loss with auto-reconnect
 - [ ] Component tests (mocked WebSocket)
+- [ ] Performance: <100ms sync latency for typical edits
+- [ ] Document locking UI (optional - if time permits)
+- [ ] Comments/mentions UI (out of scope - future PR)
+
+**Time Estimate:** 420 minutes (7 hours)
+
+**Risks:**
+- Yjs integration complexity with React state management
+- WebSocket connection stability on AWS API Gateway
+- Performance with large documents
+- Browser compatibility (especially cursor rendering)
 
 **Notes:**
-Requires careful UX design to avoid overwhelming users with presence indicators.
+Backend collaboration service (PR-019) is complete. E2E tests exist showing expected features. Current LetterEditor uses simple textarea that needs Yjs integration.
 
 ---
 
@@ -4323,63 +4358,215 @@ Essential for team collaboration and reliable deployments.
 ---
 
 ### PR-026: User Documentation and Help System
-**Status:** New
-**Dependencies:** PR-015, PR-016, PR-017, PR-018
+**Status:** Blocked-Ready
+**Dependencies:** PR-015✅, PR-016✅, PR-017✅, PR-018✅
 **Priority:** Medium
 
-**Description:**
-Create user-facing documentation including getting started guide, feature documentation, and in-app help system.
+**Planning Status:** COMPLETE
+**Planned by:** Agent White (2025-11-14)
 
-**Files (ESTIMATED - will be refined during Planning):**
-- docs/user-guide.md (create)
-- docs/getting-started.md (create)
-- docs/templates-guide.md (create)
-- docs/faq.md (create)
-- frontend/src/components/help/HelpPanel.tsx (create)
-- frontend/src/components/help/Tooltip.tsx (create)
-- frontend/public/videos/ (create directory) - tutorial videos
+**Description:**
+Create user-facing documentation including getting started guide, feature documentation, in-app help system with tooltips, help panel, and guided tour for first-time users.
+
+**Files (VERIFIED during Planning - 18 files + assets):**
+
+**Documentation Files (Markdown):**
+- docs/user/index.md (create) - Documentation home/table of contents
+- docs/user/getting-started.md (create) - Quick start guide for new users
+- docs/user/authentication.md (create) - Registration, login, password reset
+- docs/user/firm-management.md (create) - Managing firm settings and users
+- docs/user/document-upload.md (create) - Uploading and managing source documents
+- docs/user/templates.md (create) - Creating and editing demand letter templates
+- docs/user/demand-letters.md (create) - Complete demand letter workflow
+- docs/user/collaboration.md (create) - Real-time collaboration features
+- docs/user/export.md (create) - Exporting to Word/PDF
+- docs/user/faq.md (create) - Frequently asked questions
+- docs/user/troubleshooting.md (create) - Common issues and solutions
+- docs/user/keyboard-shortcuts.md (create) - Keyboard shortcuts reference
+
+**Frontend Components:**
+- frontend/src/components/help/HelpButton.tsx (create) - Global help button (? icon)
+- frontend/src/components/help/HelpPanel.tsx (create) - Sliding help panel
+- frontend/src/components/help/Tooltip.tsx (create) - Contextual tooltips
+- frontend/src/components/help/GuidedTour.tsx (create) - First-time user walkthrough
+- frontend/src/hooks/useHelpPanel.ts (create) - Help panel state management
+
+**Assets:**
+- docs/user/images/ (create directory) - 20+ screenshots and diagrams
+
+**Modified Files:**
+- frontend/src/components/layout/Header.tsx (modify) - Add help button to header
+- frontend/src/App.tsx (modify) - Add HelpPanel to root layout
+
+**Technology Decisions:**
+- **Documentation Format:** Markdown for easy editing and version control
+- **Images:** PNG screenshots with annotations, SVG diagrams
+- **Help Panel:** Slide-in panel from right side, keyboard accessible (? key)
+- **Tooltips:** Radix UI Tooltip (already in dependencies)
+- **Guided Tour:** Custom implementation using Context API for tour state
+- **Search:** Client-side search through documentation (lunr.js or similar)
+- **Video Tutorials:** Optional - defer to future if time constrained
+
+**Documentation Content Strategy:**
+1. **Getting Started Guide:** 10-minute walkthrough (account creation → first letter)
+2. **Feature Documentation:** Dedicated page for each major feature
+3. **FAQ:** 15+ common questions covering auth, templates, exports, billing
+4. **Screenshots:** 20+ annotated images showing key UI screens
+5. **Keyboard Shortcuts:** Comprehensive reference for power users
 
 **Acceptance Criteria:**
-- [ ] Getting started guide for new users
-- [ ] Feature documentation for each major feature
-- [ ] Template creation guide with examples
-- [ ] FAQ covering common questions
-- [ ] In-app help tooltips for key UI elements
-- [ ] Contextual help panel accessible from workspace
-- [ ] Screenshots and diagrams for clarity
-- [ ] Video tutorials for complex workflows (optional)
+- [ ] Getting started guide (complete workflow in <10 min)
+- [ ] Feature documentation for all major features (auth, docs, templates, letters, export)
+- [ ] Template creation guide with variable syntax examples
+- [ ] FAQ covering 15+ common questions
+- [ ] Troubleshooting guide for common issues
+- [ ] In-app help button accessible from all pages
+- [ ] Contextual help tooltips for 20+ key UI elements
+- [ ] Help panel with searchable documentation
+- [ ] Guided tour for first-time users
+- [ ] Screenshots and diagrams for visual clarity (20+ images)
+- [ ] Keyboard shortcuts reference
+- [ ] Video tutorials (optional - future enhancement)
+
+**Time Estimate:** 360 minutes (6 hours)
+- Writing documentation content: 180 min
+- Creating screenshots and diagrams: 60 min
+- Help panel component: 40 min
+- Tooltip implementation: 30 min
+- Guided tour component: 40 min
+- Integration and testing: 10 min
+
+**Screenshot Requirements:**
+Login, registration, dashboard, document upload, template editor, variable inserter, workspace, generation in progress, export options, user management, firm settings, collaboration indicators (20+ total with annotations)
 
 **Notes:**
-Can be developed in parallel with features as they're completed.
+Essential for user onboarding and reducing support burden. Legal professionals may not be technically sophisticated.
 
 ---
 
 ### PR-027: API Documentation (OpenAPI/Swagger)
-**Status:** New
-**Dependencies:** PR-004, PR-005, PR-006, PR-007, PR-012, PR-013
+**Status:** Blocked-Ready
+**Dependencies:** PR-004✅, PR-005✅, PR-006✅, PR-007✅, PR-012✅, PR-013✅
 **Priority:** Medium
 
-**Description:**
-Generate comprehensive API documentation using OpenAPI 3.0 specification with interactive Swagger UI.
+**Planning Status:** COMPLETE
+**Planned by:** Agent White (2025-11-14)
 
-**Files (ESTIMATED - will be refined during Planning):**
-- services/api/openapi.yaml (create) - OpenAPI spec
-- services/api/src/docs/swagger.ts (create) - Swagger UI setup
-- services/api/src/routes/docs.ts (create) - serve documentation
-- scripts/generate-api-docs.sh (create)
+**Description:**
+Generate comprehensive API documentation using OpenAPI 3.0 specification with interactive Swagger UI. Document all 33 API endpoints with request/response schemas, authentication requirements, and code examples.
+
+**Files (VERIFIED during Planning - 15 files):**
+
+**OpenAPI Specification:**
+- services/api/openapi.yaml (create) - Main OpenAPI 3.0 spec
+- services/api/src/docs/schemas/auth.yaml (create) - Auth-related schemas
+- services/api/src/docs/schemas/firm.yaml (create) - Firm-related schemas
+- services/api/src/docs/schemas/user.yaml (create) - User-related schemas
+- services/api/src/docs/schemas/document.yaml (create) - Document schemas
+- services/api/src/docs/schemas/template.yaml (create) - Template schemas
+- services/api/src/docs/schemas/demand-letter.yaml (create) - Demand letter schemas
+- services/api/src/docs/schemas/common.yaml (create) - Common/shared schemas (errors, pagination)
+
+**Swagger UI Setup:**
+- services/api/src/docs/swagger.ts (create) - Swagger UI configuration
+- services/api/src/routes/docs.ts (create) - Serve documentation at /api/docs
+- services/api/src/docs/swagger-theme.css (create) - Custom Swagger UI styling
+
+**Documentation Generation:**
+- scripts/generate-api-docs.sh (create) - Validate and bundle OpenAPI spec
+- scripts/validate-openapi.js (create) - Validate spec against schema
+
+**SDK Generation:**
+- scripts/generate-clients.sh (create) - Generate TypeScript and Python SDKs
+- clients/typescript/ (create, add to .gitignore) - Generated TypeScript SDK
+
+**Modified Files:**
+- services/api/src/index.ts (modify) - Mount docs routes
+- services/api/package.json (modify) - Add openapi and swagger dependencies
+
+**Technology Decisions:**
+- **Spec Format:** OpenAPI 3.0.3 (not 3.1 - better tooling support)
+- **File Format:** YAML (more readable than JSON)
+- **Structure:** Split into multiple files for maintainability, bundle for serving
+- **Swagger UI:** ^5.0.0 (latest stable)
+- **Validation:** @apidevtools/swagger-parser for validation
+- **SDK Generation:** openapi-generator-cli (TypeScript, Python clients)
+- **Code Examples:** Include curl, JavaScript, Python examples
+- **Authentication:** JWT Bearer token clearly documented
+- **Try-It-Out:** Enabled in Swagger UI for easy testing
+
+**API Endpoints to Document (33 total):**
+
+**Authentication (6 endpoints):**
+- POST /auth/register, /auth/login, /auth/refresh, /auth/logout
+- POST /auth/forgot-password, /auth/reset-password
+
+**Firms (4 endpoints):**
+- GET /firms/current, PUT /firms/current
+- GET /firms/current/users, POST /firms/current/invitations
+
+**Users (5 endpoints):**
+- GET /users/me, PUT /users/me, PUT /users/me/password
+- GET /users, DELETE /users/:id
+
+**Documents (5 endpoints):**
+- GET /documents, POST /documents/upload
+- GET /documents/:id, GET /documents/:id/download, DELETE /documents/:id
+
+**Templates (6 endpoints):**
+- GET /templates, POST /templates
+- GET /templates/:id, PUT /templates/:id, DELETE /templates/:id
+- GET /templates/:id/versions
+
+**Demand Letters (7 endpoints):**
+- GET /demand-letters, POST /demand-letters
+- GET /demand-letters/:id, PUT /demand-letters/:id, DELETE /demand-letters/:id
+- POST /demand-letters/:id/generate, /demand-letters/:id/refine, /demand-letters/:id/export
+
+**Documentation Requirements Per Endpoint:**
+- Summary and description
+- Parameters (path, query, body)
+- Request body schema with examples
+- Response schemas (success and error cases)
+- Authentication requirements
+- Example requests and responses
+- Error codes and meanings
 
 **Acceptance Criteria:**
-- [ ] OpenAPI 3.0 specification for all endpoints
-- [ ] Request/response schemas documented
-- [ ] Authentication requirements documented
-- [ ] Error responses documented
+- [ ] OpenAPI 3.0.3 specification for all 33 endpoints
+- [ ] Request/response schemas documented with examples
+- [ ] Authentication requirements clearly documented
+- [ ] Error responses documented (400, 401, 403, 404, 500)
 - [ ] Interactive Swagger UI at /api/docs
-- [ ] Code examples for common operations
-- [ ] Try-it-out functionality in Swagger UI
-- [ ] Generated client SDKs (TypeScript, Python)
+- [ ] Code examples for common operations (curl, JavaScript, Python)
+- [ ] Try-it-out functionality in Swagger UI (with auth)
+- [ ] API validation script (catches spec errors)
+- [ ] Generated TypeScript client SDK
+- [ ] Generated Python client SDK
+- [ ] API documentation versioned in git
+- [ ] Custom Swagger UI theme matching app branding
+
+**Time Estimate:** 300 minutes (5 hours)
+- Writing OpenAPI specs (33 endpoints): 165 min (~5 min each)
+- Schemas and examples: 60 min
+- Swagger UI setup and customization: 30 min
+- SDK generation configuration: 20 min
+- Validation and testing: 15 min
+- Documentation and examples: 10 min
+
+**Implementation Strategy:**
+1. **Phase 1: Core Spec Structure** - Set up file structure, common schemas, configure Swagger UI
+2. **Phase 2: Document Endpoints by Group** - Auth (6), Firm/User (9), Document (5), Template (6), Demand Letter (7)
+3. **Phase 3: Enhancement** - Code examples, SDK generation, custom theme, validation scripts
+
+**Risks:**
+- Specs becoming outdated as API evolves (consider code annotations in future)
+- Manual maintenance burden
+- SDK generation may need manual tweaks
+- Authentication in Swagger UI try-it-out
 
 **Notes:**
-Essential for future integrations and third-party developers.
+Essential for frontend developers, future integrations, and third-party developers. All backend API services are complete.
 
 ---
 
